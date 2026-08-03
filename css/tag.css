@@ -288,6 +288,11 @@
 
 @media (max-width: 768px) {
   /* ---------- Header ---------- */
+  .screen {
+
+  padding: 18px 28px; /*check for mobile*/
+}
+
 
   .tag-header {
     margin-bottom: 20px;
@@ -301,7 +306,7 @@
   .tag-header p {
     font-size: 12px;
     line-height: 1.5;
-    max-width: 340px;
+    max-width: 380px;
   }
 
   /* ---------- Manage Button ---------- */
@@ -354,8 +359,8 @@
   .tag-menu {
     width: 250px;
 
-    top: 85px;
-    right: 45px;
+    top: 70px;
+    right: 35px;
 
     padding: 14px;
 
@@ -393,6 +398,8 @@
     grid-template-columns: repeat(auto-fill, minmax(90px, 1fr));
 
     gap: 18px;
+    margin-bottom: 30px;
+    
   }
 
   /* ---------- Tag ---------- */
