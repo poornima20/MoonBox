@@ -1,10 +1,10 @@
-/* HEADER */
+/* ==========================================================
+   Header
+   ========================================================== */
 
 .tag-header {
   display: flex;
-
   justify-content: space-between;
-
   align-items: flex-start;
 
   margin-bottom: 30px;
@@ -13,101 +13,134 @@
 }
 
 .tag-header h1 {
-  font-size: 58px;
-
+  font-size: 32px;
   margin-bottom: 10px;
+  color: var(--section-title-color);
 }
 
 .tag-header p {
-  color: #9c9c9c;
-
-  font-size: 18px;
+  color: var(--section-sub-title-color);
+  font-size: 13px;
 }
 
-/* SEARCH */
+/* ==========================================================
+   Search
+   ========================================================== */
 
 .tag-search {
-  height: 56px;
-
+  height: 48px;
   display: flex;
-
   align-items: center;
-
   gap: 14px;
-
-  padding: 0 20px;
-
+  padding: 0 16px;
   background: #111;
-
-  border-radius: 18px;
-
-  margin-bottom: 45px;
+  border-radius: 22px;
+  margin-bottom: 42px;
 
   border: 1px solid rgba(255, 255, 255, 0.06);
 }
 
 .tag-search input {
   flex: 1;
-
   background: none;
-
   border: none;
-
   outline: none;
-
   color: white;
-
-  font-size: 16px;
+  font-size: 15px;
+  font-family: var(--font-main);
 }
 
-/* MANAGE */
+/* ==========================================================
+   MANAGE BUTTON
+   ========================================================== */
 
 .tag-manage-button {
-  width: 52px;
-
   height: 52px;
+  padding: 0 18px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
 
   border: none;
-
-  background: #111;
-
   border-radius: 16px;
 
   cursor: pointer;
 
-  display: flex;
+  background: var(--gradient-nav);
+  border: 1px solid var(--border);
 
-  justify-content: center;
+  color: var(--text-muted);
 
-  align-items: center;
-
-  color: white;
-
-  border: 1px solid rgba(255, 255, 255, 0.06);
+  box-shadow: var(--shadow-nav);
 }
 
-/* POPUP */
+.tag-manage-button:hover {
+  background: var(--surface-hover);
+  color: var(--text);
+}
+
+.tag-manage-button svg {
+  width: 22px;
+  height: 22px;
+  color: var(--text-muted);
+
+  stroke-width: 2;
+}
+
+.tag-manage-button span {
+  font-size: 14px;
+  font-weight: 600;
+  font-family: var(--font-main);
+
+  color: inherit;
+  white-space: nowrap;
+}
+
+/* ==========================================================
+   Popup Menu
+   ========================================================== */
 
 .tag-menu {
   position: absolute;
 
-  right: 0;
+  top: 85px;
+  right: 45px;
 
-  top: 80px;
+  width: 290px;
 
-  width: 280px;
+  background: linear-gradient(180deg, #141414, #111111);
 
-  background: #121212;
+  border-radius: 24px;
 
-  border-radius: 22px;
+  border: 1px solid rgba(255, 255, 255, 0.06);
 
-  padding: 16px;
+  box-shadow:
+    0 25px 60px rgba(0, 0, 0, 0.55),
+    inset 0 1px rgba(255, 255, 255, 0.03);
+
+  padding: 18px;
 
   display: none;
 
-  border: 1px solid rgba(255, 255, 255, 0.07);
-
   z-index: 100;
+}
+
+.tag-menu-title {
+  font-size: 11px;
+  letter-spacing: 1.4px;
+  text-transform: uppercase;
+  color: #8b8b8b;
+  margin-bottom: 18px;
+  padding-left: 8px;
+  font-weight: 600;
+}
+
+.tag-divider {
+  height: 1px;
+  background: rgba(255, 255, 255, 0.06);
+  margin: 10px 0;
 }
 
 .tag-menu.show {
@@ -117,99 +150,293 @@
 .tag-menu button {
   width: 100%;
 
-  display: flex;
-
-  gap: 18px;
-
-  padding: 14px;
-
   border: none;
 
   background: none;
 
-  color: white;
+  display: flex;
 
-  text-align: left;
+  align-items: flex-start;
+
+  gap: 16px;
+
+  padding: 12px 8px;
 
   cursor: pointer;
 
   border-radius: 14px;
+
+  transition: 0.25s;
 }
 
 .tag-menu button:hover {
-  background: #1b1b1b;
+  background: rgba(255, 255, 255, 0.03);
 }
 
 .tag-menu small {
   display: block;
-
   color: #8d8d8d;
-
   margin-top: 3px;
 }
 
-/* GRID */
+.tag-menu button svg {
+  width: 18px;
+  height: 18px;
+
+  margin-top: 3px;
+  color: #f3f3f3;
+  stroke-width: 2;
+  flex-shrink: 0;
+}
+
+.tag-menu button div {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+.tag-menu button span {
+  font-size: 15px;
+  font-weight: 500;
+  color: #f2f2f2;
+}
+
+.tag-menu button small {
+  margin-top: 3px;
+  font-size: 12px;
+  color: #8d8d8d;
+}
+
+.tag-menu {
+  opacity: 0;
+
+  transform: translateY(10px) scale(0.98);
+
+  pointer-events: none;
+
+  transition:
+    opacity 0.18s,
+    transform 0.18s;
+}
+
+.tag-menu.show {
+  display: block;
+
+  opacity: 1;
+
+  transform: none;
+
+  pointer-events: auto;
+}
+
+/* ==========================================================
+   Popup Menu
+   ========================================================== */
 
 .tag-grid {
   display: grid;
 
   grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
 
-  gap: 30px;
+  gap: 22px;
 }
 
-/* TAG */
+/* ==========================================================
+   Popup Menu
+   ========================================================== */
 
 .tag {
   background: none;
-
   border: none;
-
   cursor: pointer;
-
   display: flex;
-
   flex-direction: column;
-
   align-items: center;
-
   gap: 14px;
-
   color: white;
 }
 
 .tag-circle {
   width: 96px;
-
   height: 96px;
 
   border-radius: 50%;
-
   background: #101010;
 
   border: 1px solid rgba(255, 255, 255, 0.06);
-
   display: flex;
-
   justify-content: center;
-
   align-items: center;
-
   transition: 0.3s;
 }
 
 .tag-circle svg {
   width: 34px;
-
   height: 34px;
 }
 
 .tag.selected .tag-circle {
   background: white;
-
   color: black;
-
   transform: scale(1.05);
-
   box-shadow: 0 0 25px rgba(255, 255, 255, 0.18);
+}
+
+/* ==========================================================
+   MOBILE RESPONSIVE
+   ========================================================== */
+
+@media (max-width: 768px) {
+  /* ---------- Header ---------- */
+
+  .tag-header {
+    margin-bottom: 20px;
+  }
+
+  .tag-header h1 {
+    font-size: 28px;
+    margin-bottom: 8px;
+  }
+
+  .tag-header p {
+    font-size: 12px;
+    line-height: 1.5;
+    max-width: 340px;
+  }
+
+  /* ---------- Manage Button ---------- */
+
+  .tag-manage-button {
+    width: 44px;
+    height: 44px;
+
+    padding: 0;
+
+    border-radius: 14px;
+  }
+
+  /* Hide text on mobile */
+
+  .tag-manage-button span {
+    display: none;
+  }
+
+  .tag-manage-button svg {
+    width: 20px;
+    height: 20px;
+  }
+
+  /* ---------- Search ---------- */
+
+  .tag-search {
+    height: 44px;
+
+    padding: 0 14px;
+
+    gap: 10px;
+
+    margin-bottom: 30px;
+
+    border-radius: 18px;
+  }
+
+  .tag-search svg {
+    width: 18px;
+    height: 18px;
+  }
+
+  .tag-search input {
+    font-size: 14px;
+  }
+
+  /* ---------- Popup ---------- */
+
+  .tag-menu {
+    width: 250px;
+
+    top: 85px;
+    right: 45px;
+
+    padding: 14px;
+
+    border-radius: 20px;
+  }
+
+  .tag-menu-title {
+    font-size: 10px;
+
+    margin-bottom: 14px;
+  }
+
+  .tag-menu button {
+    gap: 14px;
+
+    padding: 10px 6px;
+  }
+
+  .tag-menu button svg {
+    width: 17px;
+    height: 17px;
+  }
+
+  .tag-menu button span {
+    font-size: 14px;
+  }
+
+  .tag-menu button small {
+    font-size: 11px;
+  }
+
+  /* ---------- Grid ---------- */
+
+  .tag-grid {
+    grid-template-columns: repeat(auto-fill, minmax(90px, 1fr));
+
+    gap: 18px;
+  }
+
+  /* ---------- Tag ---------- */
+
+  .tag {
+    gap: 10px;
+  }
+
+  .tag-circle {
+    width: 82px;
+    height: 82px;
+  }
+
+  .tag-circle svg {
+    width: 28px;
+    height: 28px;
+  }
+
+  .tag span {
+    font-size: 13px;
+  }
+}
+
+/* ==========================================================
+   SMALL PHONES
+   ========================================================== */
+
+@media (max-width: 420px) {
+  .tag-grid {
+    grid-template-columns: repeat(3, 1fr);
+    gap: 16px;
+  }
+
+  .tag-circle {
+    width: 76px;
+    height: 76px;
+  }
+
+  .tag-circle svg {
+    width: 26px;
+    height: 26px;
+  }
+
+  .tag span {
+    font-size: 12px;
+  }
 }
