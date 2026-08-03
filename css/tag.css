@@ -1,0 +1,215 @@
+/* HEADER */
+
+.tag-header {
+  display: flex;
+
+  justify-content: space-between;
+
+  align-items: flex-start;
+
+  margin-bottom: 30px;
+
+  position: relative;
+}
+
+.tag-header h1 {
+  font-size: 58px;
+
+  margin-bottom: 10px;
+}
+
+.tag-header p {
+  color: #9c9c9c;
+
+  font-size: 18px;
+}
+
+/* SEARCH */
+
+.tag-search {
+  height: 56px;
+
+  display: flex;
+
+  align-items: center;
+
+  gap: 14px;
+
+  padding: 0 20px;
+
+  background: #111;
+
+  border-radius: 18px;
+
+  margin-bottom: 45px;
+
+  border: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.tag-search input {
+  flex: 1;
+
+  background: none;
+
+  border: none;
+
+  outline: none;
+
+  color: white;
+
+  font-size: 16px;
+}
+
+/* MANAGE */
+
+.tag-manage-button {
+  width: 52px;
+
+  height: 52px;
+
+  border: none;
+
+  background: #111;
+
+  border-radius: 16px;
+
+  cursor: pointer;
+
+  display: flex;
+
+  justify-content: center;
+
+  align-items: center;
+
+  color: white;
+
+  border: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+/* POPUP */
+
+.tag-menu {
+  position: absolute;
+
+  right: 0;
+
+  top: 80px;
+
+  width: 280px;
+
+  background: #121212;
+
+  border-radius: 22px;
+
+  padding: 16px;
+
+  display: none;
+
+  border: 1px solid rgba(255, 255, 255, 0.07);
+
+  z-index: 100;
+}
+
+.tag-menu.show {
+  display: block;
+}
+
+.tag-menu button {
+  width: 100%;
+
+  display: flex;
+
+  gap: 18px;
+
+  padding: 14px;
+
+  border: none;
+
+  background: none;
+
+  color: white;
+
+  text-align: left;
+
+  cursor: pointer;
+
+  border-radius: 14px;
+}
+
+.tag-menu button:hover {
+  background: #1b1b1b;
+}
+
+.tag-menu small {
+  display: block;
+
+  color: #8d8d8d;
+
+  margin-top: 3px;
+}
+
+/* GRID */
+
+.tag-grid {
+  display: grid;
+
+  grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+
+  gap: 30px;
+}
+
+/* TAG */
+
+.tag {
+  background: none;
+
+  border: none;
+
+  cursor: pointer;
+
+  display: flex;
+
+  flex-direction: column;
+
+  align-items: center;
+
+  gap: 14px;
+
+  color: white;
+}
+
+.tag-circle {
+  width: 96px;
+
+  height: 96px;
+
+  border-radius: 50%;
+
+  background: #101010;
+
+  border: 1px solid rgba(255, 255, 255, 0.06);
+
+  display: flex;
+
+  justify-content: center;
+
+  align-items: center;
+
+  transition: 0.3s;
+}
+
+.tag-circle svg {
+  width: 34px;
+
+  height: 34px;
+}
+
+.tag.selected .tag-circle {
+  background: white;
+
+  color: black;
+
+  transform: scale(1.05);
+
+  box-shadow: 0 0 25px rgba(255, 255, 255, 0.18);
+}

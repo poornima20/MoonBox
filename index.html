@@ -69,33 +69,83 @@
 
       <main class="workspace" id="workspace">
         <!-- ======================================================
-                            TAG SCREEN
+                    TAG SCREEN
         ======================================================= -->
 
         <section class="screen tag-screen">
-          <div class="screen-header">
-            <h1>Tags</h1>
+          <!-- Header -->
 
-            <p>
-              Tag page skeleton. Everything here will be replaced in Part 2.
-            </p>
+          <div class="tag-header">
+            <div>
+              <h1>Tags</h1>
+
+              <p>Choose one or more tags to shape your MoonBox.</p>
+            </div>
+
+            <!-- Manage -->
+
+            <button class="tag-manage-button" id="tagManageButton">
+              <i data-lucide="sliders-horizontal"></i>
+            </button>
           </div>
 
-          <div class="placeholder">
-            <div class="placeholder-card">Mood Tag</div>
+          <!-- Search -->
 
-            <div class="placeholder-card">Chill</div>
+          <div class="tag-search">
+            <i data-lucide="search"></i>
 
-            <div class="placeholder-card">Night</div>
-
-            <div class="placeholder-card">Rain</div>
-
-            <div class="placeholder-card">Lofi</div>
-
-            <div class="placeholder-card">Drive</div>
+            <input type="text" placeholder="Search tags..." id="tagSearch" />
           </div>
+
+          <!-- Popup -->
+
+          <div class="tag-menu" id="tagMenu">
+            <button>
+              <i data-lucide="plus"></i>
+
+              <div>
+                <span>Add Tag</span>
+
+                <small>Create new tag</small>
+              </div>
+            </button>
+
+            <button>
+              <i data-lucide="move"></i>
+
+              <div>
+                <span>Custom Order</span>
+
+                <small>Drag to reorder</small>
+              </div>
+            </button>
+
+            <button>
+              <i data-lucide="arrow-down-a-z"></i>
+
+              <div>
+                <span>Alphabetical</span>
+
+                <small>Sort A → Z</small>
+              </div>
+            </button>
+
+            <button>
+              <i data-lucide="pencil"></i>
+
+              <div>
+                <span>Edit Tags</span>
+
+                <small>Rename / Delete</small>
+              </div>
+            </button>
+          </div>
+
+          <!-- Tags -->
+
+          <div class="tag-grid" id="tagGrid"></div>
         </section>
-
+        
         <!-- ======================================================
                             LIBRARY SCREEN
         ======================================================= -->
