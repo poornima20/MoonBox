@@ -1,0 +1,197 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <title>MoonBox</title>
+
+    <!-- Navigation -->
+    <link rel="stylesheet" href="css/navigation.css" />
+
+    <!-- Individual Screens -->
+    <link rel="stylesheet" href="css/tag.css" />
+    <link rel="stylesheet" href="css/library.css" />
+    <link rel="stylesheet" href="css/player.css" />
+  </head>
+
+  <body>
+    <div class="app">
+      <!-- ==========================================================
+                            TOP NAVIGATION
+    =========================================================== -->
+
+      <header class="top-nav">
+        <!-- Logo -->
+
+        <div class="logo">
+          <img src="assets/moonboxlogo.png" alt="Moon Box Logo" />
+
+          <span>MoonBox</span>
+        </div>
+
+        <!-- Navigation -->
+
+        <nav class="nav-pill">
+          <button class="nav-button active" data-screen="0">
+            <i data-lucide="tags" class="icon"></i>
+
+            <span class="text">Tags</span>
+          </button>
+
+          <button class="nav-button" data-screen="1">
+            <i data-lucide="library-big" class="icon"></i>
+
+            <span class="text">Library</span>
+          </button>
+
+          <button class="nav-button" data-screen="2">
+            <i data-lucide="play-circle" class="icon"></i>
+
+            <span class="text">Player</span>
+          </button>
+
+          <!-- Sliding indicator -->
+
+          <div class="nav-indicator"></div>
+        </nav>
+
+        <!-- Folder -->
+
+        <button class="folder-button">
+          <i data-lucide="box"></i>
+        </button>
+      </header>
+
+      <!-- ==========================================================
+                        HORIZONTAL WORKSPACE
+    =========================================================== -->
+
+      <main class="workspace" id="workspace">
+        <!-- ======================================================
+                            TAG SCREEN
+        ======================================================= -->
+
+        <section class="screen tag-screen">
+          <div class="screen-header">
+            <h1>Tags</h1>
+
+            <p>
+              Tag page skeleton. Everything here will be replaced in Part 2.
+            </p>
+          </div>
+
+          <div class="placeholder">
+            <div class="placeholder-card">Mood Tag</div>
+
+            <div class="placeholder-card">Chill</div>
+
+            <div class="placeholder-card">Night</div>
+
+            <div class="placeholder-card">Rain</div>
+
+            <div class="placeholder-card">Lofi</div>
+
+            <div class="placeholder-card">Drive</div>
+          </div>
+        </section>
+
+        <!-- ======================================================
+                            LIBRARY SCREEN
+        ======================================================= -->
+
+        <section class="screen library-screen">
+          <div class="screen-header">
+            <h1>Library</h1>
+
+            <p>Placeholder library. Premium version comes in Part 3.</p>
+          </div>
+
+          <div class="library-placeholder">
+            <div class="song">
+              <div class="cover"></div>
+
+              <div class="info">
+                <h3>Moonlight</h3>
+
+                <span>Unknown Artist</span>
+              </div>
+
+              <span>3:21</span>
+            </div>
+
+            <div class="song">
+              <div class="cover"></div>
+
+              <div class="info">
+                <h3>Silent Orbit</h3>
+
+                <span>Unknown Artist</span>
+              </div>
+
+              <span>4:10</span>
+            </div>
+
+            <div class="song">
+              <div class="cover"></div>
+
+              <div class="info">
+                <h3>Lunar Dust</h3>
+
+                <span>Unknown Artist</span>
+              </div>
+
+              <span>2:58</span>
+            </div>
+          </div>
+        </section>
+
+        <!-- ======================================================
+                            PLAYER SCREEN
+        ======================================================= -->
+
+        <section class="screen player-screen">
+          <div class="screen-header">
+            <h1>Player</h1>
+
+            <p>Placeholder player. Real player comes in Part 4.</p>
+          </div>
+
+          <div class="player-placeholder">
+            <div class="album"></div>
+
+            <h2>Moon Song</h2>
+
+            <span>Unknown Artist</span>
+
+            <div class="progress">
+              <div class="fill"></div>
+            </div>
+
+            <div class="controls">
+              <button>⏮</button>
+
+              <button class="play">▶</button>
+
+              <button>⏭</button>
+            </div>
+          </div>
+        </section>
+      </main>
+    </div>
+
+    <!-- ==========================================================
+                        JAVASCRIPT
+=========================================================== -->
+
+    <script src="https://unpkg.com/lucide@latest"></script>
+
+    <script src="js/navigation.js"></script>
+
+    <script src="js/tag.js"></script>
+
+    <script src="js/library.js"></script>
+
+    <script src="js/player.js"></script>
+  </body>
+</html>

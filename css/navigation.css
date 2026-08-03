@@ -1,0 +1,699 @@
+/* ==========================================================
+   MOON BOX
+   navigation.css
+   ========================================================== */
+
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap");
+/* ==========================================================
+   ROOT COLORS
+   ========================================================== */
+
+:root {
+  /* Background */
+
+  --bg: #050505;
+
+  /* Surfaces */
+
+  --surface: #101010;
+  --surface-hover: #171717;
+  --surface-active: #1e1e1e;
+
+  /* Moon */
+
+  --moon: #fafaf8;
+  --moon-soft: #f2f2ee;
+
+  /* Text */
+
+  --text: #ececec;
+  --text-muted: #a0a0a0;
+  --text-active: #080808;
+
+  /* Borders */
+
+  --border: rgba(255, 255, 255, 0.06);
+  --border-light: rgba(255, 255, 255, 0.18);
+
+  /* Shadows */
+
+  --shadow-soft: 0 8px 20px rgba(0, 0, 0, 0.35);
+
+  --surface-nav: linear-gradient(180deg, #111111, #0b0b0b);
+
+  --shadow-nav:
+    inset 0 1px rgba(255, 255, 255, 0.04), inset 0 -1px rgba(0, 0, 0, 0.65),
+    0 6px 18px rgba(0, 0, 0, 0.35);
+
+  --shadow-moon: 0 0 24px rgba(255, 255, 255, 0.08);
+
+  --shadow-active:
+    var(--shadow-moon), 0 6px 14px rgba(0, 0, 0, 0.22),
+    inset 0 1px rgba(255, 255, 255, 0.9);
+
+  /* Gradients */
+
+  --gradient-nav: linear-gradient(180deg, #111111, #0b0b0b);
+
+  --gradient-active: linear-gradient(180deg, #fafaf8, #ecece8);
+
+  --font-main: "Inter", sans-serif;
+
+  --font-size-nav: 14px;
+
+  --font-size-logo: 16px;
+
+  --font-weight: 500;
+}
+/* ==========================================================
+   RESET
+   ========================================================== */
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html,
+body {
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  font-family: var(--font-main);
+  background: var(--bg);
+  color: var(--text);
+}
+
+/* ==========================================================
+   SCROLLBAR
+   ========================================================== */
+
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--surface-hover);
+  border-radius: 20px;
+}
+
+/* ==========================================================
+   APP
+   ========================================================== */
+
+.app {
+  width: 100vw;
+  height: 100vh;
+
+  display: flex;
+  flex-direction: column;
+
+  background: var(--bg);
+
+  border: 1px solid rgba(255, 255, 255, 0.07);
+
+  box-shadow:
+    0 10px 30px rgba(0, 0, 0, 0.45),
+    inset 0 1px rgba(255, 255, 255, 0.04);
+}
+
+/* ==========================================================
+   TOP NAV
+   ========================================================== */
+
+.top-nav {
+  height: 88px;
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  padding: 0 40px;
+
+  flex-shrink: 0;
+
+  border-bottom: 1px solid rgba(255, 255, 255, 0.03);
+}
+
+/* ==========================================================
+   LOGO
+   ========================================================== */
+
+.logo {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+
+  user-select: none;
+}
+
+.logo img {
+  width: 48px;
+  height: 48px;
+
+  object-fit: contain;
+}
+
+.logo span {
+  font-size: 15px;
+  font-weight: 500;
+  letter-spacing: 0.4px;
+
+  color: var(--moon);
+}
+
+/* ==========================================================
+   NAVIGATION PILL
+   ========================================================== */
+
+.nav-pill {
+  position: relative;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  gap: 12px;
+  height: 40px;
+  padding: 5px;
+  border-radius: 20px;
+
+  /* background: var(--surface); */
+  background: var(--gradient-nav);
+  border: 1px solid var(--border);
+  box-shadow: var(--shadow-nav);
+}
+
+/* ==========================================================
+   ACTIVE INDICATOR
+   ========================================================== */
+
+.nav-indicator {
+  position: absolute;
+
+  left: 7px;
+  top: 7px;
+
+  width: 90px;
+  height: 30px;
+
+  border-radius: 20px;
+
+  /* background: #ffffff; */
+  background: var(--gradient-active);
+
+  border: 1px solid var(--border-light);
+
+  box-shadow: var(--shadow-active);
+
+  transition: 0.45s cubic-bezier(0.22, 0.61, 0.36, 1);
+
+  z-index: 0;
+}
+
+/* ==========================================================
+   BUTTON
+   ========================================================== */
+
+.nav-button {
+  width: 90px;
+  height: 30px;
+
+  border: none;
+  outline: none;
+
+  background: transparent;
+
+  border-radius: 40px;
+
+  cursor: pointer;
+
+  position: relative;
+  z-index: 2;
+
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+
+  gap: 5px;
+
+  transition: 0.25s;
+
+  color: var(--text-muted);
+}
+
+.nav-button span {
+  font-size: 13px;
+  line-height: 0.8;
+  letter-spacing: 0.3px;
+  font-weight: 600;
+
+  font-family: var(--font-main);
+}
+
+.nav-button:hover {
+  color: var(--text);
+}
+
+.nav-button.active {
+  color: var(--text-active);
+}
+
+.icon {
+  width: 22px;
+  height: 22px;
+
+  margin-bottom: 1px;
+}
+
+.text {
+  font-size: 12px;
+
+  letter-spacing: 0.3px;
+
+  font-weight: 600;
+}
+
+/* ==========================================================
+   FOLDER
+   ========================================================== */
+
+.folder-button {
+  width: 50px;
+  height: 50px;
+
+  border: none;
+
+  border-radius: 20px;
+
+  cursor: pointer;
+
+  background: var(--gradient-nav);
+
+  color: var(--text);
+
+  border: 1px solid var(--border);
+
+  box-shadow: var(--shadow-nav);
+}
+
+.folder-button:hover {
+  background: var(--surface-hover);
+}
+
+.folder-button svg {
+  width: 24px;
+  height: 24px;
+
+  stroke-width: 1.8;
+}
+
+/* ==========================================================
+   WORKSPACE
+   ========================================================== */
+
+.workspace {
+  flex: 1;
+
+  display: flex;
+
+  transition: transform 0.55s cubic-bezier(0.22, 0.61, 0.36, 1);
+
+  will-change: transform;
+}
+
+/* ==========================================================
+   SCREEN
+   ========================================================== */
+
+.screen {
+  min-width: 100vw;
+
+  height: calc(100vh - 88px);
+
+  overflow-y: auto;
+
+  padding: 55px;
+}
+
+/* ==========================================================
+   HEADER
+   ========================================================== */
+
+.screen-header h1 {
+  font-size: 44px;
+
+  font-weight: 600;
+
+  margin-bottom: 14px;
+}
+
+.screen-header p {
+  color: var(--text2);
+
+  font-size: 16px;
+
+  line-height: 1.8;
+
+  max-width: 650px;
+}
+
+/* ==========================================================
+   TAG PLACEHOLDER
+   ========================================================== */
+
+.placeholder {
+  margin-top: 60px;
+
+  display: grid;
+
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+
+  gap: 24px;
+}
+
+.placeholder-card {
+  height: 140px;
+
+  border-radius: 26px;
+
+  background: var(--gradient-nav);
+
+  border: 1px solid var(--border);
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  color: var(--text);
+
+  font-size: 18px;
+
+  transition: 0.3s;
+}
+
+.placeholder-card:hover {
+  transform: translateY(-6px);
+
+  background: var(--surface-hover);
+}
+
+/* ==========================================================
+   LIBRARY PLACEHOLDER
+   ========================================================== */
+
+.library-placeholder {
+  margin-top: 55px;
+
+  display: flex;
+  flex-direction: column;
+
+  gap: 18px;
+}
+
+.song {
+  display: flex;
+
+  align-items: center;
+
+  gap: 20px;
+
+  background: var(--surface);
+
+  border: 1px solid var(--border);
+
+  border-radius: 22px;
+
+  padding: 18px 24px;
+
+  transition: 0.3s;
+}
+
+.song:hover {
+  background: var(--surface2);
+}
+
+.cover {
+  width: 60px;
+  height: 60px;
+
+  border-radius: 16px;
+
+  background: #222;
+
+  flex-shrink: 0;
+}
+
+.info {
+  flex: 1;
+}
+
+.info h3 {
+  font-size: 18px;
+
+  margin-bottom: 6px;
+}
+
+.info span {
+  color: var(--text2);
+
+  font-size: 14px;
+}
+
+/* ==========================================================
+   PLAYER PLACEHOLDER
+   ========================================================== */
+
+.player-placeholder {
+  margin-top: 45px;
+
+  display: flex;
+
+  flex-direction: column;
+
+  align-items: center;
+
+  gap: 22px;
+}
+
+.album {
+  width: 300px;
+  height: 300px;
+
+  border-radius: 34px;
+
+  background: var(--surface);
+
+  border: 1px solid var(--border);
+}
+
+.player-placeholder h2 {
+  font-size: 28px;
+
+  font-weight: 600;
+}
+
+.player-placeholder span {
+  color: var(--text2);
+}
+
+.progress {
+  width: 450px;
+
+  height: 8px;
+
+  background: #1c1c1c;
+
+  border-radius: 30px;
+
+  overflow: hidden;
+}
+
+.fill {
+  width: 35%;
+
+  height: 100%;
+
+  background: linear-gradient(180deg, #ffffff, #e7e7e7);
+
+  box-shadow:
+    0 6px 16px rgba(255, 255, 255, 0.08),
+    inset 0 1px 1px rgba(255, 255, 255, 0.9);
+}
+
+.controls {
+  display: flex;
+
+  gap: 18px;
+}
+
+.controls button {
+  width: 65px;
+  height: 65px;
+
+  border: none;
+
+  border-radius: 18px;
+
+  background: var(--surface);
+
+  color: white;
+
+  cursor: pointer;
+
+  font-size: 22px;
+
+  border: 1px solid var(--border);
+
+  transition: 0.25s;
+}
+
+.controls button:hover {
+  transform: translateY(-4px);
+
+  background: var(--surface2);
+}
+
+.play {
+  width: 82px !important;
+
+  background: white !important;
+
+  color: black !important;
+}
+
+/* ==========================================================
+   RESPONSIVE
+   ========================================================== */
+
+/* ==========================================================
+   RESPONSIVE
+   ========================================================== */
+
+/* ---------- Tablet ---------- */
+
+@media (max-width: 1024px) {
+  .top-nav {
+    padding: 0 24px;
+    height: 80px;
+  }
+
+  .logo {
+    gap: 6px;
+  }
+
+  .logo img {
+    width: 42px;
+    height: 42px;
+  }
+
+  .logo span {
+    font-size: 14px;
+  }
+
+  .nav-pill {
+    height: 40px;
+    padding: 5px;
+    gap: 8px;
+  }
+
+  .nav-button {
+    width: 82px;
+    height: 30px;
+    gap: 5px;
+  }
+
+  .nav-indicator {
+    width: 82px;
+    height: 30px;
+  }
+
+  .nav-button span {
+    font-size: 12px;
+  }
+
+  .icon {
+    width: 20px;
+    height: 20px;
+  }
+
+  .folder-button {
+    width: 46px;
+    height: 46px;
+  }
+
+  .folder-button svg {
+    width: 22px;
+    height: 22px;
+  }
+}
+
+/* ---------- Mobile ---------- */
+
+@media (max-width: 768px) {
+  .top-nav {
+    height: 70px;
+    padding: 0 12px;
+  }
+
+  .logo {
+    gap: 6px;
+  }
+
+  .logo img {
+    width: 34px;
+    height: 34px;
+  }
+
+  .logo span {
+    display: none;
+  }
+
+  .nav-pill {
+    height: 36px;
+    padding: 4px;
+    gap: 2px;
+    border-radius: 18px;
+  }
+
+  .nav-button {
+    width: 64px;
+    height: 28px;
+    gap: 4px;
+    border-radius: 14px;
+  }
+
+  .nav-indicator {
+    width: 64px;
+    height: 28px;
+    left: 4px;
+    top: 4px;
+    border-radius: 14px;
+  }
+
+  .icon {
+    width: 16px;
+    height: 16px;
+    margin: 0;
+  }
+
+  .nav-button span {
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0;
+    line-height: 1;
+  }
+
+  .folder-button {
+    width: 36px;
+    height: 36px;
+    border-radius: 14px;
+  }
+
+  .folder-button svg {
+    width: 18px;
+    height: 18px;
+  }
+}
