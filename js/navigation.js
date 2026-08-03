@@ -87,7 +87,7 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 
   /* ======================================================
-        TOUCH SWIPE
+        TOUCH SWIPE - add data-no-swipe later to elements that should not trigger swipe
     ====================================================== */
 
   let startX = 0;
@@ -99,8 +99,17 @@ document.addEventListener("DOMContentLoaded", () => {
   workspace.addEventListener(
     "touchstart",
     (e) => {
-      startX = e.touches[0].clientX;
+      // Ignore interactive elements
+      if (
+        e.target.closest(
+          "button, input, textarea, select, a, .tag, .tag-manage-button, .tag-menu",
+        )
+      ) {
+        dragging = false;
+        return;
+      }
 
+      startX = e.touches[0].clientX;
       dragging = true;
     },
     { passive: true },
@@ -122,17 +131,12 @@ document.addEventListener("DOMContentLoaded", () => {
     const distance = currentX - startX;
 
     if (Math.abs(distance) > 80) {
-      if (distance < 0) {
-        goToScreen(currentScreen + 1);
-      } else {
-        goToScreen(currentScreen - 1);
-      }
+      if (distance < 0) goToScreen(currentScreen + 1);
+      else goToScreen(currentScreen - 1);
     }
 
     dragging = false;
-
     startX = 0;
-
     currentX = 0;
   });
 
@@ -176,7 +180,7 @@ document.addEventListener("DOMContentLoaded", () => {
     }, 100);
   });
 
-    /* ======================================================
+  /* ======================================================
         RESIZE OBSERVER
     ====================================================== */
 
