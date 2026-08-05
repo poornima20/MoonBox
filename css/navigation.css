@@ -424,7 +424,7 @@ button:focus-visible {
 
 @media (max-width: 768px) {
   .top-nav {
-    height: 70px;
+    height: 65px;
     padding: 0 12px;
   }
 

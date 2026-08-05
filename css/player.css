@@ -1675,5 +1675,691 @@ SCROLLBAR
   }
 }
 
+/*==========================================================
+MOON BOX
+UNIVERSAL RESPONSIVE
+Phone + Tablet
+==========================================================*/
+
+@media (max-width: 1100px) {
+  body {
+    overflow-y: auto;
+  }
+
+  html {
+    overflow-y: auto;
+  }
+
+  .player-workspace {
+    display: flex;
+
+    flex-direction: column;
+
+    height: 100dvh;
+
+    overflow: hidden;
+  }
 
 
+  /* ==========================================================
+   HIDE MAIN SCROLLBAR
+========================================================== */
+
+html,
+body{
+
+    overflow-y: auto;
+
+    scrollbar-width: none;      /* Firefox */
+
+    -ms-overflow-style: none;   /* IE/Edge */
+
+}
+
+html::-webkit-scrollbar,
+body::-webkit-scrollbar{
+
+    display: none;              /* Chrome, Safari */
+
+}
+  
+  /*==========================================================
+SCREEN
+==========================================================*/
+
+  #playerScreen {
+    height: auto;
+
+    padding: 14px;
+  }
+
+  /*==========================================================
+MAIN LAYOUT
+==========================================================*/
+
+  .player-layout {
+    display: flex;
+
+    flex-direction: column;
+
+    gap: 18px;
+
+    height: auto;
+  }
+
+  /*==========================================================
+ORDER
+==========================================================*/
+
+  .player-top {
+    order: 1;
+  }
+
+  .player-sidebar {
+    order: 2;
+  }
+
+  .player-panel {
+    order: 3;
+  }
+
+  /*==========================================================
+PLAYER
+==========================================================*/
+
+  .player-top {
+    display: flex;
+
+    flex-direction: column;
+
+    align-items: center;
+
+    justify-content: flex-start;
+
+    gap: 28px;
+
+    padding: 24px;
+
+    min-height: auto;
+  }
+  /*==========================================================
+ALBUM
+==========================================================*/
+
+  .player-album {
+    width: 240px;
+
+    height: 240px;
+
+    flex-shrink: 0;
+  }
+  /* cover */
+
+  .album-cover {
+    width: 205px;
+
+    height: 205px;
+  }
+
+  /* vinyl */
+
+  .record-wrapper {
+    top: 15px;
+
+    left: 112px;
+
+    width: 205px;
+
+    height: 205px;
+  }
+
+  .vinyl {
+    width: 190px;
+
+    height: 190px;
+
+    left: -95px;
+
+    top: 4px;
+  }
+
+  .record-label {
+    width: 60px;
+
+    height: 60px;
+  }
+
+  .record-label img {
+    width: 210px;
+
+    height: 210px;
+  }
+
+  /* animation distance */
+
+  .player-album.playing .record-wrapper {
+    transform: translateX(74px);
+  }
+
+  /*==========================================================
+INFO
+==========================================================*/
+
+  .player-info {
+    width: 100%;
+
+    display: flex;
+
+    flex-direction: column;
+
+    align-items: center;
+
+    text-align: center;
+
+    gap: 22px;
+  }
+  .song-meta h2 {
+    font-size: 30px;
+  }
+
+  .song-meta span {
+    font-size: 16px;
+  }
+
+  .song-extra {
+    justify-content: center;
+
+    flex-wrap: wrap;
+
+    gap: 14px;
+  }
+
+  .song-extra span {
+    font-size: 14px;
+  }
+
+  /*==========================================================
+BUTTONS
+==========================================================*/
+
+  .player-top-buttons {
+    flex-wrap: wrap;
+
+    gap: 10px;
+  }
+
+  .player-toggle {
+    min-width: 130px;
+
+    height: 44px;
+  }
+
+  /*==========================================================
+PROGRESS
+==========================================================*/
+
+  .player-progress {
+    width: 100%;
+
+    max-width: 420px;
+  }
+  /*==========================================================
+CONTROLS
+==========================================================*/
+  .player-controls {
+    justify-content: center;
+  }
+  .player-controls button {
+    width: 58px;
+
+    height: 58px;
+  }
+
+  .play-main {
+    width: 78px !important;
+
+    height: 78px !important;
+  }
+
+  /*==========================================================
+SIDE BUTTONS
+==========================================================*/
+
+  .player-sidebar {
+    display: grid;
+
+    grid-template-columns: repeat(4, 1fr);
+
+    gap: 12px;
+
+    width: 100%;
+  }
+
+  .player-side-button {
+    width: 100%;
+
+    height: 72px;
+
+    border-radius: 20px;
+
+    flex-direction: row;
+
+    gap: 10px;
+  }
+
+  .player-side-button span {
+    font-size: 13px;
+  }
+
+  .player-side-button svg {
+    width: 18px;
+
+    height: 18px;
+  }
+
+  /*==========================================================
+RIGHT PANEL
+==========================================================*/
+
+  .player-panel {
+    width: 100%;
+
+    min-height: 430px;
+  }
+
+  .player-tab {
+    padding: 24px;
+  }
+
+  .panel-header {
+    margin-bottom: 16px;
+  }
+
+  .panel-header h3 {
+    font-size: 24px;
+  }
+
+  /*==========================================================
+NOTES
+==========================================================*/
+
+  #journalText {
+    font-size: 15px;
+
+    padding: 20px;
+  }
+
+  /*==========================================================
+LYRICS
+==========================================================*/
+
+  .lyrics-view,
+  .lyrics-editor {
+    font-size: 15px;
+
+    padding: 20px;
+  }
+
+  /*==========================================================
+DETAILS
+==========================================================*/
+
+  .detail-item {
+    padding: 16px 18px;
+  }
+
+  .detail-display,
+  .detail-input {
+    font-size: 16px;
+  }
+
+  /*==========================================================
+PLAYER TAGS
+==========================================================*/
+
+  .player-selected-tags {
+    gap: 10px;
+  }
+
+  .player-selected-tag {
+    padding: 10px 14px;
+
+    font-size: 14px;
+  }
+
+  /*==========================================================
+SCROLL
+==========================================================*/
+
+  .player-panel {
+    overflow: hidden;
+  }
+}
+
+
+/*==========================================================
+EXTRA SMALL PHONES
+320px - 375px
+==========================================================*/
+
+@media (max-width:375px){
+
+    #playerScreen{
+
+        padding:10px;
+
+    }
+
+    .player-layout{
+
+        gap:14px;
+
+    }
+
+    .player-top{
+
+        padding:18px;
+
+        gap:20px;
+
+        border-radius:24px;
+
+    }
+
+    /*==========================
+    ALBUM
+    ==========================*/
+
+    .player-album{
+
+        width:190px;
+
+        height:190px;
+
+    }
+
+    .album-cover{
+
+        width:170px;
+
+        height:170px;
+
+        top:14px;
+
+    }
+
+    .record-wrapper{
+
+        width:170px;
+
+        height:170px;
+
+        left:94px;
+
+        top:10px;
+
+    }
+
+    .vinyl{
+
+        width:158px;
+
+        height:158px;
+
+        left:-80px;
+
+    }
+
+    .record-label{
+
+        width:50px;
+
+        height:50px;
+
+    }
+
+    .record-label img{
+
+        width:170px;
+
+        height:170px;
+
+    }
+
+    .player-album.playing .record-wrapper{
+
+        transform:translateX(60px);
+
+    }
+
+    /*==========================
+    SONG
+    ==========================*/
+
+    .song-meta{
+
+        gap:8px;
+
+        margin-left:0;
+
+    }
+
+    .song-meta h2{
+
+        font-size:22px;
+
+    }
+
+    .song-meta span{
+
+        font-size:15px;
+
+    }
+
+    .song-extra{
+
+        gap:10px;
+
+        margin-left:0;
+
+    }
+
+    .song-extra span{
+
+        font-size:13px;
+
+    }
+
+    .song-extra svg{
+
+        width:16px;
+
+        height:16px;
+
+    }
+
+    /*==========================
+    TOGGLES
+    ==========================*/
+
+    .player-top-buttons{
+
+        width:100%;
+
+        justify-content:center;
+
+    }
+
+    .player-toggle{
+
+        min-width:120px;
+
+        height:40px;
+
+        font-size:13px;
+
+    }
+
+    .player-toggle span{
+
+        font-size:13px;
+
+    }
+
+    /*==========================
+    PROGRESS
+    ==========================*/
+
+    .player-progress{
+
+        gap:10px;
+
+    }
+
+    .player-progress span{
+
+        font-size:12px;
+
+    }
+
+    #progressBar{
+
+        height:5px;
+
+    }
+
+    /*==========================
+    CONTROLS
+    ==========================*/
+
+    .player-controls{
+
+        gap:18px;
+
+    }
+
+    .player-controls button{
+
+        width:52px;
+
+        height:52px;
+
+    }
+
+    .play-main{
+
+        width:72px !important;
+
+        height:72px !important;
+
+    }
+
+    .play-main svg{
+
+        width:28px !important;
+
+        height:28px !important;
+
+    }
+
+    /*==========================
+    SIDE BUTTONS
+    ==========================*/
+
+    .player-sidebar{
+
+        gap:8px;
+
+    }
+
+    .player-side-button{
+
+        height:64px;
+
+        border-radius:18px;
+
+    }
+
+    .player-side-button svg{
+
+        width:16px;
+
+        height:16px;
+
+    }
+
+    .player-side-button span{
+
+        font-size:12px;
+
+    }
+
+    /*==========================
+    RIGHT PANEL
+    ==========================*/
+
+    .player-panel{
+
+        min-height:360px;
+
+        border-radius:24px;
+
+    }
+
+    .player-tab{
+
+        padding:18px;
+
+    }
+
+    .panel-header h3{
+
+        font-size:20px;
+
+    }
+
+    .panel-header button{
+
+        height:38px;
+
+        padding:0 14px;
+
+        font-size:13px;
+
+    }
+
+    /*==========================
+    NOTES / LYRICS
+    ==========================*/
+
+    #journalText,
+
+    .lyrics-view,
+
+    .lyrics-editor{
+
+        padding:16px;
+
+        font-size:14px;
+
+    }
+
+    /*==========================
+    DETAILS
+    ==========================*/
+
+    .detail-item{
+
+        padding:14px 16px;
+
+    }
+
+    .detail-display,
+
+    .detail-input{
+
+        font-size:15px;
+
+    }
+
+}
