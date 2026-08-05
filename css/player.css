@@ -1,339 +1,1292 @@
-/* ==========================================================
-   PLAYER SCREEN
-========================================================== */
+/*==========================================================
+MOON BOX
+PLAYER.CSS
+PART 1
+MAIN LAYOUT
+==========================================================*/
 
-.player-screen {
+/*==========================================================
+PLAYER SCREEN
+==========================================================*/
+
+#playerScreen {
+  height: calc(100vh - 88px);
+
+  padding: 24px 28px;
+}
+
+/*==========================================================
+MAIN LAYOUT
+==========================================================*/
+
+.player-layout {
+  display: grid;
+
+  grid-template-columns:
+    82px
+    minmax(760px, 2.2fr)
+    minmax(340px, 1fr);
+
+  gap: 24px;
+
+  width: 100%;
+
+  height: 100%;
+}
+
+/*==========================================================
+SIDEBAR
+==========================================================*/
+
+.player-sidebar {
   display: flex;
+
   flex-direction: column;
-  gap: 30px;
-}
 
-/* ==========================================================
-   HEADER
-========================================================== */
-
-.player-header h1 {
-  font-size: 32px;
-  font-weight: 600;
-  color: var(--section-title-color);
-  margin-bottom: 8px;
-}
-
-.player-header p {
-  font-size: 14px;
-  color: var(--section-sub-title-color);
-}
-
-/* ==========================================================
-   PLAYER CARD
-========================================================== */
-
-.player-card {
-  display: flex;
-
-  gap: 50px;
+  gap: 14px;
 
   align-items: center;
+}
 
-  padding: 40px;
+/*==========================================================
+SIDEBAR BUTTON
+==========================================================*/
 
-  border-radius: 30px;
+.player-side-button {
+  width: 72px;
+
+  height: 84px;
+
+  border: none;
+
+  border-radius: 24px;
+
+  cursor: pointer;
 
   background: var(--gradient-nav);
 
   border: 1px solid var(--border);
 
   box-shadow: var(--shadow-nav);
-}
 
-/* ==========================================================
-   LEFT
-========================================================== */
-
-.player-left {
-  width: 360px;
+  color: var(--text-muted);
 
   display: flex;
+
+  flex-direction: column;
 
   justify-content: center;
 
   align-items: center;
+
+  gap: 10px;
+
+  transition: 0.28s;
 }
 
-/* ==========================================================
-   VINYL
-========================================================== */
+.player-side-button svg {
+  width: 20px;
 
-.player-vinyl {
-  position: relative;
+  height: 20px;
 
-  width: 320px;
-
-  height: 320px;
+  stroke-width: 2;
 }
 
-.vinyl-record {
-  position: absolute;
-
-  width: 270px;
-
-  height: 270px;
-
-  border-radius: 50%;
-
-  background: radial-gradient(circle, #222 0%, #111 35%, #050505 70%);
-
-  top: 25px;
-
-  left: 20px;
-
-  z-index: 0;
-}
-
-.player-cover {
-  position: absolute;
-
-  width: 270px;
-
-  height: 270px;
-
-  border-radius: 28px;
-
-  object-fit: cover;
-
-  z-index: 2;
-
-  box-shadow: 0 25px 60px rgba(0, 0, 0, 0.45);
-}
-
-/* ==========================================================
-   RIGHT
-========================================================== */
-
-.player-right {
-  flex: 1;
-
-  display: flex;
-
-  flex-direction: column;
-
-  gap: 28px;
-}
-
-/* ==========================================================
-   OPTIONS
-========================================================== */
-
-.player-options {
-  display: flex;
-
-  gap: 12px;
-}
-
-.player-options button {
-  display: flex;
-
-  align-items: center;
-
-  gap: 8px;
-
-  height: 42px;
-
-  padding: 0 18px;
-
-  border: none;
-
-  border-radius: 18px;
-
-  background: var(--surface);
-
-  border: 1px solid var(--border);
-
-  color: var(--text);
-
-  cursor: pointer;
-
-  transition: 0.25s;
-}
-
-.player-options button:hover {
-  background: var(--surface-hover);
-}
-
-/* ==========================================================
-   SONG INFO
-========================================================== */
-
-.player-song-info {
-  display: flex;
-
-  flex-direction: column;
-
-  gap: 8px;
-}
-
-.player-song-info span {
-  color: var(--text-muted);
-
-  font-size: 14px;
-}
-
-.player-song-info h2 {
-  font-size: 42px;
+.player-side-button span {
+  font-size: 12px;
 
   font-weight: 600;
 
-  color: white;
+  font-family: var(--font-main);
 }
 
-/* ==========================================================
-   META
-========================================================== */
+.player-side-button:hover {
+  background: var(--gradient-active);
 
-.player-meta {
+  color: #000;
+
+  border-color: var(--border-light);
+
+  box-shadow: var(--shadow-active);
+
+  transform: translateY(-2px);
+}
+
+.player-side-button.active {
+  background: var(--gradient-active);
+
+  color: #000;
+
+  border-color: var(--border-light);
+
+  box-shadow: var(--shadow-active);
+}
+
+/*==========================================================
+CENTER PLAYER CARD
+==========================================================*/
+
+/*==========================================================
+CENTER PLAYER
+==========================================================*/
+
+.player-top {
+  position: relative;
+
+  display: grid;
+
+  grid-template-columns: 320px 1fr;
+
+  gap: 48px;
+
+  align-items: center;
+
+  width: 100%;
+  height: 100%;
+
+  padding: 38px;
+
+  overflow: hidden;
+
+  border-radius: 32px;
+
+  background: rgba(255, 255, 255, 0.07);
+  border: 1px solid rgba(255, 255, 255, 0.07);
+
+  box-shadow:
+    inset 0 1px rgba(255, 255, 255, 0.04),
+    inset 0 -1px rgba(0, 0, 0, 0.55),
+    0 24px 60px rgba(0, 0, 0, 0.45);
+}
+
+/*==========================================================
+ALBUM SECTION
+==========================================================*/
+
+.player-album {
+  position: relative;
+
+  width: 100%;
+  height: 320px;
+
+  display: flex;
+  justify-content: flex-start;
+  align-items: flex-start;
+  padding-top: 20px;
+}
+
+/*==========================================================
+PLAYER ALBUM
+==========================================================*/
+
+.player-album {
+  position: relative;
+
+  width: 320px;
+  height: 320px;
+
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+}
+
+/*==========================================================
+RECORD WRAPPER
+==========================================================*/
+
+.record-wrapper {
+  position: absolute;
+
+  top: 18px;
+  left: 138px;
+
+  width: 250px;
+  height: 250px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  z-index: 2;
+
+  transition:
+    transform 0.75s cubic-bezier(0.22, 0.61, 0.36, 1),
+    filter 0.35s;
+}
+
+/*==========================================================
+VINYL
+==========================================================*/
+
+.vinyl {
+  position: relative;
+
+  left: -122px;
+  top: 5px;
+
+  width: 230px;
+  height: 230px;
+
+  border-radius: 50%;
+
+  overflow: hidden;
+
+  background: radial-gradient(
+    circle at center,
+
+    #fdfdfd 0px,
+    #ececec 10px,
+    #d6d6d6 15px,
+    #ffffff 16px,
+    #0f0f0f 20px,
+    #060606 45px,
+    #020202 100%
+  );
+
+  border: 1px solid rgba(255, 255, 255, 0.04);
+
+  box-shadow:
+    0 35px 70px rgba(0, 0, 0, 0.7),
+    inset 0 1px rgba(255, 255, 255, 0.06),
+    inset 0 -10px 60px rgba(0, 0, 0, 0.65),
+    inset 0 0 120px rgba(0, 0, 0, 0.85);
+
+  animation: spin 8s linear infinite;
+  animation-play-state: paused;
+}
+
+/*==========================================================
+VINYL GROOVES
+==========================================================*/
+
+.vinyl::before {
+  content: "";
+
+  position: absolute;
+
+  inset: 7px;
+
+  border-radius: 50%;
+
+  background: repeating-radial-gradient(
+    circle,
+    transparent 0px,
+    transparent 3px,
+
+    rgba(255, 255, 255, 0.045) 3.4px,
+
+    rgba(0, 0, 0, 0.2) 4px,
+
+    transparent 4.8px
+  );
+
+  opacity: 0.95;
+}
+
+/*==========================================================
+VINYL REFLECTION
+==========================================================*/
+
+.vinyl::after {
+  content: "";
+
+  position: absolute;
+
+  inset: 0;
+
+  border-radius: 50%;
+
+  background:
+    radial-gradient(
+      circle at 32% 28%,
+
+      rgba(255, 255, 255, 0.18),
+      rgba(255, 255, 255, 0.05) 18%,
+
+      transparent 42%
+    ),
+    linear-gradient(135deg, rgba(255, 255, 255, 0.08), transparent 45%);
+
+  mix-blend-mode: screen;
+}
+
+/*==========================================================
+CENTER LABEL
+==========================================================*/
+
+.record-label {
+  position: absolute;
+
+  left: 50%;
+  top: 50%;
+
+  transform: translate(-50%, -50%);
+
+  width: 72px;
+  height: 72px;
+
+  border-radius: 50%;
+
+  background: radial-gradient(
+    circle,
+    #ffffff,
+    #ececec 65%,
+
+    #bfbfbf
+  );
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  box-shadow:
+    0 0 24px rgba(255, 255, 255, 0.18),
+    inset 0 1px rgba(255, 255, 255, 0.9),
+    inset 0 -3px 8px rgba(0, 0, 0, 0.18);
+
+  z-index: 1;
+}
+
+.record-label::before {
+  content: "";
+
+  position: absolute;
+
+  width: 8px;
+  height: 8px;
+
+  border-radius: 50%;
+
+  background: #111;
+}
+
+.record-label img {
+  width: 254px;
+  height: 254px;
+
+  object-fit: cover;
+}
+
+/*==========================================================
+ALBUM COVER
+==========================================================*/
+
+.album-cover {
+  position: absolute;
+
+  left: 0;
+  top: 22px;
+
+  width: 250px;
+  height: 250px;
+
+  border-radius: 14px;
+
+  object-fit: cover;
+
+  z-index: 30;
+
+  border: 1px solid rgba(255, 255, 255, 0.05);
+
+  background: #222225;
+
+  box-shadow:
+    0 40px 70px rgba(0, 0, 0, 0.6),
+    inset 0 1px rgba(255, 255, 255, 0.05);
+
+  transition:
+    transform 0.35s,
+    box-shadow 0.35s;
+}
+
+.player-top:hover .album-cover {
+  transform: translateY(-2px);
+
+  box-shadow:
+    0 50px 90px rgba(0, 0, 0, 0.65),
+    0 0 25px rgba(255, 255, 255, 0.05);
+}
+
+/*==========================================================
+PLAYING
+==========================================================*/
+
+.player-album.playing .record-wrapper {
+  transform: translateX(95px);
+}
+
+.player-album.playing .vinyl {
+  animation-play-state: running;
+}
+
+/*==========================================================
+MOON GLOW
+==========================================================*/
+
+.player-album::before {
+  content: "";
+
+  position: absolute;
+
+  width: 430px;
+  height: 430px;
+
+  left: -40px;
+  top: -65px;
+
+  border-radius: 50%;
+
+  background: radial-gradient(
+    circle,
+    rgba(255, 255, 255, 0.08),
+    rgba(255, 255, 255, 0.02) 40%,
+
+    transparent 72%
+  );
+
+  filter: blur(50px);
+
+  opacity: 0;
+
+  transition: 0.5s;
+}
+
+.player-album.playing::before {
+  opacity: 1;
+}
+
+/*==========================================================
+RIGHT SIDE OF PLAYER - center right
+==========================================================*/
+
+.player-info {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  align-self: center;
+
+  gap: 30px;
+  min-width: 0;
+  width: 100%;
+}
+.vinyl,
+.record-wrapper {
+  pointer-events: none;
+}
+
+/*==========================================================
+TOP BUTTONS
+==========================================================*/
+
+.player-top-buttons {
+  display: flex;
+  margin-left: 6px;
+  gap: 12px;
+}
+
+.player-toggle {
+  height: 42px;
+  min-width: 150px;
+
+  padding: 0 20px;
+
+  border-radius: 20px;
+
+  cursor: pointer;
+
   display: flex;
 
-  gap: 24px;
+  align-items: center;
+
+  gap: 10px;
+
+  background: var(--gradient-nav);
+
+  border: 1px solid var(--border);
+
+  box-shadow: var(--shadow-nav);
+
+  color: var(--text-muted);
+}
+
+.player-toggle svg {
+  width: 18px;
+
+  height: 18px;
+}
+
+.player-toggle span {
+  font-size: 14px;
+
+  font-weight: 600;
+}
+
+.player-toggle:hover {
+  background: var(--gradient-active);
+
+  color: #000;
+
+  border-color: var(--border-light);
+
+  box-shadow: var(--shadow-active);
+}
+
+/*==========================================================
+SONG META
+==========================================================*/
+
+.song-meta {
+  margin-left: 12px;
+  display: flex;
+
+  flex-direction: column;
+
+  gap: 13px;
+}
+
+.song-meta h2 {
+  font-size: 24px;
+  line-height: 1.1;
+  color: #fff;
+
+  font-weight: 700;
+}
+
+.song-meta span {
+  font-size: 16px;
+
+  color: #9b9b9b;
+}
+
+/*==========================================================
+SONG EXTRA
+==========================================================*/
+
+.song-extra {
+  margin-left: 13px;
+  display: flex;
 
   flex-wrap: wrap;
 
-  color: var(--text-muted);
-
-  font-size: 14px;
+  gap: 22px;
 }
 
-.player-meta span {
+.song-extra span {
   display: flex;
 
   align-items: center;
 
   gap: 8px;
+
+  color: #a0a0a0;
+
+  font-size: 15px;
 }
 
-/* ==========================================================
-   PROGRESS
-========================================================== */
+.song-extra svg {
+  width: 18px;
 
-.player-progress-area {
+  height: 18px;
+}
+
+/*==========================================================
+MOON BOX
+PLAYER.CSS
+PART 2
+VINYL • ARTWORK • TYPOGRAPHY • PROGRESS • CONTROLS
+==========================================================*/
+
+/*==========================================================
+ALBUM COVER
+==========================================================*/
+
+.player-top:hover .album-cover {
+  transform: scale(1.02);
+
+  box-shadow:
+    0 35px 70px rgba(0, 0, 0, 0.55),
+    0 0 35px rgba(255, 255, 255, 0.06);
+}
+
+/*==========================================================
+SHUFFLE / REPEAT
+==========================================================*/
+
+.player-toggle {
+  min-width: 140px;
+
+  height: 48px;
+}
+
+.player-toggle.active {
+  background: var(--gradient-active);
+
+  color: #000;
+
+  border-color: var(--border-light);
+
+  box-shadow: var(--shadow-active);
+}
+
+/*==========================================================
+PROGRESS
+==========================================================*/
+
+.player-progress {
+  width: 90%;
+  margin-left: 6px;
+
   display: grid;
 
-  grid-template-columns: 55px 1fr 55px;
+  grid-template-columns:
+    42px
+    1fr
+    42px;
 
   align-items: center;
 
-  gap: 14px;
+  gap: 16px;
 }
 
-#playerProgress {
+.player-progress span {
+  font-size: 13px;
+
+  color: #999;
+
+  text-align: center;
+}
+
+/*==========================================================
+SLIDER
+==========================================================*/
+
+#progressBar {
+  appearance: none;
+
   width: 100%;
+
+  height: 6px;
+
+  border-radius: 999px;
+
+  overflow: hidden;
+
+  background: #272727;
 }
 
-/* ==========================================================
-   CONTROLS
-========================================================== */
+#progressBar::-webkit-slider-runnable-track {
+  height: 6px;
+
+  background: #272727;
+}
+
+#progressBar::-webkit-slider-thumb {
+  appearance: none;
+
+  width: 16px;
+
+  height: 16px;
+
+  border-radius: 50%;
+
+  background: #fff;
+
+  margin-top: -5px;
+
+  box-shadow: -1000px 0 0 1000px #bdbdbd;
+}
+#progressBar::-webkit-slider-thumb:hover {
+  transform: scale(1.15);
+}
+
+#progressBar::-moz-range-track {
+  height: 6px;
+
+  background: #272727;
+
+  border: none;
+}
+
+#progressBar::-moz-range-thumb {
+  width: 16px;
+
+  height: 16px;
+
+  border: none;
+
+  border-radius: 50%;
+
+  background: #fff;
+}
+
+#progressBar,
+#progressBar::-webkit-slider-thumb {
+  cursor: pointer;
+}
+
+#progressBar::-moz-range-thumb {
+  cursor: pointer;
+}
+
+/*==========================================================
+PLAYER CONTROLS
+==========================================================*/
 
 .player-controls {
   display: flex;
 
   align-items: center;
 
-  gap: 20px;
+  justify-content: left;
+
+  margin-left: 4px;
+  gap: 28px;
 }
 
 .player-controls button {
-  width: 56px;
+  width: 62px;
 
-  height: 56px;
-
-  border-radius: 50%;
+  height: 62px;
 
   border: none;
 
+  border-radius: 50%;
+
   cursor: pointer;
 
-  background: var(--surface);
-
-  color: white;
-
-  border: 1px solid var(--border);
-
-  transition: 0.25s;
-}
-
-.player-controls button:hover {
-  transform: translateY(-2px);
-}
-
-.play-button {
-  width: 74px !important;
-
-  height: 74px !important;
-
-  background: white !important;
-
-  color: black !important;
-}
-
-/* ==========================================================
-   NOTES
-========================================================== */
-
-.player-note-card {
   display: flex;
 
-  flex-direction: column;
+  justify-content: center;
 
-  gap: 18px;
-
-  padding: 24px;
-
-  border-radius: 24px;
+  align-items: center;
 
   background: var(--gradient-nav);
 
   border: 1px solid var(--border);
+
+  box-shadow: var(--shadow-nav);
+
+  color: var(--text-muted);
+
+  transition: 0.25s;
 }
 
-.player-note-header {
+.player-controls button svg {
+  width: 24px;
+
+  height: 24px;
+
+  stroke-width: 2;
+}
+
+.player-controls button:hover {
+  background: var(--gradient-active);
+
+  color: #000;
+
+  border-color: var(--border-light);
+
+  box-shadow: var(--shadow-active);
+
+  transform: translateY(-2px);
+}
+
+/*==========================================================
+MAIN PLAY BUTTON
+==========================================================*/
+
+.play-main {
+  width: 86px !important;
+
+  height: 86px !important;
+
+  background: var(--gradient-active) !important;
+
+  border: 1px solid var(--border-light) !important;
+
+  color: #000 !important;
+
+  box-shadow:
+    var(--shadow-active),
+    0 0 28px rgba(255, 255, 255, 0.18) !important;
+}
+
+.play-main svg {
+  width: 34px !important;
+
+  height: 34px !important;
+}
+
+.play-main:hover {
+  transform: scale(1.06) !important;
+}
+
+.play-main.playing {
+  box-shadow:
+    0 0 35px rgba(255, 255, 255, 0.3),
+    var(--shadow-active) !important;
+}
+
+/*==========================================================
+ANIMATION
+==========================================================*/
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/*==========================================================
+MOON BOX
+PLAYER.CSS
+PART 3
+RIGHT PANEL
+(JOURNAL • TAGS • LYRICS • DETAILS)
+==========================================================*/
+
+/*==========================================================
+RIGHT PANEL
+==========================================================*/
+
+.player-panel {
+  display: flex;
+
+  flex-direction: column;
+
+  height: 100%;
+
+  background: #101010;
+
+  border: 1px solid rgba(255, 255, 255, 0.06);
+
+  border-radius: 32px;
+
+  overflow: hidden;
+
+  box-shadow: var(--shadow-soft);
+
+  transition: 0.3s;
+}
+
+.player-panel:hover {
+  border-color: rgba(255, 255, 255, 0.12);
+
+  box-shadow:
+    0 0 35px rgba(255, 255, 255, 0.05),
+    0 28px 70px rgba(0, 0, 0, 0.55);
+}
+
+/*==========================================================
+TABS
+==========================================================*/
+
+.player-tab {
+  display: none;
+
+  flex-direction: column;
+
+  height: 100%;
+
+  padding: 34px;
+
+  animation: playerFade 0.25s ease;
+}
+
+.player-tab.active {
+  display: flex;
+}
+
+/*==========================================================
+HEADER
+==========================================================*/
+
+.panel-header {
   display: flex;
 
   justify-content: space-between;
 
   align-items: center;
+
+  margin-bottom: 18px;
+  margin-left: 10px;
 }
 
-.player-note-header span {
-  font-size: 18px;
+.panel-header h3 {
+  font-size: 22px;
 
-  font-weight: 600;
+  font-weight: 700;
+
+  color: #fff;
 }
 
-.player-note-header button {
+.panel-header button {
+  height: 44px;
+
+  padding: 0 18px;
+
   display: flex;
 
   align-items: center;
 
-  gap: 8px;
-
-  padding: 10px 16px;
+  gap: 10px;
 
   border: none;
 
-  border-radius: 14px;
-
-  background: var(--surface);
-
-  color: white;
+  border-radius: 16px;
 
   cursor: pointer;
+
+  background: var(--gradient-nav);
+
+  border: 1px solid var(--border);
+
+  color: var(--text-muted);
+
+  box-shadow: var(--shadow-nav);
+
+  transition: 0.25s;
 }
 
-#playerNotes {
+.panel-header button svg {
+  width: 18px;
+
+  height: 18px;
+}
+
+.panel-header button:hover {
+  background: var(--gradient-active);
+
+  color: #000;
+
+  border-color: var(--border-light);
+
+  box-shadow: var(--shadow-active);
+}
+
+/*==========================================================
+JOURNAL
+==========================================================*/
+
+#journalText {
+  flex: 1;
+
   width: 100%;
 
-  min-height: 140px;
-
   resize: none;
+
+  outline: none;
+
+  border: none;
+
+  padding: 26px;
+
+  border-radius: 24px;
+
+  background: #171717;
+
+  color: #f5f5f5;
+
+  font-size: 15px;
+
+  font-family: var(--font-main);
+
+  line-height: 1.9;
+
+  border: 1px solid rgba(255, 255, 255, 0.05);
+
+  transition: 0.25s;
+}
+
+#journalText::placeholder {
+  color: #6f6f6f;
+}
+
+#journalText:focus {
+  border-color: rgba(255, 255, 255, 0.16);
+
+  box-shadow: 0 0 24px rgba(255, 255, 255, 0.05);
+}
+
+/*==========================================================
+TAGS
+==========================================================*/
+
+.player-tags {
+  display: flex;
+
+  flex-wrap: wrap;
+
+  gap: 14px;
+
+  align-content: flex-start;
+}
+
+.player-tag {
+  height: 42px;
+
+  padding: 0 18px;
+
+  border: none;
+
+  border-radius: 999px;
+
+  cursor: pointer;
+
+  display: flex;
+
+  align-items: center;
+
+  justify-content: center;
+
+  background: var(--gradient-nav);
+
+  border: 1px solid var(--border);
+
+  color: var(--text-muted);
+
+  font-size: 14px;
+
+  font-weight: 600;
+
+  transition: 0.25s;
+}
+
+.player-tag:hover {
+  background: var(--gradient-active);
+
+  color: #000;
+
+  border-color: var(--border-light);
+
+  box-shadow: var(--shadow-active);
+
+  transform: translateY(-2px);
+}
+
+.player-tag.active {
+  background: var(--gradient-active);
+
+  color: #000;
+}
+
+.player-selected-tags {
+  display: flex;
+
+  flex-wrap: wrap;
+
+  gap: 12px;
+
+  align-content: flex-start;
+}
+
+.player-selected-tag {
+  display: flex;
+
+  align-items: center;
+
+  gap: 10px;
+
+  padding: 12px 18px;
+
+  border-radius: 999px;
+
+  background: #171717;
+
+  border: 1px solid rgba(255, 255, 255, 0.06);
+
+  color: #f3f3f3;
+}
+
+.player-selected-tag svg {
+  width: 18px;
+
+  height: 18px;
+}
+
+.remove-player-tag {
+  cursor: pointer;
+
+  opacity: 0.55;
+
+  transition: 0.2s;
+}
+
+.remove-player-tag:hover {
+  opacity: 1;
+}
+
+/*==========================================================
+COMMON LYRICS STYLE
+==========================================================*/
+
+.lyrics-view,
+.lyrics-editor {
+  flex: 1;
+
+  width: 100%;
+  height: 100%;
+
+  box-sizing: border-box;
+
+  padding: 24px;
+
+  background: transparent;
+
+  border: none;
+  outline: none;
+
+  color: var(--text);
+
+  font-family: inherit;
+  font-size: 17px;
+  font-weight: 400;
+  line-height: 1.9;
+
+  white-space: pre-wrap;
+  word-break: break-word;
+
+  overflow-y: auto;
+}
+
+.lyrics-editor {
+  resize: none;
+  caret-color: #fff;
+}
+
+.lyrics-editor:focus {
+  outline: none;
+}
+
+.lyrics-view {
+  cursor: text;
+}
+
+.lyrics-view:hover {
+  color: #fff;
+}
+
+.lyrics-editor {
+  display: none;
+}
+
+.lyrics-editor.active {
+  display: block;
+}
+
+.lyrics-view.hide {
+  display: none;
+}
+
+/*==========================================================
+DETAILS
+==========================================================*/
+
+.player-details {
+  flex: 1;
+
+  display: flex;
+  flex-direction: column;
+
+  gap: 14px;
+
+  overflow-y: auto;
+
+  scrollbar-width: none;
+
+  min-height: 0;
+}
+
+.player-details::-webkit-scrollbar {
+  display: none;
+}
+
+/*==========================================================
+DETAIL CARD
+==========================================================*/
+
+.detail-item {
+  padding: 18px 22px;
+
+  background: #171717;
+
+  border: 1px solid rgba(255, 255, 255, 0.05);
+
+  border-radius: 20px;
+
+  transition:
+    border-color 0.2s ease,
+    box-shadow 0.2s ease,
+    background 0.2s ease;
+}
+
+/*==========================================================
+EDITING STATE
+==========================================================*/
+.detail-item.editing {
+  background: #1b1b1b;
+
+  border-color: rgba(255, 255, 255, 0.14);
+
+  box-shadow:
+    0 0 0 1px rgba(255, 255, 255, 0.06),
+    0 0 18px rgba(255, 255, 255, 0.05);
+}
+
+/*==========================================================
+LABEL
+==========================================================*/
+
+.detail-item span {
+  display: block;
+
+  margin-bottom: 8px;
+
+  font-size: 11px;
+
+  font-weight: 600;
+
+  letter-spacing: 1px;
+
+  text-transform: uppercase;
+
+  color: #7b7b7b;
+}
+
+/*==========================================================
+DISPLAY + INPUT
+==========================================================*/
+
+.detail-display {
+  width: 100%;
+
+  min-height: 28px;
+
+  cursor: text;
+
+  user-select: text;
+}
+
+.detail-display {
+  cursor: text;
+
+  user-select: text;
+}
+
+.detail-input {
+  display: none;
+
+  width: 100%;
+
+  min-height: 28px;
+
+  padding: 0;
+
+  margin: 0;
 
   border: none;
 
@@ -341,143 +1294,386 @@
 
   background: transparent;
 
-  color: white;
+  color: #f5f5f5;
 
-  font-size: 15px;
+  font: inherit;
 
-  font-family: var(--font-main);
+  line-height: inherit;
+
+  caret-color: #fff;
+
+  cursor: text;
+}
+/*==========================================================
+TOGGLE EDIT
+==========================================================*/
+
+.detail-item.editing .detail-display {
+  display: none;
 }
 
-/* ==========================================================
-   FOOTER
-========================================================== */
-
-.player-footer-card {
-  display: flex;
-
-  justify-content: space-between;
-
-  align-items: center;
-
-  padding: 20px 24px;
-
-  border-radius: 24px;
-
-  background: var(--gradient-nav);
-
-  border: 1px solid var(--border);
+.detail-item.editing .detail-input {
+  display: block;
 }
 
-.player-footer-card > div {
-  display: flex;
+/*==========================================================
+SCROLLBAR
+==========================================================*/
 
-  align-items: center;
-
-  gap: 12px;
+.player-tab::-webkit-scrollbar,
+.lyrics-content::-webkit-scrollbar {
+  width: 8px;
 }
 
-.player-footer-card button {
-  display: flex;
+.player-tab::-webkit-scrollbar-track,
+.lyrics-content::-webkit-scrollbar-track {
+  background: #111;
 
-  align-items: center;
-
-  gap: 8px;
-
-  padding: 12px 20px;
-
-  border: none;
-
-  border-radius: 16px;
-
-  background: white;
-
-  color: black;
-
-  cursor: pointer;
+  border-radius: 999px;
 }
 
-/* ==========================================================
-   MOBILE
-========================================================== */
+.player-tab::-webkit-scrollbar-thumb,
+.lyrics-content::-webkit-scrollbar-thumb {
+  background: #303030;
 
-@media (max-width: 900px) {
-  .player-card {
-    flex-direction: column;
+  border-radius: 999px;
+}
 
-    padding: 24px;
+.player-tab::-webkit-scrollbar-thumb:hover,
+.lyrics-content::-webkit-scrollbar-thumb:hover {
+  background: #4a4a4a;
+}
 
-    gap: 30px;
+/*==========================================================
+ANIMATION
+==========================================================*/
+
+@keyframes playerFade {
+  from {
+    opacity: 0;
+
+    transform: translateY(10px);
   }
 
-  .player-left {
-    width: 100%;
+  to {
+    opacity: 1;
+
+    transform: none;
+  }
+}
+
+/*==========================================================
+MOON BOX
+PLAYER.CSS
+PART 4
+HOVER • ANIMATIONS • RESPONSIVE
+==========================================================*/
+
+/*==========================================================
+CARD HOVER
+==========================================================*/
+
+.player-top,
+.player-panel {
+  transition:
+    background 0.3s,
+    border-color 0.3s,
+    box-shadow 0.3s,
+    transform 0.3s;
+}
+
+.player-top:hover,
+.player-panel:hover {
+  border-color: rgba(255, 255, 255, 0.12);
+
+  box-shadow:
+    0 0 35px rgba(255, 255, 255, 0.05),
+    0 35px 80px rgba(0, 0, 0, 0.55);
+}
+
+/*==========================================================
+GLOBAL BUTTON TRANSITION
+==========================================================*/
+
+.player-side-button,
+.player-toggle,
+.player-controls button,
+.panel-header button,
+.player-tag,
+.player-details div {
+  transition:
+    background 0.25s,
+    color 0.25s,
+    border-color 0.25s,
+    box-shadow 0.25s,
+    transform 0.25s,
+    opacity 0.25s;
+}
+
+/*==========================================================
+MOONLIGHT HOVER
+==========================================================*/
+
+.player-side-button:hover,
+.player-toggle:hover,
+.panel-header button:hover,
+.player-tag:hover {
+  background: var(--gradient-active);
+
+  color: #000;
+
+  border-color: var(--border-light);
+
+  box-shadow: var(--shadow-active);
+
+  transform: translateY(-2px);
+}
+
+.player-side-button:hover svg,
+.player-toggle:hover svg,
+.panel-header button:hover svg,
+.player-tag:hover svg {
+  color: #000;
+}
+
+/*==========================================================
+ACTIVE STATES
+==========================================================*/
+
+.player-side-button.active,
+.player-toggle.active,
+.player-tag.active {
+  background: var(--gradient-active);
+
+  color: #000;
+
+  border-color: var(--border-light);
+
+  box-shadow: var(--shadow-active);
+}
+
+/*==========================================================
+PLAY BUTTON
+==========================================================*/
+
+.play-main {
+  transition:
+    transform 0.25s,
+    box-shadow 0.25s,
+    background 0.25s,
+    color 0.25s;
+}
+
+.play-main:hover {
+  transform: scale(1.08);
+
+  box-shadow:
+    0 0 35px rgba(255, 255, 255, 0.22),
+    var(--shadow-active);
+}
+
+.play-main.playing {
+  background: #fff !important;
+
+  color: #000 !important;
+
+  box-shadow:
+    0 0 40px rgba(255, 255, 255, 0.32),
+    var(--shadow-active);
+}
+
+/*==========================================================
+ALBUM HOVER
+==========================================================*/
+
+.album-cover {
+  transition:
+    transform 0.35s,
+    box-shadow 0.35s;
+}
+
+.album-cover:hover {
+  transform: scale(1.025);
+
+  box-shadow:
+    0 0 28px rgba(255, 255, 255, 0.08),
+    0 30px 60px rgba(0, 0, 0, 0.6);
+}
+
+.player-top:hover .vinyl {
+  box-shadow:
+    0 0 35px rgba(255, 255, 255, 0.05),
+    0 25px 60px rgba(0, 0, 0, 0.55);
+}
+
+/*==========================================================
+PROGRESS BAR
+==========================================================*/
+
+#progressBar {
+  transition: 0.25s;
+}
+
+#progressBar:hover {
+  filter: brightness(1.15);
+}
+
+/*==========================================================
+TEXTAREA
+==========================================================*/
+
+#journalText {
+  transition:
+    border-color 0.25s,
+    box-shadow 0.25s,
+    background 0.25s;
+}
+
+#journalText:hover {
+  background: #191919;
+}
+
+#journalText:focus {
+  background: #1b1b1b;
+}
+
+/*==========================================================
+DETAIL CARDS
+==========================================================*/
+
+.player-details div {
+  cursor: default;
+}
+
+/*==========================================================
+FADE ANIMATION
+==========================================================*/
+
+.player-tab {
+  animation: playerFade 0.25s ease;
+}
+
+@keyframes playerFade {
+  from {
+    opacity: 0;
+
+    transform: translateY(12px);
   }
 
-  .player-vinyl {
-    width: 250px;
+  to {
+    opacity: 1;
 
-    height: 250px;
+    transform: none;
   }
+}
 
-  .player-cover {
-    width: 220px;
+/*==========================================================
+FOCUS
+==========================================================*/
 
-    height: 220px;
-  }
+.player-controls button:focus-visible,
+.player-toggle:focus-visible,
+.player-side-button:focus-visible,
+.panel-header button:focus-visible,
+#journalText:focus-visible {
+  outline: none;
 
-  .vinyl-record {
-    width: 220px;
+  box-shadow:
+    0 0 0 2px rgba(255, 255, 255, 0.18),
+    0 0 18px rgba(255, 255, 255, 0.12);
+}
 
-    height: 220px;
+/*==========================================================
+SCROLLBAR
+==========================================================*/
 
-    left: 15px;
-  }
+.player-panel::-webkit-scrollbar,
+.lyrics-content::-webkit-scrollbar,
+#journalText::-webkit-scrollbar {
+  width: 8px;
+}
 
-  .player-song-info h2 {
-    font-size: 30px;
-  }
+.player-panel::-webkit-scrollbar-track,
+.lyrics-content::-webkit-scrollbar-track,
+#journalText::-webkit-scrollbar-track {
+  background: transparent;
+}
 
-  .player-footer-card {
+.player-panel::-webkit-scrollbar-thumb,
+.lyrics-content::-webkit-scrollbar-thumb,
+#journalText::-webkit-scrollbar-thumb {
+  background: #2e2e2e;
+
+  border-radius: 999px;
+}
+
+.player-panel::-webkit-scrollbar-thumb:hover,
+.lyrics-content::-webkit-scrollbar-thumb:hover,
+#journalText::-webkit-scrollbar-thumb:hover {
+  background: #4a4a4a;
+}
+
+/* Hide scrollbar by default */
+#journalText::-webkit-scrollbar {
+  width: 0px;
+  transition: width 0.2s ease;
+}
+
+#journalText::-webkit-scrollbar {
+  width: 8px;
+}
+
+#journalText::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+#journalText::-webkit-scrollbar-thumb {
+  background: transparent;
+  border-radius: 999px;
+  transition: background 0.2s ease;
+}
+
+#journalText:hover::-webkit-scrollbar-thumb,
+#journalText:focus::-webkit-scrollbar-thumb {
+  background: #353535;
+}
+
+#journalText:hover::-webkit-scrollbar-thumb:hover,
+#journalText:focus::-webkit-scrollbar-thumb:hover {
+  background: #555;
+}
+
+@media (max-width: 768px) {
+  .player-layout {
+    display: flex;
+
     flex-direction: column;
 
     gap: 18px;
 
-    align-items: flex-start;
+    height: auto;
+  }
+
+  .player-top {
+    order: 1;
+  }
+
+  .player-sidebar {
+    order: 2;
+
+    flex-direction: row;
+
+    justify-content: space-evenly;
+
+    width: 100%;
+  }
+
+  .player-panel {
+    order: 3;
+
+    height: 420px;
   }
 }
 
-@media (max-width: 640px) {
-  .player-screen {
-    gap: 22px;
-  }
 
-  .player-card {
-    padding: 18px;
 
-    border-radius: 24px;
-  }
-
-  .player-song-info h2 {
-    font-size: 26px;
-  }
-
-  .player-meta {
-    gap: 14px;
-
-    font-size: 12px;
-  }
-
-  .player-options {
-    flex-wrap: wrap;
-  }
-
-  .player-progress-area {
-    grid-template-columns: 40px 1fr 40px;
-  }
-
-  .play-button {
-    width: 64px !important;
-
-    height: 64px !important;
-  }
-}

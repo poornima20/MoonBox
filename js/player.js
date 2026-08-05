@@ -4,57 +4,45 @@
 ========================================================== */
 
 document.addEventListener("DOMContentLoaded", () => {
-  /* ======================================================
-       ELEMENTS
-    ====================================================== */
+  /* ==========================================================
+   ELEMENTS
+========================================================== */
 
-  const cover = document.getElementById("playerCover");
+  const tabs = document.querySelectorAll(".player-side-button");
+  const panels = document.querySelectorAll(".player-tab");
 
-  const title = document.getElementById("playerTitle");
+  const playButton = document.getElementById("playPause");
+  const nextButton = document.getElementById("nextSong");
+  const previousButton = document.getElementById("previousSong");
 
-  const artist = document.getElementById("playerArtist");
+  const shuffleButton = document.querySelectorAll(".player-toggle")[0];
+  const repeatButton = document.querySelectorAll(".player-toggle")[1];
 
-  const year = document.getElementById("playerYear");
-
-  const genre = document.getElementById("playerGenre");
-
-  const duration = document.getElementById("playerDuration");
+  const progress = document.getElementById("progressBar");
 
   const currentTime = document.getElementById("currentTime");
-
   const totalTime = document.getElementById("totalTime");
 
-  const progress = document.getElementById("playerProgress");
+  const title = document.getElementById("playerTitle");
+  const artist = document.getElementById("playerArtist");
+  const cover = document.getElementById("playerCover");
 
-  const playButton = document.getElementById("playButton");
+  const vinyl = document.querySelector(".vinyl");
+  const album = document.querySelector(".player-album");
 
-  const previousButton = document.getElementById("previousButton");
+  /* ==========================================================
+   SAMPLE SONGS
+========================================================== */
 
-  const nextButton = document.getElementById("nextButton");
-
-  const shuffleButton = document.getElementById("shuffleButton");
-
-  const repeatButton = document.getElementById("repeatButton");
-
-  const notes = document.getElementById("playerNotes");
-
-  /* ======================================================
-       SAMPLE PLAYLIST
-    ====================================================== */
-
-  const playlist = [
+  const songs = [
     {
       title: "Midnight Drive",
 
       artist: "The Weeknd",
 
-      year: "2023",
-
-      genre: "Night",
-
       duration: 222,
 
-      cover: "assets/default-cover.png",
+      cover: "assets/new.jpg",
     },
 
     {
@@ -62,49 +50,67 @@ document.addEventListener("DOMContentLoaded", () => {
 
       artist: "JVKE",
 
-      year: "2022",
-
-      genre: "Pop",
-
       duration: 198,
 
-      cover: "assets/default-cover.png",
+      cover: "assets/moon.png",
     },
 
     {
-      title: "Rainy Days",
+      title: "Late Night Piano",
 
-      artist: "Joji",
+      artist: "Yiruma",
 
-      year: "2021",
+      duration: 245,
 
-      genre: "Rain",
-
-      duration: 184,
-
-      cover: "assets/default-cover.png",
+      cover: "assets/moonboxlogo.png",
     },
   ];
 
-  /* ======================================================
-       STATE
-    ====================================================== */
+  songs.forEach((song) => {
+    const img = new Image();
+
+    img.src = song.cover;
+  });
+
+  /* ==========================================================
+   STATE
+========================================================== */
 
   let currentSong = 0;
 
   let playing = false;
 
-  let repeat = false;
+  // 0 = Off
+  // 1 = Repeat Library
+  // 2 = Repeat Song
+  let repeatMode = 0;
 
   let shuffle = false;
 
-  let elapsed = 0;
-
   let timer = null;
 
-  /* ======================================================
-       FORMAT TIME
-    ====================================================== */
+  let elapsed = 0;
+
+  let playerTags = [
+    {
+      name: "Night",
+      icon: "moon-star",
+    },
+
+    {
+      name: "Rain",
+      icon: "cloud-rain",
+    },
+
+    {
+      name: "Lofi",
+      icon: "audio-waveform",
+    },
+  ];
+
+  /* ==========================================================
+   FORMAT TIME
+========================================================== */
 
   function format(seconds) {
     const m = Math.floor(seconds / 60);
@@ -114,183 +120,389 @@ document.addEventListener("DOMContentLoaded", () => {
     return `${m}:${String(s).padStart(2, "0")}`;
   }
 
-  /* ======================================================
-       LOAD SONG
-    ====================================================== */
+  /* ==========================================================
+   LOAD SONG
+========================================================== */
+  function updateProgress() {
+    const percent = (elapsed / songs[currentSong].duration) * 100;
+
+    progress.value = elapsed;
+
+    progress.style.setProperty("--progress", `${percent}%`);
+
+    currentTime.textContent = format(elapsed);
+  }
 
   function loadSong(index) {
-    const song = playlist[index];
-
-    cover.src = song.cover;
+    const song = songs[index];
 
     title.textContent = song.title;
 
     artist.textContent = song.artist;
 
-    year.innerHTML = `<i data-lucide="calendar-days"></i> ${song.year}`;
-
-    genre.innerHTML = `<i data-lucide="music4"></i> ${song.genre}`;
-
-    duration.innerHTML = `<i data-lucide="clock-3"></i> ${format(song.duration)}`;
+    cover.src = song.cover;
 
     totalTime.textContent = format(song.duration);
 
-    currentTime.textContent = "0:00";
+    progress.max = song.duration;
 
-    progress.value = 0;
+    progress.style.setProperty("--progress", "0%");
 
     elapsed = 0;
-
-    loadNotes();
-
-    lucide.createIcons();
+    updateProgress();
   }
 
-  /* ======================================================
-       PLAY
-    ====================================================== */
+  /* ==========================================================
+   PLAY
+========================================================== */
 
-  function play() {
+  function playSong() {
     playing = true;
+
+    playButton.classList.add("playing");
 
     playButton.innerHTML = `<i data-lucide="pause"></i>`;
 
+    vinyl.classList.add("playing");
+    album.classList.add("playing");
+
     lucide.createIcons();
 
     clearInterval(timer);
 
-    timer = setInterval(updateProgress, 1000);
+    timer = setInterval(() => {
+      elapsed++;
+
+      updateProgress();
+
+      if (elapsed >= songs[currentSong].duration) {
+        clearInterval(timer);
+
+        if (repeatMode === 2) {
+          // Repeat current song
+          elapsed = 0;
+          playSong();
+        } else {
+          autoNext();
+        }
+      }
+    }, 1000);
   }
 
-  /* ======================================================
-       PAUSE
-    ====================================================== */
+  /* ==========================================================
+   PAUSE
+========================================================== */
 
-  function pause() {
+  function pauseSong() {
     playing = false;
+
+    playButton.classList.remove("playing");
 
     playButton.innerHTML = `<i data-lucide="play"></i>`;
 
+    vinyl.classList.remove("playing");
+    album.classList.remove("playing");
+
     lucide.createIcons();
 
     clearInterval(timer);
   }
 
-  /* ======================================================
-       UPDATE PROGRESS
-    ====================================================== */
+  /* ==========================================================
+   BUTTONS
+========================================================== */
 
-  function updateProgress() {
-    elapsed++;
+  function next() {
+    clearInterval(timer);
 
-    const song = playlist[currentSong];
+    currentSong++;
 
-    if (elapsed >= song.duration) {
-      if (repeat) {
-        elapsed = 0;
-      } else {
-        nextSong();
+    if (currentSong >= songs.length) currentSong = 0;
 
-        return;
-      }
-    }
+    loadSong(currentSong);
 
-    currentTime.textContent = format(elapsed);
-
-    progress.value = (elapsed / song.duration) * 100;
+    playSong();
   }
 
-  /* ======================================================
-       NEXT
-    ====================================================== */
-
-  function nextSong() {
+  function autoNext() {
     if (shuffle) {
-      currentSong = Math.floor(Math.random() * playlist.length);
+      currentSong = Math.floor(Math.random() * songs.length);
     } else {
       currentSong++;
 
-      if (currentSong >= playlist.length) {
-        currentSong = 0;
+      // Reached the end of the playlist
+      if (currentSong >= songs.length) {
+        if (repeatMode === 1) {
+          // Repeat the whole playlist
+          currentSong = 0;
+        } else {
+          // Repeat OFF → stop playback
+          currentSong = songs.length - 1;
+
+          pauseSong();
+
+          return;
+        }
       }
     }
 
     loadSong(currentSong);
 
-    if (playing) play();
+    playSong();
   }
 
-  /* ======================================================
-       PREVIOUS
-    ====================================================== */
+  function previous() {
+    clearInterval(timer);
 
-  function previousSong() {
     currentSong--;
 
-    if (currentSong < 0) {
-      currentSong = playlist.length - 1;
-    }
+    if (currentSong < 0) currentSong = songs.length - 1;
 
     loadSong(currentSong);
 
-    if (playing) play();
+    playSong();
   }
 
-  /* ======================================================
-       NOTES
-    ====================================================== */
-
-  function noteKey() {
-    return "moonbox-note-" + playlist[currentSong].title;
-  }
-
-  function loadNotes() {
-    notes.value = localStorage.getItem(noteKey()) || "";
-  }
-
-  notes.addEventListener("input", () => {
-    localStorage.setItem(
-      noteKey(),
-
-      notes.value,
-    );
+  cover.addEventListener("click", () => {
+    if (playing) {
+      pauseSong();
+    } else {
+      playSong();
+    }
   });
-
-  /* ======================================================
-       BUTTONS
-    ====================================================== */
 
   playButton.addEventListener("click", () => {
-    playing ? pause() : play();
+    if (playing) {
+      pauseSong();
+    } else {
+      playSong();
+    }
   });
 
-  nextButton.addEventListener("click", nextSong);
+  nextButton.addEventListener("click", next);
 
-  previousButton.addEventListener("click", previousSong);
+  previousButton.addEventListener("click", previous);
+
+  /* ==========================================================
+   PROGRESS
+========================================================== */
+
+  progress.addEventListener("input", () => {
+    elapsed = Number(progress.value);
+
+    updateProgress();
+  });
+  /* ==========================================================
+   SHUFFLE
+========================================================== */
 
   shuffleButton.addEventListener("click", () => {
     shuffle = !shuffle;
 
     shuffleButton.classList.toggle("active", shuffle);
+
+    shuffleButton.querySelector("span").textContent = shuffle
+      ? "Shuffle On"
+      : "Shuffle";
   });
+
+  /* ==========================================================
+   REPEAT
+========================================================== */
+  function updateRepeatButton() {
+    const text = repeatButton.querySelector("span");
+
+    repeatButton.classList.remove("repeat-library", "repeat-song");
+
+    switch (repeatMode) {
+      case 0:
+        text.textContent = "Repeat";
+
+        repeatButton.classList.remove("active");
+
+        break;
+
+      case 1:
+        text.textContent = "Repeat List";
+
+        repeatButton.classList.add("active");
+        repeatButton.classList.add("repeat-library");
+
+        break;
+
+      case 2:
+        text.textContent = "Repeat Song";
+
+        repeatButton.classList.add("active");
+        repeatButton.classList.add("repeat-song");
+
+        break;
+    }
+  }
 
   repeatButton.addEventListener("click", () => {
-    repeat = !repeat;
+    repeatMode++;
 
-    repeatButton.classList.toggle("active", repeat);
+    if (repeatMode > 2) repeatMode = 0;
+
+    updateRepeatButton();
   });
 
-  progress.addEventListener("input", () => {
-    const song = playlist[currentSong];
+  /* ==========================================================
+   SIDEBAR
+========================================================== */
 
-    elapsed = Math.floor((progress.value / 100) * song.duration);
+  tabs.forEach((button) => {
+    button.addEventListener("click", () => {
+      tabs.forEach((b) => b.classList.remove("active"));
 
-    currentTime.textContent = format(elapsed);
+      button.classList.add("active");
+
+      const panel = button.dataset.panel;
+
+      panels.forEach((p) => p.classList.remove("active"));
+
+      document.getElementById(panel + "Panel").classList.add("active");
+    });
   });
 
-  /* ======================================================
-       INIT
-    ====================================================== */
+  /* ==========================================================
+   LYRICS
+========================================================== */
+  lyricsView.addEventListener("click", () => {
+    lyricsEditor.value = lyricsView.textContent;
+
+    lyricsView.classList.add("hide");
+
+    lyricsEditor.classList.add("active");
+
+    lyricsEditor.focus();
+  });
+
+  lyricsEditor.addEventListener("blur", () => {
+    lyricsView.textContent = lyricsEditor.value;
+
+    lyricsEditor.classList.remove("active");
+
+    lyricsView.classList.remove("hide");
+  });
+
+  /* ==========================================================
+   Details
+========================================================== */
+
+  const detailItems = document.querySelectorAll(".detail-item");
+
+  detailItems.forEach((item) => {
+    const display = item.querySelector(".detail-display");
+
+    const input = item.querySelector(".detail-input");
+
+    item.addEventListener("click", () => {
+      item.classList.add("editing");
+
+      input.focus();
+
+      input.setSelectionRange(input.value.length, input.value.length);
+    });
+
+    function save() {
+      display.textContent = input.value.trim();
+
+      item.classList.remove("editing");
+    }
+
+    input.addEventListener("blur", save);
+
+    input.addEventListener("keydown", (e) => {
+      if (e.key === "Enter") {
+        input.blur();
+      }
+    });
+  });
+
+ 
+
+
+  /* ==========================================================
+   Tags
+========================================================== */
+
+  document.getElementById("addPlayerTag").addEventListener("click", () => {
+    const dummy = [
+      {
+        name: "Drive",
+        icon: "car-front",
+      },
+
+      {
+        name: "Study",
+        icon: "book-open",
+      },
+
+      {
+        name: "Jazz",
+        icon: "music-4",
+      },
+    ];
+
+    const available = dummy.filter(
+      (tag) => !playerTags.some((t) => t.name === tag.name),
+    );
+
+    if (available.length === 0) return;
+
+    playerTags.push(available[0]);
+
+    renderPlayerTags();
+  });
+
+  document.addEventListener("click", (e) => {
+    const remove = e.target.closest(".remove-player-tag");
+
+    if (!remove) return;
+
+    playerTags.splice(remove.dataset.index, 1);
+
+    renderPlayerTags();
+  });
+
+  function renderPlayerTags() {
+    const container = document.getElementById("playerSelectedTags");
+
+    container.innerHTML = "";
+
+    playerTags.forEach((tag, index) => {
+      const button = document.createElement("button");
+
+      button.className = "player-selected-tag";
+
+      button.innerHTML = `
+
+            <i data-lucide="${tag.icon}"></i>
+
+            <span>${tag.name}</span>
+
+            <i
+                class="remove-player-tag"
+                data-index="${index}"
+                data-lucide="x"
+            ></i>
+
+        `;
+
+      container.appendChild(button);
+    });
+
+    lucide.createIcons();
+  }
+
+  /* ==========================================================
+   INITIALIZE
+========================================================== */
 
   loadSong(currentSong);
+  renderPlayerTags();
+
+  lucide.createIcons();
 });

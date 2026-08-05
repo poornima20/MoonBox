@@ -279,166 +279,323 @@
         <!-- ======================================================
                             PLAYER SCREEN
         ======================================================= -->
+        <!-- ==========================================================
+PLAYER SCREEN
+========================================================== -->
 
-        <!-- ======================================================
-                    PLAYER SCREEN
-======================================================= -->
+        <section class="screen" id="playerScreen">
+          <div class="player-layout">
+            <!-- ==================================================
+        LEFT SIDEBAR
+        =================================================== -->
 
-        <section class="screen player-screen">
-          <!-- ==============================================
-        HEADER
-    =============================================== -->
+            <aside class="player-sidebar">
+              <button class="player-side-button active" data-panel="journal">
+                <i data-lucide="notebook-pen"></i>
+                <span>Notes</span>
+              </button>
 
-          <div class="player-header">
-            <div>
-              <h1>Player</h1>
+              <button class="player-side-button" data-panel="tags">
+                <i data-lucide="tag"></i>
+                <span>Tags</span>
+              </button>
 
-              <p>Enjoy your music under the moonlight.</p>
-            </div>
-          </div>
+              <button class="player-side-button" data-panel="lyrics">
+                <i data-lucide="quote"></i>
+                <span>Lyrics</span>
+              </button>
 
-          <!-- ==============================================
-        PLAYER CARD
-    =============================================== -->
+              <button class="player-side-button" data-panel="details">
+                <i data-lucide="info"></i>
+                <span>Details</span>
+              </button>
+            </aside>
 
-          <div class="player-card">
-            <!-- LEFT -->
+            <!-- ==================================================
+        PLAYER
+        =================================================== -->
 
-            <div class="player-left">
-              <div class="player-vinyl">
-                <div class="vinyl-record"></div>
+            <section class="player-top">
+              <!-- Album -->
+
+              <div class="player-album">
+                <div class="record-wrapper">
+                  <div class="vinyl">
+                    <div class="shine"></div>
+                    <div class="record-label">
+                      <img src="assets/new.jpg" alt="" />
+                    </div>
+                  </div>
+                </div>
 
                 <img
                   id="playerCover"
-                  class="player-cover"
-                  src="assets\moonboxlogo.png"
-                  alt="Album Cover"
+                  class="album-cover"
+                  src="assets/moon.png"
+                  alt=""
                 />
               </div>
+
+              <!-- Song Info -->
+
+              <div class="player-info">
+                <div class="player-top-buttons">
+                  <button class="player-toggle">
+                    <i data-lucide="shuffle"></i>
+                    <span>Shuffle</span>
+                  </button>
+
+                  <button class="player-toggle">
+                    <i data-lucide="repeat"></i>
+                    <span>Repeat</span>
+                  </button>
+                </div>
+
+                <div class="song-meta">
+                  <h2 id="playerTitle">Sailing</h2>
+                  <span id="playerArtist"> Christopher Cross </span>
+                </div>
+
+                <div class="song-extra">
+                  <span>
+                    <i data-lucide="calendar"></i>
+                    1979
+                  </span>
+
+                  <span>
+                    <i data-lucide="music"></i>
+                    Soft Rock
+                  </span>
+
+                  <span>
+                    <i data-lucide="clock-3"></i>
+                    4:18
+                  </span>
+                </div>
+
+                <div class="player-progress">
+                  <span id="currentTime">0:00</span>
+
+                  <input
+                    id="progressBar"
+                    type="range"
+                    min="0"
+                    max="100"
+                    value="25"
+                  />
+
+                  <span id="totalTime">4:18</span>
+                </div>
+
+                <div class="player-controls">
+                  <button id="previousSong">
+                    <i data-lucide="skip-back"></i>
+                  </button>
+
+                  <button id="playPause" class="play-main">
+                    <i data-lucide="play"></i>
+                  </button>
+
+                  <button id="nextSong">
+                    <i data-lucide="skip-forward"></i>
+                  </button>
+                </div>
+              </div>
+            </section>
+
+            <!-- ==================================================
+        RIGHT PANEL
+        =================================================== -->
+
+            <aside class="player-panel">
+              <!-- ==========================
+            JOURNAL
+            =========================== -->
+
+              <div class="player-tab active" id="journalPanel">
+                <div class="panel-header">
+                  
+                  <h3> Notes</h3>
+                </div>
+
+                <textarea id="journalText">
+Feels like ocean breeze.
+
+Perfect for long drives.
+                </textarea>
+              </div>
+
+              <!-- ==========================
+            TAGS
+            =========================== -->
+
+             <div class="player-tab" id="tagsPanel">
+
+                <div class="panel-header">
+
+                    <h3>Tags</h3>
+
+                    <button id="addPlayerTag">
+                        <i data-lucide="plus"></i>
+                        Add Tag
+                    </button>
+
+                </div>
+
+                <div id="playerSelectedTags" class="player-selected-tags">
+
+                </div>
+
             </div>
 
-            <!-- RIGHT -->
+              <!-- ==========================
+            LYRICS
+            =========================== -->
 
-            <div class="player-right">
-              <!-- TOP BUTTONS -->
+              <div class="player-tab" id="lyricsPanel">
+                <div class="panel-header">
+    <h3>Lyrics</h3>
 
-              <div class="player-options">
-                <button id="shuffleButton">
-                  <i data-lucide="shuffle"></i>
+    <button id="uploadLyrics">
+        <i data-lucide="upload"></i>
+        Upload
+    </button>
+</div>
 
-                  <span>Shuffle</span>
-                </button>
+<div class="lyrics-view" id="lyricsView">Sailing takes me away...
+To where I've always heard...
+It could be...
+</div>
 
-                <button id="repeatButton">
-                  <i data-lucide="repeat"></i>
+<textarea
+    id="lyricsEditor"
+    class="lyrics-editor"
+></textarea>
 
-                  <span>Repeat</span>
-                </button>
-              </div>
+<input
+    type="file"
+    id="lyricsFile"
+    accept=".txt,.lrc"
+    hidden
+>
+                </div>
 
-              <!-- SONG -->
 
-              <div class="player-song-info">
-                <span id="playerArtist"> Unknown Artist </span>
+         <!-- ==========================
+DETAILS
+=========================== -->
 
-                <h2 id="playerTitle">Moon Song</h2>
-              </div>
+<div class="player-tab" id="detailsPanel">
 
-              <!-- EXTRA INFO -->
+    <div class="panel-header">
+        <h3>Track Details</h3>
+    </div>
 
-              <div class="player-meta">
-                <span id="playerYear">
-                  <i data-lucide="calendar-days"></i>
+    <div class="player-details">
 
-                  ----
-                </span>
+        <!-- Album -->
+        <div class="detail-item">
+            <span>Album</span>
 
-                <span id="playerGenre">
-                  <i data-lucide="music4"></i>
-
-                  Unknown
-                </span>
-
-                <span id="playerDuration">
-                  <i data-lucide="clock-3"></i>
-
-                  0:00
-                </span>
-              </div>
-
-              <!-- PROGRESS -->
-
-              <div class="player-progress-area">
-                <span id="currentTime"> 0:00 </span>
-
-                <input
-                  type="range"
-                  min="0"
-                  max="100"
-                  value="0"
-                  id="playerProgress"
-                />
-
-                <span id="totalTime"> 0:00 </span>
-              </div>
-
-              <!-- CONTROLS -->
-
-              <div class="player-controls">
-                <button id="previousButton">
-                  <i data-lucide="skip-back"></i>
-                </button>
-
-                <button id="playButton" class="play-button">
-                  <i data-lucide="play"></i>
-                </button>
-
-                <button id="nextButton">
-                  <i data-lucide="skip-forward"></i>
-                </button>
-              </div>
-            </div>
-          </div>
-
-          <!-- ==============================================
-        NOTES CARD
-    =============================================== -->
-
-          <div class="player-note-card">
-            <div class="player-note-header">
-              <span> My Notes </span>
-
-              <button id="editNoteButton">
-                <i data-lucide="pencil"></i>
-
-                Edit
-              </button>
+            <div class="detail-display">
+                Christopher Cross
             </div>
 
-            <textarea
-              id="playerNotes"
-              placeholder="Write something about this song..."
-            ></textarea>
-          </div>
+            <input
+                class="detail-input"
+                type="text"
+                value="Christopher Cross"
+            >
+        </div>
 
-          <!-- ==============================================
-        BOTTOM CARD
-    =============================================== -->
+        <!-- Artist -->
+        <div class="detail-item">
+            <span>Artist</span>
 
-          <div class="player-footer-card">
-            <div>
-              <i data-lucide="sparkles"></i>
-
-              <span> Discover more music using MoonBox Tags. </span>
+            <div class="detail-display">
+                Christopher Cross
             </div>
 
-            <button id="goTagsButton">
-              Go to Tags
+            <input
+                class="detail-input"
+                type="text"
+                value="Christopher Cross"
+            >
+        </div>
 
-              <i data-lucide="chevron-right"></i>
-            </button>
+        <!-- Year -->
+        <div class="detail-item">
+            <span>Year</span>
+
+            <div class="detail-display">
+                1979
+            </div>
+
+            <input
+                class="detail-input"
+                type="text"
+                value="1979"
+            >
+        </div>
+
+        <!-- Genre -->
+        <div class="detail-item">
+            <span>Genre</span>
+
+            <div class="detail-display">
+                Soft Rock
+            </div>
+
+            <input
+                class="detail-input"
+                type="text"
+                value="Soft Rock"
+            >
+        </div>
+
+        <!-- Bitrate -->
+        <div class="detail-item">
+            <span>Bitrate</span>
+
+            <div class="detail-display">
+                320 kbps
+            </div>
+
+            <input
+                class="detail-input"
+                type="text"
+                value="320 kbps"
+            >
+        </div>
+
+        <!-- Format -->
+        <div class="detail-item">
+            <span>Format</span>
+
+            <div class="detail-display">
+                FLAC
+            </div>
+
+            <input
+                class="detail-input"
+                type="text"
+                value="FLAC"
+            >
+        </div>
+
+    </div>
+
+</div>
+              </div>
+
+          
+            </aside>
           </div>
         </section>
+
+        <!-- ==========================================================
+                     end workspace
+=========================================================== -->
       </main>
     </div>
 
