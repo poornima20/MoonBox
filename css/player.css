@@ -1700,29 +1700,28 @@ Phone + Tablet
     overflow: hidden;
   }
 
+  .app {
+    border: none;
+  }
 
   /* ==========================================================
    HIDE MAIN SCROLLBAR
 ========================================================== */
 
-html,
-body{
-
+  html,
+  body {
     overflow-y: auto;
 
-    scrollbar-width: none;      /* Firefox */
+    scrollbar-width: none; /* Firefox */
 
-    -ms-overflow-style: none;   /* IE/Edge */
+    -ms-overflow-style: none; /* IE/Edge */
+  }
 
-}
+  html::-webkit-scrollbar,
+  body::-webkit-scrollbar {
+    display: none; /* Chrome, Safari */
+  }
 
-html::-webkit-scrollbar,
-body::-webkit-scrollbar{
-
-    display: none;              /* Chrome, Safari */
-
-}
-  
   /*==========================================================
 SCREEN
 ==========================================================*/
@@ -1782,10 +1781,13 @@ PLAYER
 
     min-height: auto;
   }
+
   /*==========================================================
 ALBUM
 ==========================================================*/
-
+  .player-album::before {
+    pointer-events: none;
+  }
   .player-album {
     width: 240px;
 
@@ -1965,6 +1967,7 @@ RIGHT PANEL
     width: 100%;
 
     min-height: 430px;
+    height: 60vh;
   }
 
   .player-tab {
@@ -1985,7 +1988,6 @@ NOTES
 
   #journalText {
     font-size: 15px;
-
     padding: 20px;
   }
 
@@ -2036,330 +2038,256 @@ SCROLL
   }
 }
 
-
 /*==========================================================
 EXTRA SMALL PHONES
 320px - 375px
 ==========================================================*/
 
-@media (max-width:375px){
+@media (max-width: 375px) {
+  .app {
+    border: none;
+  }
 
-    #playerScreen{
+  #playerScreen {
+    padding: 8px;
+  }
 
-        padding:8px;
+  .player-layout {
+    gap: 14px;
+  }
 
-    }
+  .player-top {
+    padding: 18px;
 
-    .player-layout{
+    gap: 20px;
 
-        gap:14px;
+    border-radius: 24px;
+  }
 
-    }
-
-    .player-top{
-
-        padding:18px;
-
-        gap:20px;
-
-        border-radius:24px;
-
-    }
-
-    /*==========================
+  /*==========================
     ALBUM
     ==========================*/
+  .player-album::before {
+    pointer-events: none;
+  }
+  .player-album {
+    width: 190px;
 
-    .player-album{
+    height: 190px;
+  }
 
-        width:190px;
+  .album-cover {
+    width: 170px;
 
-        height:190px;
+    height: 170px;
 
-    }
+    top: 14px;
+  }
 
-    .album-cover{
+  .record-wrapper {
+    width: 170px;
 
-        width:170px;
+    height: 170px;
 
-        height:170px;
+    left: 94px;
 
-        top:14px;
+    top: 10px;
+  }
 
-    }
+  .vinyl {
+    width: 158px;
 
-    .record-wrapper{
+    height: 158px;
 
-        width:170px;
+    left: -80px;
+  }
 
-        height:170px;
+  .record-label {
+    width: 50px;
 
-        left:94px;
+    height: 50px;
+  }
 
-        top:10px;
+  .record-label img {
+    width: 170px;
 
-    }
+    height: 170px;
+  }
 
-    .vinyl{
+  .player-album.playing .record-wrapper {
+    transform: translateX(60px);
+  }
 
-        width:158px;
-
-        height:158px;
-
-        left:-80px;
-
-    }
-
-    .record-label{
-
-        width:50px;
-
-        height:50px;
-
-    }
-
-    .record-label img{
-
-        width:170px;
-
-        height:170px;
-
-    }
-
-    .player-album.playing .record-wrapper{
-
-        transform:translateX(60px);
-
-    }
-
-    /*==========================
+  /*==========================
     SONG
     ==========================*/
 
-    .song-meta{
+  .song-meta {
+    gap: 8px;
 
-        gap:8px;
+    margin-left: 0;
+  }
 
-        margin-left:0;
+  .song-meta h2 {
+    font-size: 22px;
+  }
 
-    }
+  .song-meta span {
+    font-size: 15px;
+  }
 
-    .song-meta h2{
+  .song-extra {
+    gap: 10px;
 
-        font-size:22px;
+    margin-left: 0;
+  }
 
-    }
+  .song-extra span {
+    font-size: 13px;
+  }
 
-    .song-meta span{
+  .song-extra svg {
+    width: 16px;
 
-        font-size:15px;
+    height: 16px;
+  }
 
-    }
-
-    .song-extra{
-
-        gap:10px;
-
-        margin-left:0;
-
-    }
-
-    .song-extra span{
-
-        font-size:13px;
-
-    }
-
-    .song-extra svg{
-
-        width:16px;
-
-        height:16px;
-
-    }
-
-    /*==========================
+  /*==========================
     TOGGLES
     ==========================*/
 
-    .player-top-buttons{
+  .player-top-buttons {
+    width: 100%;
 
-        width:100%;
+    justify-content: center;
+  }
 
-        justify-content:center;
+  .player-toggle {
+    min-width: 120px;
 
-    }
+    height: 40px;
 
-    .player-toggle{
+    font-size: 13px;
+  }
 
-        min-width:120px;
+  .player-toggle span {
+    font-size: 13px;
+  }
 
-        height:40px;
-
-        font-size:13px;
-
-    }
-
-    .player-toggle span{
-
-        font-size:13px;
-
-    }
-
-    /*==========================
+  /*==========================
     PROGRESS
     ==========================*/
 
-    .player-progress{
+  .player-progress {
+    gap: 10px;
+  }
 
-        gap:10px;
+  .player-progress span {
+    font-size: 12px;
+  }
 
-    }
+  #progressBar {
+    height: 5px;
+  }
 
-    .player-progress span{
-
-        font-size:12px;
-
-    }
-
-    #progressBar{
-
-        height:5px;
-
-    }
-
-    /*==========================
+  /*==========================
     CONTROLS
     ==========================*/
 
-    .player-controls{
+  .player-controls {
+    gap: 18px;
+  }
 
-        gap:18px;
+  .player-controls button {
+    width: 52px;
 
-    }
+    height: 52px;
+  }
 
-    .player-controls button{
+  .play-main {
+    width: 72px !important;
 
-        width:52px;
+    height: 72px !important;
+  }
 
-        height:52px;
+  .play-main svg {
+    width: 28px !important;
 
-    }
+    height: 28px !important;
+  }
 
-    .play-main{
-
-        width:72px !important;
-
-        height:72px !important;
-
-    }
-
-    .play-main svg{
-
-        width:28px !important;
-
-        height:28px !important;
-
-    }
-
-    /*==========================
+  /*==========================
     SIDE BUTTONS
     ==========================*/
 
-    .player-sidebar{
+  .player-sidebar {
+    gap: 8px;
+  }
 
-        gap:8px;
+  .player-side-button {
+    height: 64px;
 
-    }
+    border-radius: 18px;
+  }
 
-    .player-side-button{
+  .player-side-button svg {
+    width: 16px;
 
-        height:64px;
+    height: 16px;
+  }
 
-        border-radius:18px;
+  .player-side-button span {
+    font-size: 12px;
+  }
 
-    }
-
-    .player-side-button svg{
-
-        width:16px;
-
-        height:16px;
-
-    }
-
-    .player-side-button span{
-
-        font-size:12px;
-
-    }
-
-    /*==========================
+  /*==========================
     RIGHT PANEL
     ==========================*/
 
-    .player-panel{
+  .player-panel {
+    min-height: 360px;
 
-        min-height:360px;
+    border-radius: 24px;
+  }
 
-        border-radius:24px;
+  .player-tab {
+    padding: 18px;
+  }
 
-    }
+  .panel-header h3 {
+    font-size: 20px;
+  }
 
-    .player-tab{
+  .panel-header button {
+    height: 38px;
 
-        padding:18px;
+    padding: 0 14px;
 
-    }
+    font-size: 13px;
+  }
 
-    .panel-header h3{
-
-        font-size:20px;
-
-    }
-
-    .panel-header button{
-
-        height:38px;
-
-        padding:0 14px;
-
-        font-size:13px;
-
-    }
-
-    /*==========================
+  /*==========================
     NOTES / LYRICS
     ==========================*/
 
-    #journalText,
+  #journalText,
+  .lyrics-view,
+  .lyrics-editor {
+    padding: 16px;
 
-    .lyrics-view,
+    font-size: 14px;
+  }
 
-    .lyrics-editor{
-
-        padding:16px;
-
-        font-size:14px;
-
-    }
-
-    /*==========================
+  /*==========================
     DETAILS
     ==========================*/
 
-    .detail-item{
+  .detail-item {
+    padding: 14px 16px;
+  }
 
-        padding:14px 16px;
-
-    }
-
-    .detail-display,
-
-    .detail-input{
-
-        font-size:15px;
-
-    }
-
+  .detail-display,
+  .detail-input {
+    font-size: 15px;
+  }
 }
