@@ -1,0 +1,1029 @@
+/* ==========================================================
+   MOONBOX FOLDER MANAGER
+   Flat, soft-dark, Finder / Arc / Notion desktop inspired.
+   No glassmorphism, no glow, no gradients, no floating cards.
+   ========================================================== */
+
+:root {
+  --folder-bg: #101010;
+  --folder-surface: #151515;
+  --folder-surface-2: #242424;
+  --folder-selected-bg: #222222;
+  --folder-border: rgba(255, 255, 255, 0.06);
+
+  --folder-text: #ececec;
+  --folder-muted: #b2b2b3;
+
+  --folder-accent: #f1f4f9;
+  --folder-hover: rgba(100, 100, 100, 0.04);
+  --folder-selected: #3c3c3c;
+
+  --folder-icon: #c8944f;
+
+  --folder-font:
+    "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+}
+
+* {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(31, 31, 31, 0.1) transparent;
+}
+
+/* ==========================================================
+   OVERLAY
+   ========================================================== */
+
+.folder-overlay {
+  position: fixed;
+  inset: 0;
+
+  background: rgba(0, 0, 0, 0.5);
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  opacity: 0;
+  visibility: hidden;
+
+  transition: opacity 0.2s ease;
+
+  z-index: 99999;
+
+  font-family: var(--folder-font);
+}
+
+.folder-overlay.show {
+  opacity: 1;
+  visibility: visible;
+}
+
+/* ==========================================================
+   WINDOW
+   ========================================================== */
+
+.folder-window {
+  width: min(1200px, 92vw);
+  height: min(760px, 90vh);
+
+  background: var(--folder-bg);
+
+  border: 1px solid var(--folder-border);
+
+  border-radius: 22px;
+
+  overflow: hidden;
+
+  display: flex;
+  flex-direction: column;
+
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.35);
+
+  transform: scale(0.97);
+
+  transition:
+    transform 0.2s ease,
+    opacity 0.2s ease;
+}
+
+.folder-overlay.show .folder-window {
+  transform: scale(1);
+}
+
+/* ==========================================================
+   HEADER
+   ========================================================== */
+
+.folder-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+
+  padding: 26px 32px 22px;
+
+  border-bottom: 1px solid var(--folder-border);
+
+  background: var(--folder-bg);
+
+  flex-shrink: 0;
+}
+
+.folder-header h2 {
+  color: var(--folder-text);
+
+  font-size: 30px;
+
+  font-weight: 700;
+
+  margin: 0 0 6px;
+}
+
+.folder-header p {
+  color: var(--folder-muted);
+
+  font-size: 14px;
+
+  max-width: 600px;
+
+  line-height: 1.5;
+
+  margin: 0;
+}
+
+.folder-close {
+  width: 36px;
+  height: 36px;
+
+  border: 1px solid var(--folder-border);
+
+  border-radius: 50%;
+
+  cursor: pointer;
+
+  background: transparent;
+
+  color: var(--folder-muted);
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  flex-shrink: 0;
+
+  transition:
+    background 0.15s ease,
+    color 0.15s ease;
+}
+
+.folder-close:hover {
+  background: var(--folder-hover);
+
+  color: var(--folder-text);
+}
+
+.folder-close i,
+.folder-close svg {
+  width: 16px;
+  height: 16px;
+}
+
+/* ==========================================================
+   BODY
+   ========================================================== */
+
+.folder-body {
+  flex: 1;
+
+  display: grid;
+
+  grid-template-columns: 300px 1fr;
+
+  overflow: hidden;
+}
+
+/* ==========================================================
+   SIDEBAR
+   ========================================================== */
+
+.folder-sidebar {
+  display: flex;
+
+  flex-direction: column;
+
+  background: var(--folder-surface);
+
+  border-right: 1px solid var(--folder-border);
+
+  overflow: hidden;
+}
+
+/* ==========================================================
+   TOOLBAR
+   ========================================================== */
+
+.folder-sidebar-header {
+  padding: 20px 15px;
+
+  display: flex;
+  flex-direction: row;
+
+  gap: 8px;
+
+  border-bottom: 1px solid var(--folder-border);
+
+  flex-shrink: 0;
+}
+
+/* ==========================================================
+   BUTTONS
+   ========================================================== */
+
+.folder-sidebar-header button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  gap: 8px;
+
+  flex: 1;
+
+  height: 38px;
+  padding: 0 14px;
+
+  border: 1px solid var(--folder-border);
+
+  border-radius: 10px;
+
+  cursor: pointer;
+
+  background: var(--folder-surface-2);
+
+  color: var(--folder-muted);
+
+  font-family: var(--folder-font);
+  font-size: 13px;
+
+  font-weight: 500;
+
+  transition:
+    background 0.15s ease,
+    color 0.15s ease;
+}
+
+.folder-sidebar-header button:hover {
+  background: var(--folder-hover);
+
+  color: var(--folder-text);
+}
+
+.folder-sidebar-header button svg {
+  width: 18px;
+  height: 18px;
+}
+
+/* ==========================================================
+   SEARCH
+   ========================================================== */
+
+.folder-search {
+  margin: 14px 20px;
+
+  position: relative;
+
+  flex-shrink: 0;
+}
+
+.folder-search input {
+  width: 100%;
+
+  height: 38px;
+
+  padding: 0 14px 0 38px;
+
+  border: 1px solid var(--folder-border);
+
+  outline: none;
+
+  border-radius: 10px;
+
+  background: var(--folder-surface-2);
+
+  color: var(--folder-text);
+
+  font-family: var(--folder-font);
+  font-size: 13px;
+
+  transition: border-color 0.15s ease;
+}
+
+.folder-search input:focus {
+  border-color: rgba(111, 168, 255, 0.4);
+}
+
+.folder-search input::placeholder {
+  color: var(--folder-muted);
+}
+
+.folder-search i {
+  position: absolute;
+
+  left: 12px;
+
+  top: 50%;
+
+  transform: translateY(-50%);
+
+  color: var(--folder-muted);
+
+  font-size: 13px;
+
+  pointer-events: none;
+}
+
+/* ==========================================================
+   TREE
+   ========================================================== */
+
+.folder-tree {
+  flex: 1;
+
+  overflow-y: auto;
+
+  padding: 20px 12px 20px;
+}
+
+/* ==========================================================
+   FOLDER ITEM
+   ========================================================== */
+
+.folder-item {
+  display: flex;
+
+  align-items: center;
+
+  justify-content: space-between;
+
+  gap: 10px;
+
+  height: 40px;
+  padding: 0 12px;
+
+  margin-bottom: 2px;
+
+  border-radius: 10px;
+
+  cursor: pointer;
+
+  transition: background 0.12s ease;
+}
+
+.folder-item:hover {
+  background: var(--folder-hover);
+}
+
+.folder-item.active {
+  background: var(--folder-selected-bg);
+}
+
+.folder-left {
+  display: flex;
+
+  align-items: center;
+
+  gap: 10px;
+
+  min-width: 0;
+}
+
+.folder-left i {
+  color: var(--folder-icon);
+
+  font-size: 14px;
+
+  flex-shrink: 0;
+}
+
+.folder-name {
+  color: var(--folder-text);
+
+  font-size: 14px;
+
+  font-weight: 500;
+
+  white-space: nowrap;
+
+  overflow: hidden;
+
+  text-overflow: ellipsis;
+}
+
+.folder-count {
+  color: var(--folder-muted);
+
+  font-size: 13px;
+
+  flex-shrink: 0;
+}
+
+/* ==========================================================
+   EMPTY
+   ========================================================== */
+
+.folder-empty {
+  height: 100%;
+
+  display: flex;
+
+  flex-direction: column;
+
+  justify-content: center;
+
+  align-items: center;
+
+  text-align: center;
+
+  padding: 40px;
+}
+
+.folder-empty i {
+  width: 56px;
+  height: 56px;
+
+  color: var(--folder-muted);
+
+  margin-bottom: 16px;
+
+  opacity: 0.6;
+}
+
+.folder-empty h3 {
+  color: var(--folder-text);
+
+  font-size: 16px;
+
+  margin: 0 0 6px;
+}
+
+.folder-empty p {
+  color: var(--folder-muted);
+
+  font-size: 13px;
+
+  line-height: 1.5;
+
+  max-width: 240px;
+
+  margin: 0;
+}
+
+/* ==========================================================
+   SCROLLBAR
+   ========================================================== */
+
+.folder-tree::-webkit-scrollbar {
+  width: 6px;
+}
+
+.folder-tree::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.1);
+
+  border-radius: 10px;
+}
+
+.folder-tree::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+/* ==========================================================
+   FOLDER CONTENT (RIGHT PANEL)
+   ========================================================== */
+
+.folder-content {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+
+  background: var(--folder-bg);
+}
+
+/* ==========================================================
+   CONTENT HEADER
+   ========================================================== */
+
+.folder-content-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+
+  padding: 17.3px 28px;
+
+  border-bottom: 1px solid var(--folder-border);
+
+  background: var(--folder-bg);
+
+  flex-shrink: 0;
+}
+
+.folder-content-header h3 {
+  color: var(--folder-text);
+
+  font-size: 22px;
+
+  font-weight: 700;
+
+  margin: 0;
+}
+
+.folder-info {
+  display: flex;
+  gap: 16px;
+
+  color: var(--folder-muted);
+
+  font-size: 13px;
+}
+
+.folder-info span {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+/* ==========================================================
+   SONG LIST
+   ========================================================== */
+
+.folder-song-list {
+  flex: 1;
+
+  overflow-y: auto;
+
+  padding: 8px 16px 16px;
+}
+
+/* ==========================================================
+   SONG ROW
+   ========================================================== */
+
+.folder-song {
+  display: grid;
+
+  grid-template-columns:
+    32px
+    1fr
+    auto
+    auto;
+
+  align-items: center;
+
+  gap: 14px;
+
+  padding: 10px 12px;
+
+  border-radius: 10px;
+
+  transition: background 0.12s ease;
+
+  cursor: default;
+
+  border: none;
+}
+
+.folder-song:hover {
+  background: var(--folder-hover);
+}
+
+/* ==========================================================
+   SONG ICON
+   ========================================================== */
+
+.song-icon {
+  width: 32px;
+  height: 32px;
+
+  border-radius: 8px;
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  background: transparent;
+
+  color: var(--folder-muted);
+
+  flex-shrink: 0;
+}
+
+.folder-song.playing .song-icon {
+  color: var(--folder-accent);
+}
+
+/* ==========================================================
+   SONG DETAILS
+   ========================================================== */
+
+.song-details {
+  min-width: 0;
+}
+
+.song-title {
+  color: var(--folder-text);
+
+  font-size: 14px;
+
+  font-weight: 500;
+
+  white-space: nowrap;
+
+  overflow: hidden;
+
+  text-overflow: ellipsis;
+}
+
+.song-subtitle {
+  margin-top: 2px;
+
+  color: var(--folder-muted);
+
+  font-size: 13px;
+
+  white-space: nowrap;
+
+  overflow: hidden;
+
+  text-overflow: ellipsis;
+}
+
+/* ==========================================================
+   DURATION
+   ========================================================== */
+
+.song-duration {
+  color: var(--folder-muted);
+
+  font-size: 13px;
+
+  font-variant-numeric: tabular-nums;
+}
+
+/* ==========================================================
+   DELETE BUTTON
+   ========================================================== */
+
+.song-delete {
+  width: 28px;
+  height: 28px;
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  border: none;
+
+  border-radius: 8px;
+
+  background: transparent;
+
+  color: var(--folder-muted);
+
+  cursor: pointer;
+
+  opacity: 0;
+
+  transition:
+    opacity 0.12s ease,
+    background 0.12s ease,
+    color 0.12s ease;
+}
+
+.folder-song:hover .song-delete {
+  opacity: 1;
+}
+
+.song-delete:hover {
+  background: rgba(255, 255, 255, 0.08);
+
+  color: #ff6b6b;
+}
+
+/* ==========================================================
+   EMPTY SONG LIST
+   ========================================================== */
+
+.folder-song-empty {
+  height: 100%;
+
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+
+  text-align: center;
+
+  color: var(--folder-muted);
+
+  padding: 50px;
+}
+
+.folder-song-empty i {
+  width: 56px;
+  height: 56px;
+
+  margin-bottom: 16px;
+
+  opacity: 0.5;
+}
+
+.folder-song-empty h3 {
+  color: var(--folder-text);
+
+  font-size: 16px;
+
+  margin-bottom: 8px;
+}
+
+/* ==========================================================
+   FOOTER
+   ========================================================== */
+
+.folder-footer {
+  display: flex;
+
+  justify-content: space-between;
+  align-items: center;
+
+  padding: 14px 24px;
+
+  border-top: 1px solid var(--folder-border);
+
+  background: var(--folder-bg);
+
+  color: var(--folder-muted);
+
+  font-size: 13px;
+
+  flex-shrink: 0;
+}
+
+/* ==========================================================
+   SCROLLBAR
+   ========================================================== */
+
+.folder-song-list::-webkit-scrollbar {
+  width: 6px;
+}
+
+.folder-song-list::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.1);
+
+  border-radius: 10px;
+}
+
+.folder-song-list::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.folder-back {
+  display: none;
+}
+
+/* ==========================================================
+   TABLET
+   ========================================================== */
+
+@media (max-width: 1000px) {
+  .folder-window {
+    width: 96vw;
+    height: 92vh;
+  }
+
+  .folder-body {
+    grid-template-columns: 240px 1fr;
+  }
+}
+
+/* ==========================================================
+   MOBILE
+   ========================================================== */
+
+/* ==========================================================
+   MOBILE
+   Folders and Content become separate views
+   ========================================================== */
+
+@media (max-width: 720px) {
+  /* ----------------------------------------------------------
+     WINDOW
+     ---------------------------------------------------------- */
+
+  .folder-window {
+    width: 100vw;
+    height: 100vh;
+
+    border-radius: 0;
+  }
+
+  /* ----------------------------------------------------------
+     HEADER
+     ---------------------------------------------------------- */
+
+  .folder-header {
+    padding: 20px;
+  }
+
+  .folder-header h2 {
+    font-size: 24px;
+  }
+
+  .folder-header p {
+    font-size: 13px;
+    line-height: 1.5;
+  }
+
+  /* ----------------------------------------------------------
+     BODY
+     ---------------------------------------------------------- */
+
+  .folder-body {
+    position: relative;
+
+    display: block;
+
+    overflow: hidden;
+  }
+
+  /* ----------------------------------------------------------
+     SIDEBAR
+     ---------------------------------------------------------- */
+
+  .folder-sidebar {
+    position: absolute;
+
+    inset: 0;
+
+    width: 100%;
+    height: 100%;
+
+    border: none;
+
+    background: var(--folder-surface);
+
+    overflow: hidden;
+
+    z-index: 2;
+
+    display: flex;
+  }
+
+  /* ----------------------------------------------------------
+     CONTENT
+     ---------------------------------------------------------- */
+
+  .folder-content {
+    position: absolute;
+
+    inset: 0;
+
+    width: 100%;
+    height: 100%;
+
+    background: var(--folder-bg);
+
+    z-index: 1;
+
+    display: flex;
+  }
+
+  /* ----------------------------------------------------------
+     MOBILE INITIAL STATE
+     SHOW FOLDERS FIRST
+     ---------------------------------------------------------- */
+
+  .folder-body.mobile-folders .folder-sidebar {
+    transform: translateX(0);
+  }
+
+  .folder-body.mobile-folders .folder-content {
+    transform: translateX(100%);
+  }
+
+  /* ----------------------------------------------------------
+     MOBILE CONTENT STATE
+     SHOW SONGS
+     ---------------------------------------------------------- */
+
+  .folder-body.mobile-content .folder-sidebar {
+    transform: translateX(-100%);
+  }
+
+  .folder-body.mobile-content .folder-content {
+    transform: translateX(0);
+  }
+
+  /* ----------------------------------------------------------
+     SLIDE ANIMATION
+     ---------------------------------------------------------- */
+
+  .folder-sidebar,
+  .folder-content {
+    transition: transform 0.25s ease;
+  }
+
+  /* ----------------------------------------------------------
+     SIDEBAR TOOLBAR
+     ---------------------------------------------------------- */
+
+  .folder-sidebar-header {
+    padding: 16px 15px;
+  }
+
+  /* ----------------------------------------------------------
+     FOLDER LIST
+     ---------------------------------------------------------- */
+
+  .folder-tree {
+    padding: 16px 12px 20px;
+
+    overflow-y: auto;
+  }
+
+  /* ----------------------------------------------------------
+     CONTENT HEADER
+     ---------------------------------------------------------- */
+
+  .folder-content-header {
+    padding: 16px 20px;
+
+    min-height: 70px;
+  }
+
+  /* ----------------------------------------------------------
+     TITLE AREA
+     ---------------------------------------------------------- */
+
+  .folder-title-area {
+    display: flex;
+
+    align-items: center;
+
+    gap: 12px;
+  }
+
+  /* ----------------------------------------------------------
+     BACK BUTTON
+     ---------------------------------------------------------- */
+
+  .folder-back {
+    width: 36px;
+    height: 36px;
+
+    display: flex;
+
+    align-items: center;
+    justify-content: center;
+
+    flex-shrink: 0;
+
+    border: 1px solid var(--folder-border);
+
+    border-radius: 10px;
+
+    background: transparent;
+
+    color: var(--folder-muted);
+
+    cursor: pointer;
+  }
+
+  .folder-back:hover {
+    background: var(--folder-hover);
+
+    color: var(--folder-text);
+  }
+
+  .folder-back svg {
+    width: 18px;
+    height: 18px;
+  }
+
+  /* ----------------------------------------------------------
+     SONG LIST
+     ---------------------------------------------------------- */
+
+  .folder-song-list {
+    padding: 8px 12px 16px;
+
+    overflow-y: auto;
+  }
+
+  /* ----------------------------------------------------------
+     SONG ROW
+     ---------------------------------------------------------- */
+
+  .folder-song {
+    grid-template-columns:
+      28px
+      1fr
+      auto;
+
+    gap: 12px;
+
+    padding: 10px 8px;
+  }
+
+  /* ----------------------------------------------------------
+     DELETE
+     ---------------------------------------------------------- */
+
+  .song-delete {
+    display: none;
+  }
+
+  /* ----------------------------------------------------------
+     INFO
+     ---------------------------------------------------------- */
+
+  .folder-info {
+    font-size: 12px;
+  }
+}

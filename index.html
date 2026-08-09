@@ -13,13 +13,14 @@
     <link rel="stylesheet" href="css/tag.css" />
     <link rel="stylesheet" href="css/library.css" />
     <link rel="stylesheet" href="css/player.css" />
+    <link rel="stylesheet" href="css/folders.css" />
   </head>
 
   <body>
     <div class="app">
       <!-- ==========================================================
                             TOP NAVIGATION
-    =========================================================== -->
+        =========================================================== -->
 
       <header class="top-nav">
         <!-- Logo -->
@@ -58,14 +59,14 @@
 
         <!-- Folder -->
 
-        <button class="folder-button">
+        <button class="folder-button" id="openFolders">
           <i data-lucide="box"></i>
         </button>
       </header>
 
       <!-- ==========================================================
                         HORIZONTAL WORKSPACE
-    =========================================================== -->
+        =========================================================== -->
 
       <main class="workspace" id="workspace">
         <!-- ======================================================
@@ -153,12 +154,8 @@
         </section>
 
         <!-- ======================================================
-                            LIBRARY SCREEN
-        ======================================================= -->
-
-        <!-- ======================================================
                     LIBRARY SCREEN
-======================================================= -->
+        ======================================================= -->
 
         <section class="screen library-screen">
           <!-- ====================================================
@@ -279,15 +276,12 @@
         <!-- ======================================================
                             PLAYER SCREEN
         ======================================================= -->
-        <!-- ==========================================================
-PLAYER SCREEN
-========================================================== -->
 
         <section class="screen" id="playerScreen">
           <div class="player-layout">
             <!-- ==================================================
-        LEFT SIDEBAR
-        =================================================== -->
+            LEFT SIDEBAR
+            =================================================== -->
 
             <aside class="player-sidebar">
               <button class="player-side-button active" data-panel="journal">
@@ -312,8 +306,8 @@ PLAYER SCREEN
             </aside>
 
             <!-- ==================================================
-        PLAYER
-        =================================================== -->
+            PLAYER
+            =================================================== -->
 
             <section class="player-top">
               <!-- Album -->
@@ -404,18 +398,17 @@ PLAYER SCREEN
             </section>
 
             <!-- ==================================================
-        RIGHT PANEL
-        =================================================== -->
+            RIGHT PANEL
+            =================================================== -->
 
             <aside class="player-panel">
               <!-- ==========================
-            JOURNAL
-            =========================== -->
+                JOURNAL
+              =========================== -->
 
               <div class="player-tab active" id="journalPanel">
                 <div class="panel-header">
-                  
-                  <h3> Notes</h3>
+                  <h3>Notes</h3>
                 </div>
 
                 <textarea id="journalText">
@@ -426,182 +419,215 @@ Perfect for long drives.
               </div>
 
               <!-- ==========================
-            TAGS
-            =========================== -->
+                TAGS
+              =========================== -->
 
-             <div class="player-tab" id="tagsPanel">
-
+              <div class="player-tab" id="tagsPanel">
                 <div class="panel-header">
+                  <h3>Tags</h3>
 
-                    <h3>Tags</h3>
-
-                    <button id="addPlayerTag">
-                        <i data-lucide="plus"></i>
-                        Add Tag
-                    </button>
-
+                  <button id="addPlayerTag">
+                    <i data-lucide="plus"></i>
+                    Add Tag
+                  </button>
                 </div>
 
-                <div id="playerSelectedTags" class="player-selected-tags">
-
-                </div>
-
-            </div>
+                <div id="playerSelectedTags" class="player-selected-tags"></div>
+              </div>
 
               <!-- ==========================
-            LYRICS
-            =========================== -->
+                LYRICS
+              =========================== -->
 
               <div class="player-tab" id="lyricsPanel">
                 <div class="panel-header">
-    <h3>Lyrics</h3>
+                  <h3>Lyrics</h3>
 
-    <button id="uploadLyrics">
-        <i data-lucide="upload"></i>
-        Upload
-    </button>
-</div>
-
-<div class="lyrics-view" id="lyricsView">Sailing takes me away...
-To where I've always heard...
-It could be...
-</div>
-
-<textarea
-    id="lyricsEditor"
-    class="lyrics-editor"
-></textarea>
-
-<input
-    type="file"
-    id="lyricsFile"
-    accept=".txt,.lrc"
-    hidden
->
+                  <button id="uploadLyrics">
+                    <i data-lucide="upload"></i>
+                    Upload
+                  </button>
                 </div>
 
+                <div class="lyrics-view" id="lyricsView">
+                  Sailing takes me away... To where I've always heard... It
+                  could be...
+                </div>
 
-         <!-- ==========================
-DETAILS
-=========================== -->
+                <textarea id="lyricsEditor" class="lyrics-editor"></textarea>
 
-<div class="player-tab" id="detailsPanel">
-
-    <div class="panel-header">
-        <h3>Track Details</h3>
-    </div>
-
-    <div class="player-details">
-
-        <!-- Album -->
-        <div class="detail-item">
-            <span>Album</span>
-
-            <div class="detail-display">
-                Christopher Cross
-            </div>
-
-            <input
-                class="detail-input"
-                type="text"
-                value="Christopher Cross"
-            >
-        </div>
-
-        <!-- Artist -->
-        <div class="detail-item">
-            <span>Artist</span>
-
-            <div class="detail-display">
-                Christopher Cross
-            </div>
-
-            <input
-                class="detail-input"
-                type="text"
-                value="Christopher Cross"
-            >
-        </div>
-
-        <!-- Year -->
-        <div class="detail-item">
-            <span>Year</span>
-
-            <div class="detail-display">
-                1979
-            </div>
-
-            <input
-                class="detail-input"
-                type="text"
-                value="1979"
-            >
-        </div>
-
-        <!-- Genre -->
-        <div class="detail-item">
-            <span>Genre</span>
-
-            <div class="detail-display">
-                Soft Rock
-            </div>
-
-            <input
-                class="detail-input"
-                type="text"
-                value="Soft Rock"
-            >
-        </div>
-
-        <!-- Bitrate -->
-        <div class="detail-item">
-            <span>Bitrate</span>
-
-            <div class="detail-display">
-                320 kbps
-            </div>
-
-            <input
-                class="detail-input"
-                type="text"
-                value="320 kbps"
-            >
-        </div>
-
-        <!-- Format -->
-        <div class="detail-item">
-            <span>Format</span>
-
-            <div class="detail-display">
-                FLAC
-            </div>
-
-            <input
-                class="detail-input"
-                type="text"
-                value="FLAC"
-            >
-        </div>
-
-    </div>
-
-</div>
+                <input type="file" id="lyricsFile" accept=".txt,.lrc" hidden />
               </div>
 
-          
+              <!-- ==========================
+              DETAILS
+              =========================== -->
+
+              <div class="player-tab" id="detailsPanel">
+                <div class="panel-header">
+                  <h3>Track Details</h3>
+                </div>
+
+                <div class="player-details">
+                  <!-- Album -->
+                  <div class="detail-item">
+                    <span>Album</span>
+
+                    <div class="detail-display">Christopher Cross</div>
+
+                    <input
+                      class="detail-input"
+                      type="text"
+                      value="Christopher Cross"
+                    />
+                  </div>
+
+                  <!-- Artist -->
+                  <div class="detail-item">
+                    <span>Artist</span>
+
+                    <div class="detail-display">Christopher Cross</div>
+
+                    <input
+                      class="detail-input"
+                      type="text"
+                      value="Christopher Cross"
+                    />
+                  </div>
+
+                  <!-- Year -->
+                  <div class="detail-item">
+                    <span>Year</span>
+
+                    <div class="detail-display">1979</div>
+
+                    <input class="detail-input" type="text" value="1979" />
+                  </div>
+
+                  <!-- Genre -->
+                  <div class="detail-item">
+                    <span>Genre</span>
+
+                    <div class="detail-display">Soft Rock</div>
+
+                    <input class="detail-input" type="text" value="Soft Rock" />
+                  </div>
+
+                  <!-- Bitrate -->
+                  <div class="detail-item">
+                    <span>Bitrate</span>
+
+                    <div class="detail-display">320 kbps</div>
+
+                    <input class="detail-input" type="text" value="320 kbps" />
+                  </div>
+
+                  <!-- Format -->
+                  <div class="detail-item">
+                    <span>Format</span>
+
+                    <div class="detail-display">FLAC</div>
+
+                    <input class="detail-input" type="text" value="FLAC" />
+                  </div>
+                </div>
+              </div>
             </aside>
           </div>
         </section>
-
-        <!-- ==========================================================
-                     end workspace
-=========================================================== -->
       </main>
+
+      <!-- ==========================================================
+        FOLDER MANAGER
+        ========================================================== -->
+
+      <div class="folder-overlay" id="folderOverlay">
+        <div class="folder-window">
+          <!-- Header -->
+
+          <div class="folder-header">
+            <div>
+              <h2>Folders</h2>
+
+              <p>
+                Import folders from your computer. MoonBox stores the folder
+                reference while keeping your music organized.
+              </p>
+            </div>
+
+            <button class="folder-close" id="closeFolders">
+              <i data-lucide="x"></i>
+            </button>
+          </div>
+
+          <!-- Body -->
+
+          <div class="folder-body">
+            <!-- LEFT -->
+
+            <aside class="folder-sidebar">
+              <div class="folder-sidebar-header">
+                <button id="addFolderButton">
+                  <i data-lucide="folder-plus"></i>
+
+                  Add Folder
+                </button>
+
+                <button id="addFilesButton">
+                  <i data-lucide="file-plus"></i>
+
+                  Add Files
+                </button>
+              </div>
+
+              <div class="folder-tree" id="folderTree">
+                <!-- generated by JS -->
+              </div>
+            </aside>
+
+            <!-- RIGHT -->
+
+            <section class="folder-content">
+              <div class="folder-content-header">
+                <div class="folder-title-area">
+                  <!-- MOBILE ONLY -->
+                  <button class="folder-back" id="folderBack">
+                    <i data-lucide="arrow-left"></i>
+                  </button>
+
+                  <div>
+                    <h3 id="folderTitle">No Folder Selected</h3>
+
+                    <div class="folder-info">
+                      <span id="folderSongCount">0 Songs</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="folder-song-list" id="folderSongList"></div>
+            </section>
+          </div>
+        </div>
+
+        <!-- hidden pickers -->
+
+        <input
+          type="file"
+          id="folderPicker"
+          webkitdirectory
+          directory
+          multiple
+          hidden
+        />
+
+        <input type="file" id="filePicker" accept="audio/*" multiple hidden />
+      </div>
     </div>
 
     <!-- ==========================================================
                         JAVASCRIPT
-=========================================================== -->
+    =========================================================== -->
 
     <script src="https://unpkg.com/lucide@latest"></script>
 
@@ -612,5 +638,7 @@ DETAILS
     <script src="js/library.js"></script>
 
     <script src="js/player.js"></script>
+
+    <script src="js/folders.js"></script>
   </body>
 </html>

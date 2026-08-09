@@ -197,9 +197,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
   const folderButton = document.querySelector(".folder-button");
 
-  folderButton.addEventListener("click", () => {
-    alert("Folder picker will be implemented later.");
-  });
 
   /* ======================================================
         INITIALIZE
