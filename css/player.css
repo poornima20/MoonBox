@@ -1692,12 +1692,19 @@ Phone + Tablet
 
   .player-workspace {
     display: flex;
-
     flex-direction: column;
+    min-height: 100dvh;
+    height: auto;
+    overflow: visible;
+  }
 
-    height: 100dvh;
-
-    overflow: hidden;
+  html,
+  body {
+    min-height: 100%;
+    height: auto;
+    overflow-x: hidden;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
   }
 
   .app {
@@ -1779,7 +1786,10 @@ PLAYER
 
     padding: 24px;
 
-    min-height: auto;
+    width: 100%;
+    height: auto;
+    min-height: 0;
+    flex-shrink: 0;
   }
 
   /*==========================================================
@@ -1931,6 +1941,7 @@ SIDE BUTTONS
     display: grid;
 
     grid-template-columns: repeat(4, 1fr);
+    flex-shrink: 0;
 
     gap: 12px;
 
@@ -1962,16 +1973,25 @@ SIDE BUTTONS
   /*==========================================================
 RIGHT PANEL
 ==========================================================*/
-
   .player-panel {
     width: 100%;
-
-    min-height: 430px;
-    height: 60vh;
+    height: 420px;
+    min-height: 420px;
+    max-height: 420px;
+    flex-shrink: 0;
   }
 
   .player-tab {
-    padding: 24px;
+    min-height: 0;
+    overflow: hidden;
+  }
+
+  #journalText,
+  .lyrics-view,
+  .lyrics-editor,
+  .player-details {
+    min-height: 0;
+    overflow-y: auto;
   }
 
   .panel-header {
@@ -2245,9 +2265,9 @@ EXTRA SMALL PHONES
     ==========================*/
 
   .player-panel {
+    height: 360px;
     min-height: 360px;
-
-    border-radius: 24px;
+    max-height: 360px;
   }
 
   .player-tab {
@@ -2289,5 +2309,23 @@ EXTRA SMALL PHONES
   .detail-display,
   .detail-input {
     font-size: 15px;
+  }
+}
+
+@media (max-width: 1100px) {
+  .workspace {
+    height: auto;
+    min-height: 0;
+    overflow: visible;
+  }
+
+  .screen {
+    width: 100%;
+    height: auto;
+  }
+
+  #playerScreen {
+    height: auto;
+    min-height: 0;
   }
 }
