@@ -165,6 +165,62 @@ function saveTags() {
 }
 
 /* ==========================================================
+   SYNC FOLDER TAGS
+   Folder names automatically become tags
+========================================================== */
+
+function syncFolderTags(folders) {
+  if (!Array.isArray(folders)) return;
+
+  let changed = false;
+
+  folders.forEach((folder) => {
+    /* ALL is virtual, not a folder-generated tag */
+
+    if (!folder || folder.tagId === "all") {
+      return;
+    }
+
+    const tagId = folder.tagId;
+
+    const tagName = folder.name;
+
+    /* Check if tag already exists */
+
+    const existingTag = tags.find((tag) => tag.id === tagId);
+
+    /* Already exists */
+    if (existingTag) {
+      return;
+    }
+
+    /* Create tag from folder */
+
+    tags.push({
+      id: tagId,
+
+      name: tagName,
+
+      icon: "folder",
+
+      system: false,
+
+      folderTag: true,
+    });
+
+    changed = true;
+  });
+
+  /* Save only if something changed */
+
+  if (changed) {
+    saveTags();
+
+    renderTags();
+  }
+}
+
+/* ==========================================================
    ID GENERATOR
 ========================================================== */
 
@@ -1234,12 +1290,6 @@ document.addEventListener("moonbox:removeTag", (event) => {
 
   if (!tagId) return;
 
-  /* ALL cannot be deselected */
-
-  if (tagId === "all") {
-    return;
-  }
-
   /* Actual selection state lives here */
 
   selectedTagIds.delete(tagId);
@@ -1257,6 +1307,18 @@ document.addEventListener("moonbox:removeTag", (event) => {
       },
     }),
   );
+});
+
+/* ==========================================================
+   FOLDER → TAG CONNECTION
+========================================================== */
+
+document.addEventListener("moonbox:foldersReady", (event) => {
+  const folders = event.detail?.folders;
+
+  if (!folders) return;
+
+  syncFolderTags(folders);
 });
 
 /* ==========================================================

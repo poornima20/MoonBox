@@ -43,52 +43,33 @@ document.addEventListener("DOMContentLoaded", () => {
   let selectedTagIds = new Set();
 
   /* ======================================================
-       SAMPLE SONGS
-    ====================================================== */
+   GET ALL SONGS FROM FOLDERS
+====================================================== */
 
-  const songs = [
-    {
-      title: "Midnight Drive",
-      artist: "The Weeknd",
-      duration: "3:42",
-      tags: ["all", "night"],
-    },
+  function getAllSongs() {
+    const allSongs = [];
 
-    {
-      title: "Golden Hour",
-      artist: "JVKE",
-      duration: "3:18",
-      tags: ["all", "night"],
-    },
+    if (!Array.isArray(folders)) {
+      return allSongs;
+    }
 
-    {
-      title: "Rainy Days",
-      artist: "Joji",
-      duration: "2:54",
-      tags: ["all", "rain"],
-    },
+    folders.forEach((folder) => {
+      if (!Array.isArray(folder.songs)) return;
 
-    {
-      title: "Focus Mode",
-      artist: "Lofi Hip Hop",
-      duration: "2:31",
-      tags: ["all", "lofi"],
-    },
+      folder.songs.forEach((song) => {
+        // Avoid duplicate songs by ID
+        const alreadyExists = allSongs.some(
+          (existingSong) => existingSong.id === song.id,
+        );
 
-    {
-      title: "Late Night Piano",
-      artist: "Yiruma",
-      duration: "4:05",
-      tags: ["all", "night", "lofi"],
-    },
+        if (!alreadyExists) {
+          allSongs.push(song);
+        }
+      });
+    });
 
-    {
-      title: "Stargazing",
-      artist: "Kygo",
-      duration: "3:56",
-      tags: ["all", "night"],
-    },
-  ];
+    return allSongs;
+  }
 
   /* ======================================================
    RENDER SELECTED TAGS
@@ -198,75 +179,154 @@ document.addEventListener("DOMContentLoaded", () => {
       }),
     );
   });
+
   /* ======================================================
-       SONG TEMPLATE
-    ====================================================== */
+SONG TEMPLATE
+====================================================== */
 
   function songHTML(song, index) {
     return `
 
     <div class="library-song">
 
-        <button class="song-action ${playingSong === index ? "playing" : ""}">
+      <button
+        class="song-action ${playingSong === index ? "playing" : ""}"
+      >
 
-            <i data-lucide="${
-              editMode ? "trash-2" : playingSong === index ? "pause" : "play"
-            }"></i>
+        <i data-lucide="${
+          editMode ? "trash-2" : playingSong === index ? "pause" : "play"
+        }"></i>
 
-        </button>
+      </button>
 
-        <div class="song-info">
 
-            <h3>${song.title}</h3>
+      <div class="song-info">
 
-            <span>${song.artist}</span>
+        <h3>
+          ${song.name}
+        </h3>
 
-        </div>
+        <span>
+          Unknown Artist
+        </span>
 
-        <div class="song-right">
+      </div>
 
-            ${
-              editMode
-                ? `
-                    <div class="song-drag">
-                        <i data-lucide="grip"></i>
-                    </div>
-                    `
-                : `
-                    <span class="song-duration">
-                        ${song.duration}
-                    </span>
-                    `
-            }
 
-        </div>
+      <div class="song-right">
+
+        ${
+          editMode
+            ? `
+
+              <div class="song-drag">
+
+                <i data-lucide="grip"></i>
+
+              </div>
+
+            `
+            : `
+
+              <span class="song-duration">
+                --:--
+              </span>
+
+            `
+        }
+
+      </div>
 
     </div>
 
-    `;
+  `;
   }
-
   /* ======================================================
-       RENDER SONGS
-    ====================================================== */
+RENDER SONGS
+====================================================== */
 
   function renderSongs() {
     songList.innerHTML = "";
 
-    const filtered = songs.filter((song) => {
-      return (
-        song.title.toLowerCase().includes(searchText) ||
-        song.artist.toLowerCase().includes(searchText)
-      );
+    const allSongs = getAllSongs();
+
+    /* ====================================================
+     SEARCH + TAG FILTER
+  ==================================================== */
+
+    const filtered = allSongs.filter((song) => {
+      /* -----------------------------------------------
+       SEARCH
+    ----------------------------------------------- */
+
+      const matchesSearch = song.name.toLowerCase().includes(searchText);
+
+      /* ====================================================
+   TAG FILTER
+==================================================== */
+
+      if (selectedTagIds.size === 0) {
+        return matchesSearch;
+      }
+
+      /* ----------------------------------------------------
+   ALL is a special virtual tag
+
+   It does NOT participate in the actual
+   Union / Intersection comparison.
+---------------------------------------------------- */
+
+      const actualTags = [...selectedTagIds].filter((tagId) => tagId !== "all");
+
+      /* ----------------------------------------------------
+   Only ALL selected
+---------------------------------------------------- */
+
+      if (actualTags.length === 0) {
+        return matchesSearch;
+      }
+
+      /* ----------------------------------------------------
+   UNION
+   Match ANY selected real tag
+---------------------------------------------------- */
+
+      if (filterMode === "union") {
+        const matchesTags = actualTags.some((tagId) =>
+          song.tags.includes(tagId),
+        );
+
+        return matchesSearch && matchesTags;
+      }
+
+      /* ----------------------------------------------------
+   INTERSECTION
+   Match ALL selected real tags
+---------------------------------------------------- */
+
+      if (filterMode === "intersection") {
+        const matchesTags = actualTags.every((tagId) =>
+          song.tags.includes(tagId),
+        );
+
+        return matchesSearch && matchesTags;
+      }
+
+      return matchesSearch;
     });
+
+    /* ====================================================
+     RENDER
+  ==================================================== */
 
     filtered.forEach((song, index) => {
-      songList.insertAdjacentHTML(
-        "beforeend",
-
-        songHTML(song, index),
-      );
+      songList.insertAdjacentHTML("beforeend", songHTML(song, index));
     });
+
+    /* ====================================================
+     PLAY BUTTONS
+  ==================================================== */
+
     songList.querySelectorAll(".song-action").forEach((button, index) => {
       button.addEventListener("click", (e) => {
         e.stopPropagation();
@@ -344,8 +404,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
       filterMenu.classList.remove("show");
 
-      // Later:
-      // renderSongs();
+      renderSongs();
     });
   });
 
@@ -355,14 +414,12 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   });
 
-
-
   /* ======================================================
        INITIALIZE
     ====================================================== */
 
   document.addEventListener("moonbox:tagsChanged", (event) => {
-    selectedTagIds = event.detail.selectedTagIds || [];
+    selectedTagIds = new Set(event.detail.selectedTagIds || []);
 
     renderTags();
 

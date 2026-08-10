@@ -1,118 +1,117 @@
 /* ==========================================================
-   FOLDER MANAGER (UI ONLY)
+   FOLDER MANAGER
 ========================================================== */
 
 const overlay = document.getElementById("folderOverlay");
+
 const openBtn = document.getElementById("openFolders");
+
 const closeBtn = document.getElementById("closeFolders");
 
 const folderTree = document.getElementById("folderTree");
+
 const folderTitle = document.getElementById("folderTitle");
+
 const songList = document.getElementById("folderSongList");
 
 const folderBack = document.getElementById("folderBack");
+
 const folderBody = document.querySelector(".folder-body");
 
 /* ==========================================================
-   DUMMY DATA
+   CREATE SONG
+   Every song automatically gets ALL
+========================================================== */
+
+function createSong(name, extraTags = []) {
+  return {
+    id: crypto.randomUUID
+      ? crypto.randomUUID()
+      : `${Date.now()}-${Math.random()}`,
+
+    name,
+
+    tags: ["all", ...extraTags.filter((tag) => tag !== "all")],
+  };
+}
+
+/* ==========================================================
+   MASTER SONG DATA
+   Each song exists ONLY ONCE
+========================================================== */
+
+const songs = [
+  createSong("Golden Hour.flac", ["drive-mix"]),
+
+  createSong("Sailing.flac", ["drive-mix"]),
+
+  createSong("Vienna.mp3"),
+
+  createSong("Africa.flac"),
+
+  createSong("The Night We Met.flac", ["rainy-day"]),
+
+  createSong("Until I Found You.flac", ["rainy-day"]),
+
+  createSong("Moonlight Sonata.flac", ["classical"]),
+];
+
+/* ==========================================================
+   FOLDER DATA
 ========================================================== */
 
 const folders = [
+  /* --------------------------------------------------------
+     ALL FILES
+     Shows every song
+  -------------------------------------------------------- */
+
   {
     name: "All Files",
 
-    songs: [
-      {
-        id: "golden-hour",
-        name: "Golden Hour.flac",
-        tags: ["all"],
-      },
+    tagId: "all",
 
-      {
-        id: "sailing",
-        name: "Sailing.flac",
-        tags: ["all"],
-      },
-
-      {
-        id: "vienna",
-        name: "Vienna.mp3",
-        tags: ["all"],
-      },
-
-      {
-        id: "africa",
-        name: "Africa.flac",
-        tags: ["all"],
-      },
-    ],
+    songs: songs,
   },
+
+  /* --------------------------------------------------------
+     DRIVE MIX
+  -------------------------------------------------------- */
 
   {
     name: "Drive Mix",
 
-    songs: [
-      {
-        id: "golden-hour",
-        name: "Golden Hour.flac",
-        tags: ["all", "drive"],
-      },
+    tagId: "drive-mix",
 
-      {
-        id: "sailing",
-        name: "Sailing.flac",
-        tags: ["all", "drive"],
-      },
-    ],
+    songs: songs.filter((song) => song.tags.includes("drive-mix")),
   },
+
+  /* --------------------------------------------------------
+     RAINY DAY
+  -------------------------------------------------------- */
 
   {
     name: "Rainy Day",
 
-    songs: [
-      {
-        id: "night-we-met",
-        name: "The Night We Met.flac",
-        tags: ["all", "rain"],
-      },
+    tagId: "rainy-day",
 
-      {
-        id: "until-found-you",
-        name: "Until I Found You.flac",
-        tags: ["all", "rain"],
-      },
-    ],
+    songs: songs.filter((song) => song.tags.includes("rainy-day")),
+  },
+
+  /* --------------------------------------------------------
+     CLASSICAL
+  -------------------------------------------------------- */
+
+  {
+    name: "Classical",
+
+    tagId: "classical",
+
+    songs: songs.filter((song) => song.tags.includes("classical")),
   },
 ];
 
 let currentFolder = 0;
-
-
-
-
-/* ==========================================================
-   creating song folder
-========================================================== */
-
-
-function createSong(name, extraTags = []) {
-
-  return {
-    id:
-      crypto.randomUUID
-        ? crypto.randomUUID()
-        : `${Date.now()}-${Math.random()}`,
-
-    name,
-
-    tags: [
-      "all",
-      ...extraTags.filter(
-        tag => tag !== "all"
-      )
-    ]
-  };
-}
 
 /* ==========================================================
    POPUP
@@ -254,3 +253,16 @@ function renderSongs() {
 }
 
 renderFolders();
+
+/* ==========================================================
+   FOLDER → TAG → LIBRARY CONNECTION
+========================================================== */
+
+document.dispatchEvent(
+  new CustomEvent("moonbox:foldersReady", {
+    detail: {
+      folders: folders,
+      songs: songs,
+    },
+  }),
+);
