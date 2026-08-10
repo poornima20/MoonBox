@@ -9,6 +9,13 @@
 ========================================================== */
 
 const DEFAULT_TAGS = [
+  {
+    id: "all",
+    name: "ALL",
+    icon: "layers-3",
+    system: true,
+  },
+
   { id: "chill", name: "Chill", icon: "moon" },
   { id: "rain", name: "Rain", icon: "cloud-rain" },
   { id: "night", name: "Night", icon: "moon-star" },
@@ -119,17 +126,29 @@ function loadTags() {
   try {
     const saved = localStorage.getItem("moonboxTags");
 
-    if (!saved) {
-      return [...DEFAULT_TAGS];
+    let loadedTags = [];
+
+    if (saved) {
+      const parsed = JSON.parse(saved);
+
+      if (Array.isArray(parsed)) {
+        loadedTags = parsed;
+      }
     }
 
-    const parsed = JSON.parse(saved);
+    /* Make sure ALL always exists */
+    const allTagExists = loadedTags.some((tag) => tag.id === "all");
 
-    if (!Array.isArray(parsed)) {
-      return [...DEFAULT_TAGS];
+    if (!allTagExists) {
+      loadedTags.unshift({
+        id: "all",
+        name: "ALL",
+        icon: "layers-3",
+        system: true,
+      });
     }
 
-    return parsed;
+    return loadedTags;
   } catch (error) {
     console.warn("MoonBox: Could not load tags.", error);
 
@@ -837,6 +856,12 @@ function openEditTagModal(tagId) {
 
   if (!tag) return;
 
+  if (tag.id === "all") {
+    alert("ALL is a system tag and cannot be edited.");
+
+    return;
+  }
+
   const modal = createModal({
     title: "Edit Tag",
     subtitle: "Change the tag name or icon.",
@@ -937,6 +962,12 @@ function openEditTagModal(tagId) {
 ========================================================== */
 
 function deleteTag(tagId) {
+  if (tagId === "all") {
+    alert("ALL is a system tag and cannot be deleted.");
+
+    return;
+  }
+
   const tag = tags.find((item) => item.id === tagId);
 
   if (!tag) return;
@@ -1193,7 +1224,39 @@ document.addEventListener("keydown", (event) => {
 ========================================================== */
 
 document.addEventListener("moonbox:requestTags", (event) => {
-  event.detail.tags = [...tags];
+  if (event.detail && typeof event.detail.setTags === "function") {
+    event.detail.setTags([...tags]);
+  }
+});
+
+document.addEventListener("moonbox:removeTag", (event) => {
+  const tagId = event.detail?.tagId;
+
+  if (!tagId) return;
+
+  /* ALL cannot be deselected */
+
+  if (tagId === "all") {
+    return;
+  }
+
+  /* Actual selection state lives here */
+
+  selectedTagIds.delete(tagId);
+
+  /* Update Tag UI */
+
+  renderTags();
+
+  /* Tell Library */
+
+  document.dispatchEvent(
+    new CustomEvent("moonbox:tagsChanged", {
+      detail: {
+        selectedTagIds: [...selectedTagIds],
+      },
+    }),
+  );
 });
 
 /* ==========================================================

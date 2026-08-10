@@ -20,23 +20,99 @@ const folderBody = document.querySelector(".folder-body");
 const folders = [
   {
     name: "All Files",
-    songs: ["Golden Hour.flac", "Sailing.flac", "Vienna.mp3", "Africa.flac"],
+
+    songs: [
+      {
+        id: "golden-hour",
+        name: "Golden Hour.flac",
+        tags: ["all"],
+      },
+
+      {
+        id: "sailing",
+        name: "Sailing.flac",
+        tags: ["all"],
+      },
+
+      {
+        id: "vienna",
+        name: "Vienna.mp3",
+        tags: ["all"],
+      },
+
+      {
+        id: "africa",
+        name: "Africa.flac",
+        tags: ["all"],
+      },
+    ],
   },
+
   {
     name: "Drive Mix",
-    songs: ["Golden Hour.flac", "Sailing.flac"],
+
+    songs: [
+      {
+        id: "golden-hour",
+        name: "Golden Hour.flac",
+        tags: ["all", "drive"],
+      },
+
+      {
+        id: "sailing",
+        name: "Sailing.flac",
+        tags: ["all", "drive"],
+      },
+    ],
   },
+
   {
     name: "Rainy Day",
-    songs: ["The Night We Met.flac", "Until I Found You.flac"],
-  },
-  {
-    name: "Classical",
-    songs: ["Moonlight Sonata.flac"],
+
+    songs: [
+      {
+        id: "night-we-met",
+        name: "The Night We Met.flac",
+        tags: ["all", "rain"],
+      },
+
+      {
+        id: "until-found-you",
+        name: "Until I Found You.flac",
+        tags: ["all", "rain"],
+      },
+    ],
   },
 ];
 
 let currentFolder = 0;
+
+
+
+
+/* ==========================================================
+   creating song folder
+========================================================== */
+
+
+function createSong(name, extraTags = []) {
+
+  return {
+    id:
+      crypto.randomUUID
+        ? crypto.randomUUID()
+        : `${Date.now()}-${Math.random()}`,
+
+    name,
+
+    tags: [
+      "all",
+      ...extraTags.filter(
+        tag => tag !== "all"
+      )
+    ]
+  };
+}
 
 /* ==========================================================
    POPUP
@@ -150,7 +226,7 @@ function renderSongs() {
             <div class="song-details">
 
                 <div class="song-title">
-                    ${song}
+                    ${song.name}
                 </div>
 
                 <div class="song-subtitle">

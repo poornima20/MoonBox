@@ -40,26 +40,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
   let playingSong = -1;
 
-  /* ======================================================
-       SAMPLE TAGS
-    ====================================================== */
-
-  const activeTags = [
-    {
-      name: "Night",
-      icon: "moon",
-    },
-
-    {
-      name: "Rain",
-      icon: "cloud-rain",
-    },
-
-    {
-      name: "Lofi",
-      icon: "audio-waveform",
-    },
-  ];
+  let selectedTagIds = new Set();
 
   /* ======================================================
        SAMPLE SONGS
@@ -68,106 +49,130 @@ document.addEventListener("DOMContentLoaded", () => {
   const songs = [
     {
       title: "Midnight Drive",
-
       artist: "The Weeknd",
-
       duration: "3:42",
-
-      tags: ["Night"],
+      tags: ["all", "night"],
     },
 
     {
       title: "Golden Hour",
-
       artist: "JVKE",
-
       duration: "3:18",
-
-      tags: ["Night"],
+      tags: ["all", "night"],
     },
 
     {
       title: "Rainy Days",
-
       artist: "Joji",
-
       duration: "2:54",
-
-      tags: ["Rain"],
+      tags: ["all", "rain"],
     },
 
     {
       title: "Focus Mode",
-
       artist: "Lofi Hip Hop",
-
       duration: "2:31",
-
-      tags: ["Lofi"],
+      tags: ["all", "lofi"],
     },
 
     {
       title: "Late Night Piano",
-
       artist: "Yiruma",
-
       duration: "4:05",
-
-      tags: ["Night", "Lofi"],
+      tags: ["all", "night", "lofi"],
     },
 
     {
       title: "Stargazing",
-
       artist: "Kygo",
-
       duration: "3:56",
-
-      tags: ["Night"],
+      tags: ["all", "night"],
     },
   ];
 
   /* ======================================================
-       RENDER SELECTED TAGS
-    ====================================================== */
+   RENDER SELECTED TAGS
+====================================================== */
+
   function renderTags() {
     selectedTags.innerHTML = "";
 
-    activeTags.forEach((tag) => {
+    /* ------------------------------------------------------
+     Get tag definitions from tag.js
+  ------------------------------------------------------ */
+
+    let availableTags = [];
+
+    document.dispatchEvent(
+      new CustomEvent("moonbox:requestTags", {
+        detail: {
+          setTags(value) {
+            availableTags = value;
+          },
+        },
+      }),
+    );
+
+    /* ------------------------------------------------------
+     Create lookup map
+  ------------------------------------------------------ */
+
+    const tagMap = new Map(availableTags.map((tag) => [tag.id, tag]));
+
+    /* ------------------------------------------------------
+     Render selected tags
+  ------------------------------------------------------ */
+
+    selectedTagIds.forEach((tagId) => {
+      const tag = tagMap.get(tagId);
+
+      if (!tag) return;
+
       const chip = document.createElement("button");
 
       chip.className = "library-selected-tag";
 
+      chip.dataset.tagId = tag.id;
+
       chip.innerHTML = `
-            <i data-lucide="${tag.icon}"></i>
+      <i data-lucide="${tag.icon}"></i>
 
-            <span>${tag.name}</span>
+      <span>${tag.name}</span>
 
-            <i data-lucide="x" class="tag-remove"></i>
-        `;
+      <i
+        data-lucide="x"
+        class="tag-remove"
+      ></i>
+    `;
 
       selectedTags.appendChild(chip);
     });
 
-    /* ---------- ADD TAG BUTTON ---------- */
+    /* ------------------------------------------------------
+     ADD TAG BUTTON
+  ------------------------------------------------------ */
 
     const addButton = document.createElement("button");
 
     addButton.className = "library-add-tag";
 
     addButton.innerHTML = `
-        <i data-lucide="plus"></i>
-        <span>Add Tag</span>
-    `;
+    <i data-lucide="plus"></i>
+    <span>Add Tag</span>
+  `;
 
     addButton.addEventListener("click", () => {
-      document.querySelector('.nav-button[data-screen="0"]').click();
+      document.querySelector('.nav-button[data-screen="0"]')?.click();
     });
 
     selectedTags.appendChild(addButton);
 
     lucide.createIcons();
   }
+  /* ======================================================
+   REMOVE TAG FROM LIBRARY
+   Tell tag.js to deselect it
+====================================================== */
 
   selectedTags.addEventListener("click", (e) => {
     const remove = e.target.closest(".tag-remove");
@@ -176,7 +181,22 @@ document.addEventListener("DOMContentLoaded", () => {
 
     e.stopPropagation();
 
-    remove.closest(".library-selected-tag").remove();
+    const chip = remove.closest(".library-selected-tag");
+
+    if (!chip) return;
+
+    const tagId = chip.dataset.tagId;
+
+    if (!tagId) return;
+
+    /* Tell tag.js */
+    document.dispatchEvent(
+      new CustomEvent("moonbox:removeTag", {
+        detail: {
+          tagId: tagId,
+        },
+      }),
+    );
   });
   /* ======================================================
        SONG TEMPLATE
@@ -335,13 +355,35 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   });
 
+
+
   /* ======================================================
        INITIALIZE
     ====================================================== */
 
-  renderTags();
+  document.addEventListener("moonbox:tagsChanged", (event) => {
+    selectedTagIds = event.detail.selectedTagIds || [];
 
-  renderSongs();
+    renderTags();
+
+    renderSongs();
+  });
+
+  function getAvailableTags() {
+    let availableTags = [];
+
+    document.dispatchEvent(
+      new CustomEvent("moonbox:requestTags", {
+        detail: {
+          setTags(tags) {
+            availableTags = tags;
+          },
+        },
+      }),
+    );
+
+    return availableTags;
+  }
 
   lucide.createIcons();
 });
