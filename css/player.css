@@ -985,7 +985,7 @@ JOURNAL
 
   padding: 26px;
 
-  border-radius: 24px;
+  border-radius: 10px;
 
   background: #171717;
 
@@ -1216,7 +1216,7 @@ DETAIL CARD
 
   border: 1px solid rgba(255, 255, 255, 0.05);
 
-  border-radius: 20px;
+  border-radius: 0;
 
   transition:
     border-color 0.2s ease,
@@ -1643,6 +1643,7 @@ SCROLLBAR
   background: #555;
 }
 
+
 @media (max-width: 768px) {
   .player-layout {
     display: flex;
@@ -1670,7 +1671,7 @@ SCROLLBAR
 
   .player-panel {
     order: 3;
-
+    border-radius: 0;
     height: 420px;
   }
 }
@@ -1790,6 +1791,8 @@ PLAYER
     height: auto;
     min-height: 0;
     flex-shrink: 0;
+
+    border-radius: 0;
   }
 
   /*==========================================================
@@ -1992,6 +1995,7 @@ RIGHT PANEL
   .player-details {
     min-height: 0;
     overflow-y: auto;
+    border-radius: 0;
   }
 
   .panel-header {
@@ -2009,6 +2013,7 @@ NOTES
   #journalText {
     font-size: 15px;
     padding: 20px;
+    border-radius: 0;
   }
 
   /*==========================================================
@@ -2028,6 +2033,7 @@ DETAILS
 
   .detail-item {
     padding: 16px 18px;
+    border-radius: 0;
   }
 
   .detail-display,
@@ -2055,6 +2061,7 @@ SCROLL
 
   .player-panel {
     overflow: hidden;
+    border-radius: 0;
   }
 }
 
@@ -2081,7 +2088,7 @@ EXTRA SMALL PHONES
 
     gap: 20px;
 
-    border-radius: 24px;
+    border-radius: 0;
   }
 
   /*==========================
@@ -2247,7 +2254,7 @@ EXTRA SMALL PHONES
   .player-side-button {
     height: 64px;
 
-    border-radius: 18px;
+    border-radius: 10px;
   }
 
   .player-side-button svg {
@@ -2268,11 +2275,14 @@ EXTRA SMALL PHONES
     height: 360px;
     min-height: 360px;
     max-height: 360px;
+    border-radius: 0;
   }
 
   .player-tab {
     padding: 18px;
   }
+
+ 
 
   .panel-header h3 {
     font-size: 20px;
@@ -2304,6 +2314,7 @@ EXTRA SMALL PHONES
 
   .detail-item {
     padding: 14px 16px;
+    border-radius: 0;
   }
 
   .detail-display,

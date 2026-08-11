@@ -591,7 +591,7 @@
 .song-duration {
   color: #a6a6a6;
   padding-right: 14px;
-  font-size: 14px;
+  font-size: 12px;
 }
 
 .song-drag {
@@ -853,7 +853,7 @@
   .song-duration {
     padding-right: 8px;
 
-    font-size: 13px;
+    font-size: 11px;
   }
 
   .song-drag svg {
@@ -947,7 +947,7 @@
   }
 
   .song-duration {
-    font-size: 12px;
+    font-size: 8px;
   }
 
   .library-filter-menu {

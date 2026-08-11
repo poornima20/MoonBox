@@ -634,17 +634,6 @@
   text-overflow: ellipsis;
 }
 
-/* ==========================================================
-   DURATION
-   ========================================================== */
-
-.song-duration {
-  color: var(--folder-muted);
-
-  font-size: 13px;
-
-  font-variant-numeric: tabular-nums;
-}
 
 /* ==========================================================
    DELETE BUTTON

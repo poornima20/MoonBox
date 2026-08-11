@@ -18,6 +18,8 @@ document.addEventListener("DOMContentLoaded", () => {
 
   const editStatus = document.getElementById("libraryEditStatus");
 
+  const libraryFooter = document.getElementById("libraryFooter");
+
   const filterButton = document.getElementById("libraryFilterButton");
 
   const filterMenu = document.getElementById("libraryFilterMenu");
@@ -64,6 +66,19 @@ document.addEventListener("DOMContentLoaded", () => {
     return allFilesFolder.songs || [];
   }
 
+  /* ======================================================
+   UPDATE LIBRARY FOOTER
+====================================================== */
+
+  function updateLibraryFooter(songCount) {
+    if (!libraryFooter) return;
+
+    const songText = songCount === 1 ? "Song" : "Songs";
+
+    libraryFooter.innerHTML = `
+    <span>${songCount} ${songText}</span>
+  `;
+  }
   /* ======================================================
    RENDER SELECTED TAGS
 ====================================================== */
@@ -314,6 +329,7 @@ RENDER SONGS
       return matchesSearch;
     });
 
+    updateLibraryFooter(filtered.length);
     /* ====================================================
    SEND CURRENT LIBRARY QUEUE TO PLAYER
 ==================================================== */
