@@ -42,33 +42,26 @@ document.addEventListener("DOMContentLoaded", () => {
 
   let selectedTagIds = new Set();
 
+  let playingSongId = null;
+  let playerIsPlaying = false;
+
   /* ======================================================
-   GET ALL SONGS FROM FOLDERS
+   GET ALL MASTER SONGS
+   All Files is the master library
 ====================================================== */
 
   function getAllSongs() {
-    const allSongs = [];
-
     if (!Array.isArray(folders)) {
-      return allSongs;
+      return [];
     }
 
-    folders.forEach((folder) => {
-      if (!Array.isArray(folder.songs)) return;
+    const allFilesFolder = folders.find((folder) => folder.tagId === "all");
 
-      folder.songs.forEach((song) => {
-        // Avoid duplicate songs by ID
-        const alreadyExists = allSongs.some(
-          (existingSong) => existingSong.id === song.id,
-        );
+    if (!allFilesFolder) {
+      return [];
+    }
 
-        if (!alreadyExists) {
-          allSongs.push(song);
-        }
-      });
-    });
-
-    return allSongs;
+    return allFilesFolder.songs || [];
   }
 
   /* ======================================================
@@ -185,17 +178,18 @@ SONG TEMPLATE
 ====================================================== */
 
   function songHTML(song, index) {
+    const isPlaying = playerIsPlaying && playingSongId === song.id;
+
     return `
 
     <div class="library-song">
 
       <button
-        class="song-action ${playingSong === index ? "playing" : ""}"
+        class="song-action ${isPlaying ? "playing" : ""}"
+        data-song-id="${song.id}"
       >
 
-        <i data-lucide="${
-          editMode ? "trash-2" : playingSong === index ? "pause" : "play"
-        }"></i>
+        <i data-lucide="${isPlaying ? "pause" : "play"}"></i>
 
       </button>
 
@@ -241,6 +235,7 @@ SONG TEMPLATE
 
   `;
   }
+
   /* ======================================================
 RENDER SONGS
 ====================================================== */
@@ -265,55 +260,71 @@ RENDER SONGS
    TAG FILTER
 ==================================================== */
 
+      /* ====================================================
+   TAG FILTER
+==================================================== */
+
       if (selectedTagIds.size === 0) {
         return matchesSearch;
       }
 
-      /* ----------------------------------------------------
-   ALL is a special virtual tag
+      /* ====================================================
+   ALL IS A SPECIAL VIRTUAL TAG
+==================================================== */
 
-   It does NOT participate in the actual
-   Union / Intersection comparison.
----------------------------------------------------- */
+      const hasAll = selectedTagIds.has("all");
 
       const actualTags = [...selectedTagIds].filter((tagId) => tagId !== "all");
 
-      /* ----------------------------------------------------
-   Only ALL selected
----------------------------------------------------- */
+      /* ====================================================
+   ONLY ALL
+==================================================== */
 
       if (actualTags.length === 0) {
         return matchesSearch;
       }
 
-      /* ----------------------------------------------------
+      /* ====================================================
    UNION
-   Match ANY selected real tag
----------------------------------------------------- */
+   ALL + anything = ALL SONGS
+==================================================== */
 
       if (filterMode === "union") {
-        const matchesTags = actualTags.some((tagId) =>
-          song.tags.includes(tagId),
-        );
+        if (hasAll) {
+          return matchesSearch;
+        }
 
-        return matchesSearch && matchesTags;
+        return (
+          matchesSearch && actualTags.some((tagId) => song.tags.includes(tagId))
+        );
       }
 
-      /* ----------------------------------------------------
+      /* ====================================================
    INTERSECTION
-   Match ALL selected real tags
----------------------------------------------------- */
+   ALL + tags = those tags
+==================================================== */
 
       if (filterMode === "intersection") {
-        const matchesTags = actualTags.every((tagId) =>
-          song.tags.includes(tagId),
+        return (
+          matchesSearch &&
+          actualTags.every((tagId) => song.tags.includes(tagId))
         );
-
-        return matchesSearch && matchesTags;
       }
 
       return matchesSearch;
     });
+
+    /* ====================================================
+   SEND CURRENT LIBRARY QUEUE TO PLAYER
+==================================================== */
+
+    document.dispatchEvent(
+      new CustomEvent("moonbox:libraryQueueChanged", {
+        detail: {
+          songs: filtered,
+        },
+      }),
+    );
 
     /* ====================================================
      RENDER
@@ -324,8 +335,8 @@ RENDER SONGS
     });
 
     /* ====================================================
-     PLAY BUTTONS
-  ==================================================== */
+   PLAY / PAUSE BUTTONS
+==================================================== */
 
     songList.querySelectorAll(".song-action").forEach((button, index) => {
       button.addEventListener("click", (e) => {
@@ -333,18 +344,71 @@ RENDER SONGS
 
         if (editMode) return;
 
-        if (playingSong === index) {
-          playingSong = -1;
-        } else {
-          playingSong = index;
+        /* -----------------------------------------------
+       Get the song from the CURRENT rendered list
+    ------------------------------------------------ */
+
+        const clickedSong = filtered[index];
+
+        if (!clickedSong) return;
+
+        /* ==================================================
+       PAUSE CURRENT SONG
+    ================================================== */
+
+        if (playerIsPlaying && playingSongId === clickedSong.id) {
+          document.dispatchEvent(new CustomEvent("moonbox:pausePlayer"));
+
+          return;
         }
 
-        renderSongs();
+        /* ==================================================
+       PLAY SONG
+    ================================================== */
+
+        document.dispatchEvent(
+          new CustomEvent("moonbox:playFromLibrary", {
+            detail: {
+              songs: filtered,
+              index: index,
+            },
+          }),
+        );
+
+        /* ==================================================
+       OPEN PLAYER
+    ================================================== */
+
+        const playerButton = document.querySelector(
+          '.nav-button[data-screen="2"]',
+        );
+
+        if (playerButton) {
+          playerButton.click();
+        }
       });
     });
 
     lucide.createIcons();
   }
+
+  document.addEventListener("moonbox:playFromLibrary", (event) => {
+    const queue = event.detail.songs || [];
+
+    const index = event.detail.index ?? 0;
+
+    if (queue.length === 0) {
+      return;
+    }
+
+    songs = queue;
+
+    currentSong = index;
+
+    loadSong(currentSong);
+
+    playSong();
+  });
 
   /* ======================================================
        SEARCH
@@ -412,6 +476,18 @@ RENDER SONGS
     if (!filterMenu.contains(e.target) && !filterButton.contains(e.target)) {
       filterMenu.classList.remove("show");
     }
+  });
+
+  /* ======================================================
+   PLAYER PLAYBACK STATE
+====================================================== */
+
+  document.addEventListener("moonbox:playbackStateChanged", (event) => {
+    playingSongId = event.detail.songId || null;
+
+    playerIsPlaying = event.detail.playing === true;
+
+    renderSongs();
   });
 
   /* ======================================================

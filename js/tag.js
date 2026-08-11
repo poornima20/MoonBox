@@ -103,6 +103,14 @@ const manageButton = document.getElementById("tagManageButton");
 
 const searchInput = document.getElementById("tagSearch");
 
+const selectionFooter = document.getElementById("tagSelectionFooter");
+
+const selectedTagCount = document.getElementById("selectedTagCount");
+
+const selectedSongCount = document.getElementById("selectedSongCount");
+
+const viewLibraryButton = document.getElementById("tagViewLibrary");
+
 /* ==========================================================
    MODAL ROOT
    Created automatically.
@@ -329,6 +337,7 @@ function toggleTagSelection(tagId) {
   }
 
   renderTags();
+  updateSelectionFooter(); /* Update bottom footer */
 
   /*
        Later:
@@ -343,6 +352,142 @@ function toggleTagSelection(tagId) {
       },
     }),
   );
+}
+
+/* ==========================================================
+   TAG SELECTION FOOTER
+========================================================== */
+
+let currentFolders = [];
+
+/* ==========================================================
+   GET ALL SONGS
+========================================================== */
+
+function getAllMoonBoxSongs() {
+  const allSongs = [];
+
+  if (!Array.isArray(currentFolders)) {
+    return allSongs;
+  }
+
+  currentFolders.forEach((folder) => {
+    if (!Array.isArray(folder?.songs)) {
+      return;
+    }
+
+    /*
+       Avoid the virtual ALL folder if your
+       folder system contains one.
+    */
+
+    if (folder.tagId === "all") {
+      folder.songs.forEach((song) => {
+        allSongs.push(song);
+      });
+
+      return;
+    }
+
+    folder.songs.forEach((song) => {
+      allSongs.push(song);
+    });
+  });
+
+  /*
+     Remove duplicate songs by ID.
+  */
+
+  const uniqueSongs = [];
+
+  const seen = new Set();
+
+  allSongs.forEach((song) => {
+    const id = song.id;
+
+    if (id && seen.has(id)) {
+      return;
+    }
+
+    if (id) {
+      seen.add(id);
+    }
+
+    uniqueSongs.push(song);
+  });
+
+  return uniqueSongs;
+}
+
+/* ==========================================================
+   COUNT SONGS FOR SELECTED TAGS
+========================================================== */
+
+function getSelectedSongCount() {
+  const songs = getAllMoonBoxSongs();
+
+  /*
+     No tags selected
+  */
+
+  if (selectedTagIds.size === 0) {
+    return 0;
+  }
+
+  /*
+     ALL selected
+  */
+
+  if (selectedTagIds.has("all")) {
+    return songs.length;
+  }
+
+  /*
+     Ignore virtual ALL.
+  */
+
+  const actualTags = [...selectedTagIds].filter((tagId) => tagId !== "all");
+
+  if (actualTags.length === 0) {
+    return songs.length;
+  }
+
+  /*
+     UNION
+
+     A song matches if it has
+     ANY selected tag.
+  */
+
+  const matchingSongs = songs.filter((song) => {
+    const songTags = Array.isArray(song.tags) ? song.tags : [];
+
+    return actualTags.some((tagId) => songTags.includes(tagId));
+  });
+
+  return matchingSongs.length;
+}
+
+/* ==========================================================
+   UPDATE FOOTER
+========================================================== */
+
+function updateSelectionFooter() {
+  if (!selectedTagCount || !selectedSongCount) {
+    return;
+  }
+
+  const tagCount = selectedTagIds.size;
+
+  const songCount = getSelectedSongCount();
+
+  /* ---------- Tag text ---------- */
+
+  selectedTagCount.textContent = `${tagCount} ${tagCount === 1 ? "tag" : "tags"} selected`;
+
+  /* ---------- Song text ---------- */
+
+  selectedSongCount.textContent = `${songCount} ${songCount === 1 ? "song" : "songs"} match your selection`;
 }
 
 /* ==========================================================
@@ -451,6 +596,22 @@ function applySearchFilter() {
 
 if (searchInput) {
   searchInput.addEventListener("input", applySearchFilter);
+}
+
+/* ==========================================================
+   VIEW LIBRARY
+========================================================== */
+
+if (viewLibraryButton) {
+  viewLibraryButton.addEventListener("click", () => {
+    const libraryButton = document.querySelector(
+      '.nav-button[data-screen="1"]',
+    );
+
+    if (libraryButton) {
+      libraryButton.click();
+    }
+  });
 }
 
 /* ==========================================================
@@ -1294,9 +1455,8 @@ document.addEventListener("moonbox:removeTag", (event) => {
 
   selectedTagIds.delete(tagId);
 
-  /* Update Tag UI */
-
-  renderTags();
+  renderTags();  /* Update Tag UI */
+  updateSelectionFooter();  /* Update footer */
 
   /* Tell Library */
 
@@ -1318,7 +1478,17 @@ document.addEventListener("moonbox:foldersReady", (event) => {
 
   if (!folders) return;
 
+  /* Keep folders available for footer counting */
+
+  currentFolders = folders;
+
+  /* Create folder-based tags */
+
   syncFolderTags(folders);
+
+  /* Update footer */
+
+  updateSelectionFooter();
 });
 
 /* ==========================================================

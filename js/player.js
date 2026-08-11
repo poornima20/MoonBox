@@ -31,40 +31,10 @@ document.addEventListener("DOMContentLoaded", () => {
   const album = document.querySelector(".player-album");
 
   /* ==========================================================
-   SAMPLE SONGS
+   LIBRARY PLAYBACK QUEUE
 ========================================================== */
 
-  const songs = [
-    {
-      title: "Midnight Drive",
-
-      artist: "The Weeknd",
-
-      duration: 222,
-
-      cover: "assets/new.jpg",
-    },
-
-    {
-      title: "Golden Hour",
-
-      artist: "JVKE",
-
-      duration: 198,
-
-      cover: "assets/moon.png",
-    },
-
-    {
-      title: "Late Night Piano",
-
-      artist: "Yiruma",
-
-      duration: 245,
-
-      cover: "assets/moonboxlogo.png",
-    },
-  ];
+  let songs = [];
 
   songs.forEach((song) => {
     const img = new Image();
@@ -109,6 +79,48 @@ document.addEventListener("DOMContentLoaded", () => {
   ];
 
   /* ==========================================================
+   RECEIVE LIBRARY QUEUE
+========================================================== */
+
+  document.addEventListener("moonbox:libraryQueueChanged", (event) => {
+    songs = event.detail.songs || [];
+
+    /*
+      Keep current song if it still exists.
+      Otherwise reset safely.
+    */
+
+    if (currentSong >= songs.length) {
+      currentSong = 0;
+    }
+  });
+
+  /* ==========================================================
+   PLAY SONG FROM LIBRARY
+========================================================== */
+
+  document.addEventListener("moonbox:playFromLibrary", (event) => {
+    const queue = event.detail.songs || [];
+    const index = event.detail.index ?? 0;
+
+    if (queue.length === 0) {
+      return;
+    }
+
+    /* Replace Player queue */
+    songs = queue;
+
+    /* Select the clicked Library song */
+    currentSong = index;
+
+    /* Load it */
+    loadSong(currentSong);
+
+    /* Start playback */
+    playSong();
+  });
+
+  /* ==========================================================
    FORMAT TIME
 ========================================================== */
 
@@ -124,7 +136,13 @@ document.addEventListener("DOMContentLoaded", () => {
    LOAD SONG
 ========================================================== */
   function updateProgress() {
-    const percent = (elapsed / songs[currentSong].duration) * 100;
+    const song = songs[currentSong];
+
+    if (!song) return;
+
+    const duration = song.duration || 180;
+
+    const percent = (elapsed / duration) * 100;
 
     progress.value = elapsed;
 
@@ -136,19 +154,38 @@ document.addEventListener("DOMContentLoaded", () => {
   function loadSong(index) {
     const song = songs[index];
 
-    title.textContent = song.title;
+    if (!song) return;
 
-    artist.textContent = song.artist;
+    /* -----------------------------------------------
+     Temporary dummy metadata
+  ------------------------------------------------ */
 
-    cover.src = song.cover;
+    const songTitle = song.title || song.name || "Unknown Song";
 
-    totalTime.textContent = format(song.duration);
+    const songArtist = song.artist || "Unknown Artist";
 
-    progress.max = song.duration;
+    const songDuration = song.duration || 180;
+
+    const songCover = song.cover || "assets/moon.png";
+
+    /* -----------------------------------------------
+     Update Player
+  ------------------------------------------------ */
+
+    title.textContent = songTitle;
+
+    artist.textContent = songArtist;
+
+    cover.src = songCover;
+
+    totalTime.textContent = format(songDuration);
+
+    progress.max = songDuration;
 
     progress.style.setProperty("--progress", "0%");
 
     elapsed = 0;
+
     updateProgress();
   }
 
@@ -168,6 +205,17 @@ document.addEventListener("DOMContentLoaded", () => {
 
     lucide.createIcons();
 
+    const song = songs[currentSong];
+
+    document.dispatchEvent(
+      new CustomEvent("moonbox:playbackStateChanged", {
+        detail: {
+          songId: song?.id || null,
+          playing: true,
+        },
+      }),
+    );
+
     clearInterval(timer);
 
     timer = setInterval(() => {
@@ -175,7 +223,9 @@ document.addEventListener("DOMContentLoaded", () => {
 
       updateProgress();
 
-      if (elapsed >= songs[currentSong].duration) {
+      const duration = songs[currentSong]?.duration || 180;
+
+      if (elapsed >= duration) {
         clearInterval(timer);
 
         if (repeatMode === 2) {
@@ -201,11 +251,28 @@ document.addEventListener("DOMContentLoaded", () => {
     playButton.innerHTML = `<i data-lucide="play"></i>`;
 
     vinyl.classList.remove("playing");
+
     album.classList.remove("playing");
 
     lucide.createIcons();
 
     clearInterval(timer);
+
+    /* ======================================================
+     TELL LIBRARY
+  =============
+  ========================================= */
+
+    const song = songs[currentSong];
+
+    document.dispatchEvent(
+      new CustomEvent("moonbox:playbackStateChanged", {
+        detail: {
+          songId: song?.id || null,
+          playing: false,
+        },
+      }),
+    );
   }
 
   /* ==========================================================
@@ -420,9 +487,6 @@ document.addEventListener("DOMContentLoaded", () => {
       }
     });
   });
-
- 
-
 
   /* ==========================================================
    Tags
