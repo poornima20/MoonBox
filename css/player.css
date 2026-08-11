@@ -1643,7 +1643,6 @@ SCROLLBAR
   background: #555;
 }
 
-
 @media (max-width: 768px) {
   .player-layout {
     display: flex;
@@ -1786,6 +1785,7 @@ PLAYER
     gap: 28px;
 
     padding: 24px;
+    padding-bottom: 70px;
 
     width: 100%;
     height: auto;
@@ -2089,6 +2089,8 @@ EXTRA SMALL PHONES
     gap: 20px;
 
     border-radius: 0;
+
+    padding-bottom: 64px;
   }
 
   /*==========================
@@ -2282,8 +2284,6 @@ EXTRA SMALL PHONES
     padding: 18px;
   }
 
- 
-
   .panel-header h3 {
     font-size: 20px;
   }
@@ -2339,4 +2339,69 @@ EXTRA SMALL PHONES
     height: auto;
     min-height: 0;
   }
+}
+
+/* ==========================================================
+   GO TO LIBRARY
+   Fixed to bottom of PLAYER-TOP
+========================================================== */
+
+.player-library-link {
+  position: absolute;
+
+  left: 50%;
+  bottom: 18px;
+
+  transform: translateX(-50%);
+
+  display: inline-flex;
+
+  align-items: center;
+  justify-content: center;
+
+  gap: 8px;
+
+  color: #8f8f8f;
+
+  text-decoration: none;
+
+  font-family: var(--font-main);
+
+  font-size: 13px;
+
+  font-weight: 500;
+
+  letter-spacing: 0.2px;
+
+  padding: 6px 10px;
+
+  border-radius: 999px;
+
+  transition:
+    color 0.25s ease,
+    background 0.25s ease,
+    transform 0.25s ease;
+}
+
+.player-library-link svg {
+  width: 15px;
+  height: 15px;
+
+  transition:
+    transform 0.25s ease,
+    color 0.25s ease;
+}
+
+.player-library-link:hover {
+  color: #fff;
+
+  background: rgba(255, 255, 255, 0.06);
+
+  transform: translateX(-50%) translateY(-2px);
+}
+
+.player-library-link:hover svg {
+  transform: translateX(3px);
+
+  color: #fff;
 }

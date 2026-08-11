@@ -351,6 +351,26 @@ document.addEventListener("DOMContentLoaded", () => {
   previousButton.addEventListener("click", previous);
 
   /* ==========================================================
+   GO TO LIBRARY
+========================================================== */
+
+  const goToLibrary = document.getElementById("playerGoToLibrary");
+
+  if (goToLibrary) {
+    goToLibrary.addEventListener("click", (e) => {
+      e.preventDefault();
+
+      const libraryButton = document.querySelector(
+        '.nav-button[data-screen="1"]',
+      );
+
+      if (libraryButton) {
+        libraryButton.click();
+      }
+    });
+  }
+
+  /* ==========================================================
    PROGRESS
 ========================================================== */
 
