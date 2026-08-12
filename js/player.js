@@ -40,6 +40,16 @@ document.addEventListener("DOMContentLoaded", () => {
   const coverInput = document.getElementById("playerCoverInput");
 
   /* ==========================================================
+   AUDIO ENGINE
+========================================================== */
+
+  const audio = new Audio();
+
+  audio.preload = "metadata";
+
+  let currentObjectUrl = null;
+
+  /* ==========================================================
    LIBRARY PLAYBACK QUEUE
 ========================================================== */
 
@@ -463,11 +473,16 @@ document.addEventListener("DOMContentLoaded", () => {
 ========================================================== */
 
   function format(seconds) {
-    const m = Math.floor(seconds / 60);
+    if (!Number.isFinite(seconds) || seconds < 0) {
+      return "0:00";
+    }
 
-    const s = seconds % 60;
+    const totalSeconds = Math.floor(seconds);
 
-    return `${m}:${String(s).padStart(2, "0")}`;
+    const minutes = Math.floor(totalSeconds / 60);
+    const remainingSeconds = totalSeconds % 60;
+
+    return `${minutes}:${String(remainingSeconds).padStart(2, "0")}`;
   }
 
   /* ==========================================================
@@ -489,25 +504,60 @@ document.addEventListener("DOMContentLoaded", () => {
     currentTime.textContent = format(elapsed);
   }
 
+  /* ==========================================================
+   LOAD SONG
+========================================================== */
+
   function loadSong(index) {
     const song = songs[index];
 
-    if (!song) return;
+    if (!song) {
+      return;
+    }
 
     /* -----------------------------------------------
-     Temporary dummy metadata
+     Stop current audio
+  ------------------------------------------------ */
+
+    audio.pause();
+
+    /* -----------------------------------------------
+     Release previous object URL
+  ------------------------------------------------ */
+
+    if (currentObjectUrl) {
+      URL.revokeObjectURL(currentObjectUrl);
+      currentObjectUrl = null;
+    }
+
+    /* -----------------------------------------------
+     Local file must exist
+  ------------------------------------------------ */
+
+    if (song.file instanceof File) {
+      currentObjectUrl = URL.createObjectURL(song.file);
+
+      audio.src = currentObjectUrl;
+    } else {
+      console.warn("MoonBox Player: No local audio File found for song:", song);
+
+      audio.removeAttribute("src");
+    }
+
+    /* -----------------------------------------------
+     Metadata
   ------------------------------------------------ */
 
     const songTitle = song.title || song.name || "Unknown Song";
 
     const songArtist = song.artist || "Unknown Artist";
 
-    const songDuration = song.duration || 180;
+    const songDuration = Number.isFinite(song.duration) ? song.duration : 0;
 
     const songCover = song.cover || "assets/moon.png";
 
     /* -----------------------------------------------
-     Update Player
+     Update Player UI
   ------------------------------------------------ */
 
     title.textContent = songTitle;
@@ -524,13 +574,35 @@ document.addEventListener("DOMContentLoaded", () => {
 
     progress.max = songDuration;
 
+    progress.value = 0;
+
     progress.style.setProperty("--progress", "0%");
 
     elapsed = 0;
 
-    updateProgress();
+    currentTime.textContent = "0:00";
+
+    /* -----------------------------------------------
+     Reset player state
+  ------------------------------------------------ */
+
+    playing = false;
+
+    playButton.classList.remove("playing");
+
+    playButton.innerHTML = `<i data-lucide="play"></i>`;
+
+    vinyl.classList.remove("playing");
+
+    album.classList.remove("playing");
+
+    clearInterval(timer);
+
     requestPlayerTags();
+
     renderPlayerTags();
+
+    lucide.createIcons();
   }
 
   /* ==========================================================
@@ -607,50 +679,47 @@ document.addEventListener("DOMContentLoaded", () => {
    PLAY
 ========================================================== */
 
-  function playSong() {
-    playing = true;
-
-    playButton.classList.add("playing");
-
-    playButton.innerHTML = `<i data-lucide="pause"></i>`;
-
-    vinyl.classList.add("playing");
-    album.classList.add("playing");
-
-    lucide.createIcons();
-
+  async function playSong() {
     const song = songs[currentSong];
 
-    document.dispatchEvent(
-      new CustomEvent("moonbox:playbackStateChanged", {
-        detail: {
-          songId: song?.id || null,
-          playing: true,
-        },
-      }),
-    );
+    if (!song) {
+      return;
+    }
 
-    clearInterval(timer);
+    if (!(song.file instanceof File)) {
+      console.warn("MoonBox Player: This song has no local File object.", song);
 
-    timer = setInterval(() => {
-      elapsed++;
+      return;
+    }
 
-      updateProgress();
+    try {
+      await audio.play();
 
-      const duration = songs[currentSong]?.duration || 180;
+      playing = true;
 
-      if (elapsed >= duration) {
-        clearInterval(timer);
+      playButton.classList.add("playing");
 
-        if (repeatMode === 2) {
-          // Repeat current song
-          elapsed = 0;
-          playSong();
-        } else {
-          autoNext();
-        }
-      }
-    }, 1000);
+      playButton.innerHTML = `<i data-lucide="pause"></i>`;
+
+      vinyl.classList.add("playing");
+
+      album.classList.add("playing");
+
+      lucide.createIcons();
+
+      document.dispatchEvent(
+        new CustomEvent("moonbox:playbackStateChanged", {
+          detail: {
+            songId: song.id || null,
+            playing: true,
+          },
+        }),
+      );
+    } catch (error) {
+      console.error("MoonBox Player: Could not play audio.", error);
+
+      playing = false;
+    }
   }
 
   /* ==========================================================
@@ -658,6 +727,8 @@ document.addEventListener("DOMContentLoaded", () => {
 ========================================================== */
 
   function pauseSong() {
+    audio.pause();
+
     playing = false;
 
     playButton.classList.remove("playing");
@@ -669,13 +740,6 @@ document.addEventListener("DOMContentLoaded", () => {
     album.classList.remove("playing");
 
     lucide.createIcons();
-
-    clearInterval(timer);
-
-    /* ======================================================
-     TELL LIBRARY
-  =============
-  ========================================= */
 
     const song = songs[currentSong];
 
@@ -690,20 +754,112 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   /* ==========================================================
-   BUTTONS
+   REAL AUDIO PROGRESS
+========================================================== */
+
+  audio.addEventListener("timeupdate", () => {
+    if (!audio.duration) {
+      return;
+    }
+
+    elapsed = audio.currentTime;
+
+    const percent = (audio.currentTime / audio.duration) * 100;
+
+    progress.value = audio.currentTime;
+
+    progress.style.setProperty("--progress", `${percent}%`);
+
+    currentTime.textContent = format(audio.currentTime);
+  });
+
+  /* ==========================================================
+   AUDIO METADATA LOADED
+========================================================== */
+
+  audio.addEventListener("loadedmetadata", () => {
+    const duration = audio.duration;
+
+    if (!Number.isFinite(duration)) {
+      return;
+    }
+
+    const song = songs[currentSong];
+
+    if (song) {
+      song.duration = duration;
+    }
+
+    progress.max = duration;
+
+    totalTime.textContent = format(duration);
+  });
+
+  /* ==========================================================
+   SONG ENDED
+========================================================== */
+
+  audio.addEventListener("ended", () => {
+    playing = false;
+
+    clearInterval(timer);
+
+    if (repeatMode === 2) {
+      /* Repeat current song */
+
+      audio.currentTime = 0;
+
+      playSong();
+
+      return;
+    }
+
+    autoNext();
+  });
+
+  /* ==========================================================
+   NEXT
 ========================================================== */
 
   function next() {
-    clearInterval(timer);
+    if (!songs.length) {
+      return;
+    }
 
     currentSong++;
 
-    if (currentSong >= songs.length) currentSong = 0;
+    if (currentSong >= songs.length) {
+      currentSong = 0;
+    }
 
     loadSong(currentSong);
 
     playSong();
   }
+
+  /* ==========================================================
+   PREVIOUS
+========================================================== */
+
+  function previous() {
+    if (!songs.length) {
+      return;
+    }
+
+    currentSong--;
+
+    if (currentSong < 0) {
+      currentSong = songs.length - 1;
+    }
+
+    loadSong(currentSong);
+
+    playSong();
+  }
+
+  /* ==========================================================
+   BUTTONS
+========================================================== */
 
   function autoNext() {
     if (shuffle) {
@@ -726,18 +882,6 @@ document.addEventListener("DOMContentLoaded", () => {
         }
       }
     }
-
-    loadSong(currentSong);
-
-    playSong();
-  }
-
-  function previous() {
-    clearInterval(timer);
-
-    currentSong--;
-
-    if (currentSong < 0) currentSong = songs.length - 1;
 
     loadSong(currentSong);
 
@@ -833,14 +977,23 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   /* ==========================================================
-   PROGRESS
+   SEEK
 ========================================================== */
 
   progress.addEventListener("input", () => {
-    elapsed = Number(progress.value);
+    const value = Number(progress.value);
+
+    if (!Number.isFinite(value)) {
+      return;
+    }
+
+    audio.currentTime = value;
+
+    elapsed = value;
 
     updateProgress();
   });
+
   /* ==========================================================
    SHUFFLE
 ========================================================== */
