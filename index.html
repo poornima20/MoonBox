@@ -152,8 +152,6 @@
 
           <div class="tag-grid" id="tagGrid"></div>
 
-          <div class="tag-grid" id="tagGrid"></div>
-
           <!-- ==========================================================
      TAG SELECTION FOOTER
 ========================================================== -->
@@ -180,7 +178,7 @@
             <button class="tag-view-library" id="tagViewLibrary" type="button">
               <span>View Library</span>
 
-              <i data-lucide="arrow-right"></i>
+              <i data-lucide="list-music"></i>
             </button>
           </div>
 
@@ -430,11 +428,27 @@
                 </div>
               </div>
 
-              <!-- Go to Library -->
+              <!-- ==================================================
+              BOTTOM PLAYER NAVIGATION
+              =================================================== -->
+
+              <!-- LEFT: Go to Library -->
+
               <a href="#" class="player-library-link" id="playerGoToLibrary">
+                <i data-lucide="list-music"></i>
                 <span>Go to Library</span>
-                <i data-lucide="arrow-right"></i>
               </a>
+
+              <!-- RIGHT: Visualization -->
+
+              <button
+                class="player-visualization-toggle"
+                id="playerVisualizationToggle"
+                type="button"
+              >
+                <i data-lucide="audio-waveform"></i>
+                <span>Visualization: Off</span>
+              </button>
             </section>
 
             <!-- ==================================================

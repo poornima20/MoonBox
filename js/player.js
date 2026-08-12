@@ -30,6 +30,9 @@ document.addEventListener("DOMContentLoaded", () => {
   const vinyl = document.querySelector(".vinyl");
   const album = document.querySelector(".player-album");
 
+  const lyricsView = document.getElementById("lyricsView");
+  const lyricsEditor = document.getElementById("lyricsEditor");
+
   /* ==========================================================
    LIBRARY PLAYBACK QUEUE
 ========================================================== */
@@ -367,6 +370,46 @@ document.addEventListener("DOMContentLoaded", () => {
       if (libraryButton) {
         libraryButton.click();
       }
+    });
+  }
+
+  /* ==========================================================
+   VISUALIZATION MODE
+========================================================== */
+
+  const playerScreen = document.getElementById("playerScreen");
+
+  const visualizationButton = document.getElementById(
+    "playerVisualizationToggle",
+  );
+
+  if (visualizationButton) {
+    visualizationButton.addEventListener("click", () => {
+      const isVisualizationOn =
+        playerScreen.classList.toggle("visualization-mode");
+
+      const text = visualizationButton.querySelector("span");
+      const icon = visualizationButton.querySelector("svg");
+
+      if (isVisualizationOn) {
+        text.textContent = "Visualization: On";
+
+        visualizationButton.classList.add("active");
+
+        if (icon) {
+          icon.setAttribute("data-lucide", "audio-waveform");
+        }
+      } else {
+        text.textContent = "Visualization: Off";
+
+        visualizationButton.classList.remove("active");
+
+        if (icon) {
+          icon.setAttribute("data-lucide", "audio-waveform");
+        }
+      }
+
+      lucide.createIcons();
     });
   }
 

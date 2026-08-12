@@ -1395,6 +1395,165 @@
 }
 
 /* ==========================================================
+   Tag Selection Footer
+========================================================== */
+.tag-selection-footer {
+  position: fixed !important;
+
+  left: 10px !important;
+  right: 10px !important;
+
+  /* Stay above Android/iOS bottom area */
+  bottom: max(12px, env(safe-area-inset-bottom)) !important;
+
+  width: auto !important;
+
+  height: 64px !important;
+
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+
+  padding: 8px !important;
+
+  box-sizing: border-box !important;
+
+  background: var(--bg) !important;
+
+  border: 1px solid none !important;
+
+  border-radius: 16px !important;
+
+  box-shadow:
+    0 12px 35px rgba(0, 0, 0, 0.65),
+    0 0 0 1px rgba(255, 255, 255, 0.02) !important;
+
+  backdrop-filter: blur(18px) !important;
+  -webkit-backdrop-filter: blur(18px) !important;
+
+  z-index: 99999 !important;
+
+  visibility: visible !important;
+  opacity: 1 !important;
+}
+
+.tag-selection-info {
+  display: flex !important;
+  align-items: center !important;
+
+  gap: 9px !important;
+
+  min-width: 0 !important;
+
+  flex: 1 !important;
+}
+
+.tag-selection-icon {
+  width: 38px !important;
+  height: 38px !important;
+
+  min-width: 38px !important;
+
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+
+  border-radius: 11px !important;
+
+  background: #151515 !important;
+
+  border: 1px solid rgba(255, 255, 255, 0.16) !important;
+}
+
+.tag-selection-icon svg {
+  width: 18px !important;
+  height: 18px !important;
+}
+
+/* ========================================================
+     TEXT
+  ======================================================== */
+
+.tag-selection-text {
+  display: flex !important;
+  flex-direction: column !important;
+
+  gap: 3px !important;
+
+  min-width: 0 !important;
+}
+
+.tag-selection-text strong {
+  font-size: 12px !important;
+
+  color: #f2f2f2 !important;
+
+  white-space: nowrap !important;
+}
+
+.tag-selection-text span {
+  font-size: 9px !important;
+
+  color: #777 !important;
+
+  white-space: nowrap !important;
+}
+
+/* ========================================================
+     VIEW LIBRARY
+  ======================================================== */
+
+.tag-view-library {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+
+  flex-shrink: 0 !important;
+
+  width: 132px !important;
+  min-width: 132px !important;
+
+  height: 46px !important;
+
+  padding: 0 12px !important;
+
+  gap: 9px !important;
+
+  border-radius: 12px !important;
+
+  background: #f4f4f4 !important;
+
+  color: #111 !important;
+
+  font-size: 11px !important;
+  font-weight: 650 !important;
+
+  border: none !important;
+
+  visibility: visible !important;
+  opacity: 1 !important;
+}
+
+.tag-view-library svg {
+  width: 16px !important;
+  height: 16px !important;
+}
+
+/* ========================================================
+     IMPORTANT:
+     Give the page enough bottom space so the final
+     tags aren't hidden behind the footer.
+  ======================================================== */
+
+.tag-screen {
+  padding-bottom: 110px !important;
+}
+
+.tag-grid {
+  padding-bottom: 90px !important;
+}
+
+/* ==========================================================
    MOBILE
 ========================================================== */
 
@@ -2090,9 +2249,9 @@
 
     box-sizing: border-box !important;
 
-    background: rgba(10, 10, 10, 0.97) !important;
+    background: var(--bg) !important;
 
-    border: 1px solid rgba(255, 255, 255, 0.2) !important;
+    border: 1px solid none !important;
 
     border-radius: 16px !important;
 
