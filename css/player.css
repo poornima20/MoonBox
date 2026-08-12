@@ -2814,7 +2814,7 @@ EXTRA SMALL PHONES
     width: 170px;
     height: 170px;
 
-    left:-25px;
+    left: -25px;
     top: 10px;
   }
 
@@ -2856,13 +2856,12 @@ EXTRA SMALL PHONES
   }
 }
 
-
-@media (max-width: 350){
-    #playerScreen.visualization-mode .album-cover {
+@media (max-width: 350) {
+  #playerScreen.visualization-mode .album-cover {
     width: 150px;
     height: 150px;
 
-    left:-25px;
+    left: -25px;
     top: 10px;
   }
 
@@ -2882,4 +2881,229 @@ EXTRA SMALL PHONES
 
 body:has(#playerScreen.visualization-mode) .top-nav {
   display: none;
+}
+
+/* ==========================================================
+   TRACK DETAILS HEADER
+========================================================== */
+
+.player-details-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+/* ==========================================================
+   CHANGE COVER BUTTON
+========================================================== */
+
+.player-change-cover {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+
+  height: 36px;
+  padding: 0 13px;
+
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 999px;
+
+  background: rgba(255, 255, 255, 0.035);
+
+  color: #969696;
+
+  font-family: var(--font-main);
+  font-size: 12px;
+  font-weight: 500;
+
+  cursor: pointer;
+
+  transition:
+    color 0.25s ease,
+    background 0.25s ease,
+    border-color 0.25s ease,
+    transform 0.25s ease;
+}
+
+.player-change-cover svg {
+  width: 15px;
+  height: 15px;
+}
+
+.player-change-cover:hover {
+  color: #fff;
+
+  background: rgba(255, 255, 255, 0.07);
+
+  border-color: rgba(255, 255, 255, 0.14);
+
+  transform: translateY(-1px);
+}
+
+.player-change-cover:active {
+  transform: translateY(0);
+}
+
+/* ==========================================================
+   MOBILE
+========================================================== */
+
+@media (max-width: 600px) {
+  .player-details-header {
+    gap: 10px;
+  }
+
+  .player-change-cover {
+    width: 36px;
+    height: 36px;
+
+    padding: 0;
+  }
+
+  .player-change-cover span {
+    display: none;
+  }
+
+  .player-change-cover svg {
+    width: 16px;
+    height: 16px;
+  }
+}
+
+/* ==========================================================
+   CHANGE COVER — MOBILE
+========================================================== */
+
+@media (max-width: 600px) {
+  .player-details-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    width: 100%;
+    gap: 12px;
+  }
+
+  .player-details-header h3 {
+    margin: 0;
+
+    font-size: 20px;
+    line-height: 1.2;
+
+    white-space: nowrap;
+  }
+
+  /* Change Cover button */
+
+  .player-change-cover {
+    flex: 0 0 40px !important;
+
+    width: 40px !important;
+    min-width: 40px !important;
+    max-width: 40px !important;
+
+    height: 40px !important;
+    min-height: 40px !important;
+
+    padding: 0 !important;
+    margin: 0 !important;
+
+    display: flex !important;
+
+    align-items: center !important;
+    justify-content: center !important;
+
+    gap: 0 !important;
+
+    box-sizing: border-box;
+
+    border-radius: 12px !important;
+
+    background: rgba(255, 255, 255, 0.045) !important;
+
+    border: 1px solid rgba(255, 255, 255, 0.1) !important;
+
+    color: #b5b5b5 !important;
+
+    box-shadow: none !important;
+
+    transform: none !important;
+  }
+
+  /* Hide "Change Cover" text */
+
+  .player-change-cover span {
+    display: none !important;
+  }
+
+  /* FORCE THE LUCIDE ICON TO BE VISIBLE */
+
+  .player-change-cover svg {
+    display: block !important;
+
+    width: 19px !important;
+    height: 19px !important;
+
+    min-width: 19px !important;
+    min-height: 19px !important;
+
+    max-width: 19px !important;
+    max-height: 19px !important;
+
+    flex-shrink: 0 !important;
+
+    stroke: currentColor !important;
+
+    stroke-width: 2 !important;
+
+    color: currentColor !important;
+
+    opacity: 1 !important;
+
+    visibility: visible !important;
+
+    overflow: visible !important;
+  }
+
+  .player-change-cover:active {
+    transform: scale(0.94) !important;
+
+    background: rgba(255, 255, 255, 0.08) !important;
+  }
+}
+
+/* ==========================================================
+   VERY SMALL PHONES
+========================================================== */
+
+@media (max-width: 375px) {
+  .player-details-header {
+    gap: 8px;
+  }
+
+  .player-details-header h3 {
+    font-size: 18px;
+  }
+
+  .player-change-cover {
+    flex-basis: 38px !important;
+
+    width: 38px !important;
+    min-width: 38px !important;
+
+    height: 38px !important;
+    min-height: 38px !important;
+
+    border-radius: 11px !important;
+  }
+
+  .player-change-cover svg {
+    width: 18px !important;
+    height: 18px !important;
+
+    min-width: 18px !important;
+    min-height: 18px !important;
+  }
 }

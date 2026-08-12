@@ -33,6 +33,12 @@ document.addEventListener("DOMContentLoaded", () => {
   const lyricsView = document.getElementById("lyricsView");
   const lyricsEditor = document.getElementById("lyricsEditor");
 
+  const vinylCover = document.getElementById("playerVinylCover");
+
+  const changeCoverButton = document.getElementById("playerChangeCover");
+
+  const coverInput = document.getElementById("playerCoverInput");
+
   /* ==========================================================
    LIBRARY PLAYBACK QUEUE
 ========================================================== */
@@ -181,6 +187,10 @@ document.addEventListener("DOMContentLoaded", () => {
 
     cover.src = songCover;
 
+    if (vinylCover) {
+      vinylCover.src = songCover;
+    }
+
     totalTime.textContent = format(songDuration);
 
     progress.max = songDuration;
@@ -190,6 +200,76 @@ document.addEventListener("DOMContentLoaded", () => {
     elapsed = 0;
 
     updateProgress();
+  }
+
+  /* ==========================================================
+   CHANGE ALBUM COVER
+========================================================== */
+
+  if (changeCoverButton && coverInput) {
+    changeCoverButton.addEventListener("click", () => {
+      coverInput.click();
+    });
+
+    coverInput.addEventListener("change", (event) => {
+      const file = event.target.files?.[0];
+
+      if (!file) {
+        return;
+      }
+
+      if (!file.type.startsWith("image/")) {
+        return;
+      }
+
+      const reader = new FileReader();
+
+      reader.onload = (e) => {
+        const newCover = e.target.result;
+
+        /* -----------------------------------------------
+         Update album artwork
+      ------------------------------------------------ */
+
+        cover.src = newCover;
+
+        /* -----------------------------------------------
+         Update vinyl artwork
+      ------------------------------------------------ */
+
+        if (vinylCover) {
+          vinylCover.src = newCover;
+        }
+
+        /* -----------------------------------------------
+         Update current song data
+      ------------------------------------------------ */
+
+        const song = songs[currentSong];
+
+        if (song) {
+          song.cover = newCover;
+        }
+
+        /* -----------------------------------------------
+         Tell the rest of MoonBox
+      ------------------------------------------------ */
+
+        document.dispatchEvent(
+          new CustomEvent("moonbox:coverChanged", {
+            detail: {
+              songId: song?.id || null,
+              cover: newCover,
+            },
+          }),
+        );
+      };
+
+      reader.readAsDataURL(file);
+
+      /* Allow selecting the same image again */
+      coverInput.value = "";
+    });
   }
 
   /* ==========================================================

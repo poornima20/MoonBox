@@ -349,7 +349,7 @@
                   <div class="vinyl">
                     <div class="shine"></div>
                     <div class="record-label">
-                      <img src="assets/new.jpg" alt="" />
+                      <img id="playerVinylCover" src="assets/new.jpg" alt="" />
                     </div>
                   </div>
                 </div>
@@ -518,8 +518,24 @@ Perfect for long drives.
               =========================== -->
 
               <div class="player-tab" id="detailsPanel">
-                <div class="panel-header">
+                <div class="panel-header player-details-header">
                   <h3>Track Details</h3>
+
+                  <button
+                    type="button"
+                    class="player-change-cover"
+                    id="playerChangeCover"
+                  >
+                    <i data-lucide="image-plus"></i>
+                    <span>Change Cover</span>
+                  </button>
+
+                  <input
+                    type="file"
+                    id="playerCoverInput"
+                    accept="image/*"
+                    hidden
+                  />
                 </div>
 
                 <div class="player-details">
