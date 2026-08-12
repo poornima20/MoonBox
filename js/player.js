@@ -70,22 +70,351 @@ document.addEventListener("DOMContentLoaded", () => {
 
   let elapsed = 0;
 
-  let playerTags = [
-    {
-      name: "Night",
-      icon: "moon-star",
-    },
+  /* ==========================================================
+   PLAYER TAG SYSTEM
+========================================================== */
 
-    {
-      name: "Rain",
-      icon: "cloud-rain",
-    },
+  let availablePlayerTags = [];
 
-    {
-      name: "Lofi",
-      icon: "audio-waveform",
-    },
-  ];
+  const addPlayerTag = document.getElementById("addPlayerTag");
+
+  const playerSelectedTags = document.getElementById("playerSelectedTags");
+
+  const playerTagPicker = document.getElementById("playerTagPicker");
+
+  const playerTagPickerList = document.getElementById("playerTagPickerList");
+
+  const playerTagSearch = document.getElementById("playerTagSearch");
+
+  const closePlayerTagPicker = document.getElementById("closePlayerTagPicker");
+
+  const donePlayerTagPicker = document.getElementById("donePlayerTagPicker");
+
+  const playerTagSelectionCount = document.getElementById(
+    "playerTagSelectionCount",
+  );
+
+  /* ==========================================================
+   GET MASTER TAG LIST FROM TAG.JS
+========================================================== */
+
+  /* ==========================================================
+   TEMPORARY PLAYER TAGS
+   For UI testing only
+========================================================== */
+
+  function requestPlayerTags() {
+    availablePlayerTags = [
+      {
+        id: "chill",
+        name: "Chill",
+        icon: "moon",
+      },
+      {
+        id: "rain",
+        name: "Rain",
+        icon: "cloud-rain",
+      },
+      {
+        id: "night",
+        name: "Night",
+        icon: "moon-star",
+      },
+      {
+        id: "lofi",
+        name: "Lofi",
+        icon: "audio-waveform",
+      },
+      {
+        id: "drive",
+        name: "Drive",
+        icon: "car-front",
+      },
+      {
+        id: "study",
+        name: "Study",
+        icon: "book-open",
+      },
+      {
+        id: "jazz",
+        name: "Jazz",
+        icon: "music-4",
+      },
+      {
+        id: "focus",
+        name: "Focus",
+        icon: "target",
+      },
+      {
+        id: "sleep",
+        name: "Sleep",
+        icon: "bed",
+      },
+      {
+        id: "coding",
+        name: "Coding",
+        icon: "code-2",
+      },
+      {
+        id: "nature",
+        name: "Nature",
+        icon: "leaf",
+      },
+      {
+        id: "travel",
+        name: "Travel",
+        icon: "plane",
+      },
+      {
+        id: "happy",
+        name: "Happy",
+        icon: "smile",
+      },
+      {
+        id: "relax",
+        name: "Relax",
+        icon: "flower-2",
+      },
+      {
+        id: "piano",
+        name: "Piano",
+        icon: "piano",
+      },
+    ];
+
+    return availablePlayerTags;
+  }
+
+  /* ==========================================================
+   OPEN PLAYER TAG PICKER
+========================================================== */
+
+  if (addPlayerTag) {
+    addPlayerTag.addEventListener("click", () => {
+      /* Clear search first */
+      if (playerTagSearch) {
+        playerTagSearch.value = "";
+      }
+
+      /* Get latest master tags */
+      requestPlayerTags();
+
+      /* Render available tags */
+      renderPlayerTagPicker();
+
+      /* Show popup */
+      playerTagPicker?.classList.add("open");
+
+      /* Refresh Lucide icons */
+      lucide.createIcons();
+    });
+  }
+
+  /* ==========================================================
+   SEARCH PLAYER TAGS
+========================================================== */
+
+  playerTagSearch?.addEventListener("input", () => {
+    renderPlayerTagPicker();
+  });
+
+  /* ==========================================================
+   RENDER PLAYER TAGS
+========================================================== */
+
+  function renderPlayerTags() {
+    if (!playerSelectedTags) return;
+
+    playerSelectedTags.innerHTML = "";
+
+    const song = songs[currentSong];
+
+    if (!song) return;
+
+    if (!Array.isArray(song.tags)) {
+      song.tags = [];
+    }
+
+    const tagMap = new Map(availablePlayerTags.map((tag) => [tag.id, tag]));
+
+    song.tags.forEach((tagId) => {
+      const tag = tagMap.get(tagId);
+
+      if (!tag) return;
+
+      const button = document.createElement("button");
+
+      button.className = "player-selected-tag";
+
+      button.dataset.tagId = tag.id;
+
+      button.innerHTML = `
+      <i data-lucide="${tag.icon}"></i>
+
+      <span>${tag.name}</span>
+
+      <i
+        data-lucide="x"
+        class="remove-player-tag"
+      ></i>
+    `;
+
+      playerSelectedTags.appendChild(button);
+    });
+
+    lucide.createIcons();
+  }
+
+  /* ==========================================================
+   RENDER TAG PICKER
+========================================================== */
+
+  function renderPlayerTagPicker() {
+    if (!playerTagPickerList) return;
+
+    const song = songs[currentSong];
+
+    if (!song) return;
+
+    if (!Array.isArray(song.tags)) {
+      song.tags = [];
+    }
+
+    const search = playerTagSearch.value.trim().toLowerCase();
+
+    playerTagPickerList.innerHTML = "";
+
+    availablePlayerTags
+      .filter((tag) => tag.id !== "all")
+      .filter((tag) => tag.name.toLowerCase().includes(search))
+      .forEach((tag) => {
+        const selected = song.tags.includes(tag.id);
+
+        const button = document.createElement("button");
+
+        button.type = "button";
+
+        button.className = "player-tag-picker-option";
+
+        if (selected) {
+          button.classList.add("selected");
+        }
+
+        button.dataset.tagId = tag.id;
+
+        button.innerHTML = `
+        <i data-lucide="${tag.icon}"></i>
+
+        <span>${tag.name}</span>
+
+        <span class="player-tag-check">
+          ${selected ? "✓" : ""}
+        </span>
+      `;
+
+        button.addEventListener("click", () => {
+          togglePlayerSongTag(tag.id);
+        });
+
+        playerTagPickerList.appendChild(button);
+      });
+
+    updatePlayerTagSelectionCount();
+
+    lucide.createIcons();
+  }
+
+  /* ==========================================================
+   TOGGLE TAG FOR CURRENT SONG
+========================================================== */
+
+  function togglePlayerSongTag(tagId) {
+    const song = songs[currentSong];
+
+    if (!song) return;
+
+    if (!Array.isArray(song.tags)) {
+      song.tags = [];
+    }
+
+    const index = song.tags.indexOf(tagId);
+
+    if (index === -1) {
+      song.tags.push(tagId);
+    } else {
+      song.tags.splice(index, 1);
+    }
+
+    renderPlayerTagPicker();
+
+    renderPlayerTags();
+
+    /* Tell Library to refresh */
+
+    document.dispatchEvent(
+      new CustomEvent("moonbox:songTagsChanged", {
+        detail: {
+          songId: song.id,
+          tags: [...song.tags],
+        },
+      }),
+    );
+  }
+
+  /* ==========================================================
+   UPDATE TAG SELECTION COUNT
+========================================================== */
+
+  function updatePlayerTagSelectionCount() {
+    const song = songs[currentSong];
+
+    if (!playerTagSelectionCount) return;
+
+    if (!song || !Array.isArray(song.tags)) {
+      playerTagSelectionCount.textContent = "0 selected";
+      return;
+    }
+
+    const count = song.tags.length;
+
+    playerTagSelectionCount.textContent = `${count} selected`;
+  }
+
+  /* ==========================================================
+   REMOVE TAG FROM PLAYER
+========================================================== */
+
+  playerSelectedTags?.addEventListener("click", (event) => {
+    const removeButton = event.target.closest(".remove-player-tag");
+
+    if (!removeButton) return;
+
+    const chip = removeButton.closest(".player-selected-tag");
+
+    if (!chip) return;
+
+    const tagId = chip.dataset.tagId;
+
+    togglePlayerSongTag(tagId);
+  });
+
+  /* ==========================================================
+   CLOSE TAG PICKER
+========================================================== */
+
+  closePlayerTagPicker?.addEventListener("click", () => {
+    playerTagPicker.classList.remove("open");
+  });
+
+  donePlayerTagPicker?.addEventListener("click", () => {
+    playerTagPicker.classList.remove("open");
+  });
+
+  playerTagPicker?.addEventListener("click", (event) => {
+    if (event.target === playerTagPicker) {
+      playerTagPicker.classList.remove("open");
+    }
+  });
 
   /* ==========================================================
    RECEIVE LIBRARY QUEUE
@@ -200,6 +529,8 @@ document.addEventListener("DOMContentLoaded", () => {
     elapsed = 0;
 
     updateProgress();
+    requestPlayerTags();
+    renderPlayerTags();
   }
 
   /* ==========================================================
@@ -640,84 +971,10 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 
   /* ==========================================================
-   Tags
-========================================================== */
-
-  document.getElementById("addPlayerTag").addEventListener("click", () => {
-    const dummy = [
-      {
-        name: "Drive",
-        icon: "car-front",
-      },
-
-      {
-        name: "Study",
-        icon: "book-open",
-      },
-
-      {
-        name: "Jazz",
-        icon: "music-4",
-      },
-    ];
-
-    const available = dummy.filter(
-      (tag) => !playerTags.some((t) => t.name === tag.name),
-    );
-
-    if (available.length === 0) return;
-
-    playerTags.push(available[0]);
-
-    renderPlayerTags();
-  });
-
-  document.addEventListener("click", (e) => {
-    const remove = e.target.closest(".remove-player-tag");
-
-    if (!remove) return;
-
-    playerTags.splice(remove.dataset.index, 1);
-
-    renderPlayerTags();
-  });
-
-  function renderPlayerTags() {
-    const container = document.getElementById("playerSelectedTags");
-
-    container.innerHTML = "";
-
-    playerTags.forEach((tag, index) => {
-      const button = document.createElement("button");
-
-      button.className = "player-selected-tag";
-
-      button.innerHTML = `
-
-            <i data-lucide="${tag.icon}"></i>
-
-            <span>${tag.name}</span>
-
-            <i
-                class="remove-player-tag"
-                data-index="${index}"
-                data-lucide="x"
-            ></i>
-
-        `;
-
-      container.appendChild(button);
-    });
-
-    lucide.createIcons();
-  }
-
-  /* ==========================================================
    INITIALIZE
 ========================================================== */
 
   loadSong(currentSong);
-  renderPlayerTags();
 
   lucide.createIcons();
 });

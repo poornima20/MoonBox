@@ -3107,3 +3107,333 @@ body:has(#playerScreen.visualization-mode) .top-nav {
     min-height: 18px !important;
   }
 }
+
+/* ==========================================================
+   PLAYER TAG PICKER
+========================================================== */
+
+.player-tag-picker-overlay {
+  position: fixed;
+
+  inset: 0;
+
+  z-index: 9999;
+
+  display: none;
+
+  align-items: center;
+  justify-content: center;
+
+  padding: 20px;
+
+  background: rgba(0, 0, 0, 0.65);
+
+  backdrop-filter: blur(12px);
+}
+
+.player-tag-picker-overlay.open {
+  display: flex;
+}
+
+/* ==========================================================
+   WINDOW
+========================================================== */
+
+.player-tag-picker-window {
+  width: min(520px, 100%);
+
+  max-height: min(650px, 90vh);
+
+  display: flex;
+
+  flex-direction: column;
+
+  overflow: hidden;
+
+  border-radius: 24px;
+
+  background: #151515;
+
+  border: 1px solid rgba(255, 255, 255, 0.08);
+
+  box-shadow:
+    0 30px 80px rgba(0, 0, 0, 0.7),
+    0 0 40px rgba(255, 255, 255, 0.04);
+}
+
+/* ==========================================================
+   HEADER
+========================================================== */
+
+.player-tag-picker-header {
+  display: flex;
+
+  align-items: center;
+
+  justify-content: space-between;
+
+  padding: 22px 24px;
+
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.player-tag-picker-header h3 {
+  margin: 0;
+
+  color: #fff;
+
+  font-size: 20px;
+}
+
+.player-tag-picker-header span {
+  display: block;
+
+  margin-top: 4px;
+
+  color: #777;
+
+  font-size: 12px;
+}
+
+.player-tag-picker-close {
+  width: 36px;
+
+  height: 36px;
+
+  display: flex;
+
+  align-items: center;
+  justify-content: center;
+
+  border-radius: 12px;
+
+  border: 1px solid rgba(255, 255, 255, 0.07);
+
+  background: rgba(255, 255, 255, 0.04);
+
+  color: #999;
+
+  cursor: pointer;
+}
+
+.player-tag-picker-close svg {
+  width: 17px;
+  height: 17px;
+}
+
+/* ==========================================================
+   SEARCH
+========================================================== */
+
+.player-tag-search {
+  margin: 18px 22px;
+
+  height: 44px;
+
+  display: flex;
+
+  align-items: center;
+
+  gap: 10px;
+
+  padding: 0 14px;
+
+  border-radius: 14px;
+
+  background: #1b1b1b;
+
+  border: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.player-tag-search svg {
+  width: 17px;
+  height: 17px;
+
+  color: #777;
+}
+
+.player-tag-search input {
+  flex: 1;
+
+  border: none;
+  outline: none;
+
+  background: transparent;
+
+  color: #fff;
+
+  font-family: inherit;
+
+  font-size: 14px;
+}
+
+.player-tag-search input::placeholder {
+  color: #666;
+}
+
+/* ==========================================================
+   TAG LIST
+========================================================== */
+
+.player-tag-picker-list {
+  flex: 1;
+
+  min-height: 0;
+
+  overflow-y: auto;
+
+  display: grid;
+
+  grid-template-columns: repeat(2, 1fr);
+
+  gap: 10px;
+
+  padding: 0 22px 22px;
+}
+
+/* ==========================================================
+   TAG OPTION
+========================================================== */
+
+.player-tag-picker-option {
+  min-height: 52px;
+
+  display: flex;
+
+  align-items: center;
+
+  gap: 10px;
+
+  padding: 0 14px;
+
+  border-radius: 14px;
+
+  border: 1px solid rgba(255, 255, 255, 0.06);
+
+  background: #1a1a1a;
+
+  color: #999;
+
+  cursor: pointer;
+
+  text-align: left;
+
+  transition:
+    background 0.2s ease,
+    color 0.2s ease,
+    border-color 0.2s ease,
+    transform 0.2s ease;
+}
+
+.player-tag-picker-option svg {
+  width: 18px;
+  height: 18px;
+
+  flex-shrink: 0;
+}
+
+.player-tag-picker-option:hover {
+  color: #fff;
+
+  background: #202020;
+
+  border-color: rgba(255, 255, 255, 0.12);
+
+  transform: translateY(-1px);
+}
+
+.player-tag-picker-option.selected {
+  color: #000;
+
+  background: var(--gradient-active);
+
+  border-color: var(--border-light);
+
+  box-shadow: var(--shadow-active);
+}
+
+.player-tag-check {
+  margin-left: auto;
+
+  font-weight: 700;
+
+  color: inherit !important;
+}
+
+/* ==========================================================
+   FOOTER
+========================================================== */
+
+.player-tag-picker-footer {
+  display: flex;
+
+  align-items: center;
+
+  justify-content: space-between;
+
+  padding: 16px 22px;
+
+  border-top: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.player-tag-picker-footer span {
+  color: #777;
+
+  font-size: 12px;
+}
+
+.player-tag-picker-footer button {
+  height: 38px;
+
+  padding: 0 18px;
+
+  border-radius: 999px;
+
+  border: 1px solid var(--border-light);
+
+  background: var(--gradient-active);
+
+  color: #000;
+
+  font-weight: 600;
+
+  cursor: pointer;
+}
+
+/* ==========================================================
+   MOBILE
+========================================================== */
+
+@media (max-width: 600px) {
+  .player-tag-picker-overlay {
+    align-items: flex-end;
+
+    padding: 0;
+  }
+
+  .player-tag-picker-window {
+    width: 100%;
+
+    max-height: 82dvh;
+
+    border-radius: 24px 24px 0 0;
+  }
+
+  .player-tag-picker-list {
+    grid-template-columns: 1fr;
+
+    padding: 0 16px 16px;
+  }
+
+  .player-tag-picker-header {
+    padding: 18px;
+  }
+
+  .player-tag-search {
+    margin: 14px 16px;
+  }
+
+  .player-tag-picker-footer {
+    padding: 14px 16px;
+  }
+}

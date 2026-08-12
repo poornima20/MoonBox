@@ -608,6 +608,53 @@ Perfect for long drives.
       </main>
 
       <!-- ==========================================================
+     PLAYER TAG PICKER
+========================================================== -->
+
+      <div class="player-tag-picker-overlay" id="playerTagPicker">
+        <div class="player-tag-picker-window">
+          <div class="player-tag-picker-header">
+            <div>
+              <h3>Add Tags</h3>
+              <span>Select tags for this song</span>
+            </div>
+
+            <button
+              type="button"
+              class="player-tag-picker-close"
+              id="closePlayerTagPicker"
+            >
+              <i data-lucide="x"></i>
+            </button>
+          </div>
+
+          <!-- Search -->
+
+          <div class="player-tag-search">
+            <i data-lucide="search"></i>
+
+            <input
+              type="text"
+              id="playerTagSearch"
+              placeholder="Search tags..."
+            />
+          </div>
+
+          <!-- Tags -->
+
+          <div class="player-tag-picker-list" id="playerTagPickerList"></div>
+
+          <!-- Footer -->
+
+          <div class="player-tag-picker-footer">
+            <span id="playerTagSelectionCount"> 0 selected </span>
+
+            <button type="button" id="donePlayerTagPicker">Done</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- ==========================================================
         FOLDER MANAGER
         ========================================================== -->
 

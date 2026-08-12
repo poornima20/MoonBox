@@ -361,62 +361,16 @@ function toggleTagSelection(tagId) {
 let currentFolders = [];
 
 /* ==========================================================
-   GET ALL SONGS
+   GET ALL MOONBOX SONGS
+   Master song collection comes from folders.js
 ========================================================== */
 
 function getAllMoonBoxSongs() {
-  const allSongs = [];
-
-  if (!Array.isArray(currentFolders)) {
-    return allSongs;
+  if (!Array.isArray(songs)) {
+    return [];
   }
 
-  currentFolders.forEach((folder) => {
-    if (!Array.isArray(folder?.songs)) {
-      return;
-    }
-
-    /*
-       Avoid the virtual ALL folder if your
-       folder system contains one.
-    */
-
-    if (folder.tagId === "all") {
-      folder.songs.forEach((song) => {
-        allSongs.push(song);
-      });
-
-      return;
-    }
-
-    folder.songs.forEach((song) => {
-      allSongs.push(song);
-    });
-  });
-
-  /*
-     Remove duplicate songs by ID.
-  */
-
-  const uniqueSongs = [];
-
-  const seen = new Set();
-
-  allSongs.forEach((song) => {
-    const id = song.id;
-
-    if (id && seen.has(id)) {
-      return;
-    }
-
-    if (id) {
-      seen.add(id);
-    }
-
-    uniqueSongs.push(song);
-  });
-
-  return uniqueSongs;
+  return songs;
 }
 
 /* ==========================================================
@@ -424,45 +378,45 @@ function getAllMoonBoxSongs() {
 ========================================================== */
 
 function getSelectedSongCount() {
-  const songs = getAllMoonBoxSongs();
+  const allSongs = getAllMoonBoxSongs();
 
-  /*
-     No tags selected
-  */
-
+  /* Nothing selected */
   if (selectedTagIds.size === 0) {
     return 0;
   }
 
-  /*
-     ALL selected
-  */
+  /* -----------------------------------------------
+       ALL = every song
+    ------------------------------------------------ */
 
   if (selectedTagIds.has("all")) {
-    return songs.length;
+    /*
+            For now, selecting ALL means
+            show every song.
+
+            This remains true even if other
+            tags are also selected.
+        */
+
+    return allSongs.length;
   }
 
-  /*
-     Ignore virtual ALL.
-  */
+  /* -----------------------------------------------
+       Real selected tags
+    ------------------------------------------------ */
 
-  const actualTags = [...selectedTagIds].filter((tagId) => tagId !== "all");
+  const selected = [...selectedTagIds];
 
-  if (actualTags.length === 0) {
-    return songs.length;
-  }
+  /* -----------------------------------------------
+       UNION
 
-  /*
-     UNION
+       Song needs ANY selected tag.
+    ------------------------------------------------ */
 
-     A song matches if it has
-     ANY selected tag.
-  */
-
-  const matchingSongs = songs.filter((song) => {
+  const matchingSongs = allSongs.filter((song) => {
     const songTags = Array.isArray(song.tags) ? song.tags : [];
 
-    return actualTags.some((tagId) => songTags.includes(tagId));
+    return selected.some((tagId) => songTags.includes(tagId));
   });
 
   return matchingSongs.length;
@@ -1455,8 +1409,8 @@ document.addEventListener("moonbox:removeTag", (event) => {
 
   selectedTagIds.delete(tagId);
 
-  renderTags();  /* Update Tag UI */
-  updateSelectionFooter();  /* Update footer */
+  renderTags(); /* Update Tag UI */
+  updateSelectionFooter(); /* Update footer */
 
   /* Tell Library */
 
