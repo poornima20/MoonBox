@@ -627,6 +627,24 @@ function notifyFolderDataChanged() {
   );
 }
 
+function getFileFormat(file) {
+  const extension = file.name.split(".").pop().toUpperCase();
+
+  return extension || "Unknown";
+}
+
+function getEstimatedBitrate(file, duration) {
+  if (!duration || duration <= 0) {
+    return "Unknown";
+  }
+
+  const bits = file.size * 8;
+
+  const kbps = bits / duration / 1000;
+
+  return `${Math.round(kbps)} kbps`;
+}
+
 /* ==========================================================
    INITIAL RENDER
 ========================================================== */

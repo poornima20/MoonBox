@@ -38,6 +38,15 @@ document.addEventListener("DOMContentLoaded", () => {
   const changeCoverButton = document.getElementById("playerChangeCover");
 
   const coverInput = document.getElementById("playerCoverInput");
+  const playerYear = document.getElementById("playerYear");
+  const playerGenre = document.getElementById("playerGenre");
+  const playerDuration = document.getElementById("playerDuration");
+
+  const notesEditor = document.getElementById("journalText");
+
+  const uploadLyricsButton = document.getElementById("uploadLyrics");
+
+  const lyricsFile = document.getElementById("lyricsFile");
 
   /* ==========================================================
    AUDIO ENGINE
@@ -108,89 +117,20 @@ document.addEventListener("DOMContentLoaded", () => {
    GET MASTER TAG LIST FROM TAG.JS
 ========================================================== */
 
-  /* ==========================================================
-   TEMPORARY PLAYER TAGS
-   For UI testing only
-========================================================== */
-
   function requestPlayerTags() {
-    availablePlayerTags = [
-      {
-        id: "chill",
-        name: "Chill",
-        icon: "moon",
-      },
-      {
-        id: "rain",
-        name: "Rain",
-        icon: "cloud-rain",
-      },
-      {
-        id: "night",
-        name: "Night",
-        icon: "moon-star",
-      },
-      {
-        id: "lofi",
-        name: "Lofi",
-        icon: "audio-waveform",
-      },
-      {
-        id: "drive",
-        name: "Drive",
-        icon: "car-front",
-      },
-      {
-        id: "study",
-        name: "Study",
-        icon: "book-open",
-      },
-      {
-        id: "jazz",
-        name: "Jazz",
-        icon: "music-4",
-      },
-      {
-        id: "focus",
-        name: "Focus",
-        icon: "target",
-      },
-      {
-        id: "sleep",
-        name: "Sleep",
-        icon: "bed",
-      },
-      {
-        id: "coding",
-        name: "Coding",
-        icon: "code-2",
-      },
-      {
-        id: "nature",
-        name: "Nature",
-        icon: "leaf",
-      },
-      {
-        id: "travel",
-        name: "Travel",
-        icon: "plane",
-      },
-      {
-        id: "happy",
-        name: "Happy",
-        icon: "smile",
-      },
-      {
-        id: "relax",
-        name: "Relax",
-        icon: "flower-2",
-      },
-      {
-        id: "piano",
-        name: "Piano",
-        icon: "piano",
-      },
-    ];
+    let masterTags = [];
+
+    document.dispatchEvent(
+      new CustomEvent("moonbox:requestTags", {
+        detail: {
+          setTags: (tags) => {
+            masterTags = Array.isArray(tags) ? tags : [];
+          },
+        },
+      }),
+    );
+
+    availablePlayerTags = masterTags;
 
     return availablePlayerTags;
   }
@@ -339,6 +279,10 @@ document.addEventListener("DOMContentLoaded", () => {
 ========================================================== */
 
   function togglePlayerSongTag(tagId) {
+    /* ALL is mandatory */
+    if (tagId === "all") {
+      return;
+    }
     const song = songs[currentSong];
 
     if (!song) return;
@@ -507,68 +451,92 @@ document.addEventListener("DOMContentLoaded", () => {
   /* ==========================================================
    LOAD SONG
 ========================================================== */
+  function loadSongDetails(song) {
+    if (!song) return;
+
+    const currentYear = new Date().getFullYear();
+
+    const details = {
+      Album: song.album || "",
+
+      Artist: song.artist || "Unknown Artist",
+
+      Year: song.year || currentYear,
+
+      Genre: song.genre || "Pop",
+
+      Bitrate: song.bitrate || "Unknown",
+
+      Format: song.format || "Unknown",
+    };
+
+    document.querySelectorAll(".detail-item").forEach((item) => {
+      const label = item.querySelector("span")?.textContent.trim();
+
+      if (!label) return;
+
+      const value = details[label];
+
+      if (value === undefined) return;
+
+      const display = item.querySelector(".detail-display");
+
+      const input = item.querySelector(".detail-input");
+
+      if (display) {
+        display.textContent = value;
+      }
+
+      if (input) {
+        input.value = value;
+      }
+    });
+  }
 
   function loadSong(index) {
+    /* 1. Get song */
     const song = songs[index];
 
     if (!song) {
       return;
     }
 
-    /* -----------------------------------------------
-     Stop current audio
-  ------------------------------------------------ */
-
+    /* 2. Stop previous audio */
     audio.pause();
 
-    /* -----------------------------------------------
-     Release previous object URL
-  ------------------------------------------------ */
-
+    /* 3. Release previous URL */
     if (currentObjectUrl) {
       URL.revokeObjectURL(currentObjectUrl);
       currentObjectUrl = null;
     }
 
-    /* -----------------------------------------------
-     Local file must exist
-  ------------------------------------------------ */
-
+    /* 4. Attach local file */
     if (song.file instanceof File) {
       currentObjectUrl = URL.createObjectURL(song.file);
 
       audio.src = currentObjectUrl;
     } else {
-      console.warn("MoonBox Player: No local audio File found for song:", song);
+      console.warn("MoonBox Player: No local audio File found:", song);
 
       audio.removeAttribute("src");
     }
 
-    /* -----------------------------------------------
-     Metadata
-  ------------------------------------------------ */
+    /* 5. Basic Player information */
+    title.textContent = song.title || song.name || "Unknown Song";
 
-    const songTitle = song.title || song.name || "Unknown Song";
+    artist.textContent = song.artist || "Unknown Artist";
 
-    const songArtist = song.artist || "Unknown Artist";
-
-    const songDuration = Number.isFinite(song.duration) ? song.duration : 0;
-
+    /* 6. Artwork */
     const songCover = song.cover || "assets/moon.png";
-
-    /* -----------------------------------------------
-     Update Player UI
-  ------------------------------------------------ */
-
-    title.textContent = songTitle;
-
-    artist.textContent = songArtist;
 
     cover.src = songCover;
 
     if (vinylCover) {
       vinylCover.src = songCover;
     }
+
+    /* 7. Duration */
+    const songDuration = Number.isFinite(song.duration) ? song.duration : 0;
 
     totalTime.textContent = format(songDuration);
 
@@ -582,10 +550,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     currentTime.textContent = "0:00";
 
-    /* -----------------------------------------------
-     Reset player state
-  ------------------------------------------------ */
-
+    /* 8. Reset visual playback state */
     playing = false;
 
     playButton.classList.remove("playing");
@@ -598,9 +563,19 @@ document.addEventListener("DOMContentLoaded", () => {
 
     clearInterval(timer);
 
+    /* 9. Load song-specific data */
+    loadSongDetails(song);
+
+    loadLyrics(song);
+
+    loadNotes(song);
+
     requestPlayerTags();
 
     renderPlayerTags();
+
+    /* 10. Update Player top */
+    updatePlayerTop(song);
 
     lucide.createIcons();
   }
@@ -1071,8 +1046,25 @@ document.addEventListener("DOMContentLoaded", () => {
   /* ==========================================================
    LYRICS
 ========================================================== */
+
+  function loadLyrics(song) {
+    const lyrics = typeof song.lyrics === "string" ? song.lyrics : "";
+
+    lyricsView.textContent = lyrics;
+
+    lyricsView.classList.remove("hide");
+
+    lyricsEditor.classList.remove("active");
+
+    lyricsEditor.value = lyrics;
+  }
+
   lyricsView.addEventListener("click", () => {
-    lyricsEditor.value = lyricsView.textContent;
+    const song = songs[currentSong];
+
+    if (!song) return;
+
+    lyricsEditor.value = song.lyrics || "";
 
     lyricsView.classList.add("hide");
 
@@ -1082,23 +1074,106 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 
   lyricsEditor.addEventListener("blur", () => {
-    lyricsView.textContent = lyricsEditor.value;
+    const song = songs[currentSong];
+
+    if (!song) return;
+
+    song.lyrics = lyricsEditor.value.trim();
+
+    lyricsView.textContent = song.lyrics;
 
     lyricsEditor.classList.remove("active");
 
     lyricsView.classList.remove("hide");
   });
 
+  lyricsFile?.addEventListener("change", async (event) => {
+    const file = event.target.files?.[0];
+
+    if (!file) return;
+
+    const song = songs[currentSong];
+
+    if (!song) return;
+
+    try {
+      const text = await file.text();
+
+      song.lyrics = text;
+
+      lyricsView.textContent = text;
+
+      lyricsEditor.value = text;
+
+      lyricsView.classList.remove("hide");
+
+      lyricsEditor.classList.remove("active");
+    } catch (error) {
+      console.error("MoonBox: Could not read lyrics file.", error);
+    }
+
+    lyricsFile.value = "";
+  });
+
   /* ==========================================================
-   Details
+   PlayerTOp Update
+========================================================== */
+
+  function updatePlayerTop(song) {
+    if (!song) return;
+
+    title.textContent = song.title || "Unknown Song";
+
+    artist.textContent = song.artist || "Unknown Artist";
+
+    if (playerYear) {
+      playerYear.innerHTML = `
+            <i data-lucide="calendar"></i>
+            ${song.year || new Date().getFullYear()}
+        `;
+    }
+
+    if (playerGenre) {
+      playerGenre.innerHTML = `
+            <i data-lucide="music"></i>
+            ${song.genre || "Pop"}
+        `;
+    }
+
+    if (playerDuration) {
+      playerDuration.innerHTML = `
+            <i data-lucide="clock-3"></i>
+            ${format(song.duration || 0)}
+        `;
+    }
+
+    lucide.createIcons();
+  }
+
+  function loadNotes(song) {
+    if (!notesEditor) return;
+
+    notesEditor.value = song.notes || "";
+  }
+
+  /* ==========================================================
+   DETAILS
 ========================================================== */
 
   const detailItems = document.querySelectorAll(".detail-item");
 
   detailItems.forEach((item) => {
+    const labelElement = item.querySelector("span");
+
     const display = item.querySelector(".detail-display");
 
     const input = item.querySelector(".detail-input");
+
+    if (!labelElement || !display || !input) {
+      return;
+    }
+
+    const field = labelElement.textContent.trim().toLowerCase();
 
     item.addEventListener("click", () => {
       item.classList.add("editing");
@@ -1109,16 +1184,83 @@ document.addEventListener("DOMContentLoaded", () => {
     });
 
     function save() {
-      display.textContent = input.value.trim();
+      const song = songs[currentSong];
+
+      if (!song) {
+        return;
+      }
+
+      const value = input.value.trim();
+
+      /* -----------------------------------------------
+           Update song metadata
+        ------------------------------------------------ */
+
+      switch (field) {
+        case "album":
+          song.album = value;
+          break;
+
+        case "artist":
+          song.artist = value;
+          break;
+
+        case "year":
+          song.year = value || new Date().getFullYear();
+          break;
+
+        case "genre":
+          song.genre = value || "Pop";
+          break;
+
+        case "bitrate":
+          song.bitrate = value || "Unknown";
+          break;
+
+        case "format":
+          song.format = value || "Unknown";
+          break;
+      }
+
+      /* -----------------------------------------------
+           Update Details UI
+        ------------------------------------------------ */
+
+      display.textContent = value || "—";
 
       item.classList.remove("editing");
+
+      /* -----------------------------------------------
+           Update Player top
+        ------------------------------------------------ */
+
+      updatePlayerTop(song);
+
+      /* -----------------------------------------------
+           Tell MoonBox
+        ------------------------------------------------ */
+
+      document.dispatchEvent(
+        new CustomEvent("moonbox:songMetadataChanged", {
+          detail: {
+            songId: song.id,
+            song: song,
+          },
+        }),
+      );
     }
 
     input.addEventListener("blur", save);
 
-    input.addEventListener("keydown", (e) => {
-      if (e.key === "Enter") {
+    input.addEventListener("keydown", (event) => {
+      if (event.key === "Enter") {
         input.blur();
+      }
+
+      if (event.key === "Escape") {
+        input.value = display.textContent;
+
+        item.classList.remove("editing");
       }
     });
   });

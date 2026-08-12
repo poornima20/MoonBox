@@ -383,19 +383,19 @@
                 </div>
 
                 <div class="song-extra">
-                  <span>
+                  <span id="playerYear">
                     <i data-lucide="calendar"></i>
-                    1979
+                    2026
                   </span>
 
-                  <span>
+                  <span id="playerGenre">
                     <i data-lucide="music"></i>
-                    Soft Rock
+                    Pop
                   </span>
 
-                  <span>
+                  <span id="playerDuration">
                     <i data-lucide="clock-3"></i>
-                    4:18
+                    0:00
                   </span>
                 </div>
 
@@ -465,11 +465,10 @@
                   <h3>Notes</h3>
                 </div>
 
-                <textarea id="journalText">
-Feels like ocean breeze.
-
-Perfect for long drives.
-                </textarea>
+                <textarea
+                  id="journalText"
+                  placeholder="Write notes for this song here..."
+                ></textarea>
               </div>
 
               <!-- ==========================
@@ -503,10 +502,11 @@ Perfect for long drives.
                   </button>
                 </div>
 
-                <div class="lyrics-view" id="lyricsView">
-                  Sailing takes me away... To where I've always heard... It
-                  could be...
-                </div>
+                <div
+                  class="lyrics-view"
+                  id="lyricsView"
+                  data-placeholder="Copy and paste or upload the lyrics for this song here..."
+                ></div>
 
                 <textarea id="lyricsEditor" class="lyrics-editor"></textarea>
 

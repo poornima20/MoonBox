@@ -3400,6 +3400,13 @@ body:has(#playerScreen.visualization-mode) .top-nav {
   cursor: pointer;
 }
 
+.lyrics-view:empty::before {
+  content: attr(data-placeholder);
+
+  color: #777;
+
+  pointer-events: none;
+}
 /* ==========================================================
    MOBILE
 ========================================================== */
