@@ -363,6 +363,14 @@ document.addEventListener("DOMContentLoaded", () => {
     goToLibrary.addEventListener("click", (e) => {
       e.preventDefault();
 
+      /* Turn Visualization OFF first */
+      playerScreen.classList.remove("visualization-mode");
+
+      visualizationButton.classList.remove("active");
+
+      visualizationButton.querySelector("span").textContent =
+        "Visualization: Off";
+
       const libraryButton = document.querySelector(
         '.nav-button[data-screen="1"]',
       );

@@ -1532,6 +1532,8 @@
 
   visibility: visible !important;
   opacity: 1 !important;
+
+  cursor: pointer;
 }
 
 .tag-view-library svg {
