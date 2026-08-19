@@ -236,6 +236,8 @@
 .tag-grid {
   display: grid;
 
+  padding: 5px;
+
   grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
 
   gap: 22px;
@@ -444,8 +446,6 @@
     font-size: 12px;
   }
 }
-
-
 
 /* ==========================================================
    TAG MANAGEMENT MODALS
@@ -2224,8 +2224,6 @@
 ========================================================== */
 
 @media (max-width: 768px) {
-
-
   /* ========================================================
      LEFT SIDE
   ======================================================== */
@@ -2338,8 +2336,6 @@
 ========================================================== */
 
 @media (max-width: 400px) {
-
-
   .tag-selection-icon {
     width: 36px !important;
     height: 36px !important;
@@ -2370,8 +2366,6 @@
 ========================================================== */
 
 @media (max-width: 350px) {
-
-
   .tag-selection-icon {
     display: none !important;
   }
@@ -2392,14 +2386,12 @@
   }
 }
 
-
 /* ==========================================================
    MOBILE TAG SECTION LAYOUT
    Footer belongs to the TAG SECTION, not the viewport.
 ========================================================== */
 
 @media (max-width: 768px) {
-
   .tag-screen {
     height: 100% !important;
     min-height: 0 !important;
@@ -2455,5 +2447,71 @@
 
   .tag-grid {
     padding-bottom: 10px !important;
+  }
+}
+
+/* ==========================================================
+   MOBILE — CLEAR SELECTION LINK
+========================================================== */
+
+@media (max-width: 768px) {
+  .tag-clear-selection {
+    display: none;
+
+    flex-shrink: 0;
+
+    margin-left: 6px;
+    margin-right: 8px;
+
+    padding: 0;
+
+    border: none;
+    background: transparent;
+
+    color: #8f8f8f;
+
+    font-family: var(--font-main, sans-serif);
+
+    font-size: 9px;
+    font-weight: 500;
+
+    line-height: 1;
+
+    white-space: nowrap;
+
+    cursor: pointer;
+
+    text-decoration: underline;
+    text-decoration-color: rgba(255, 255, 255, 0.22);
+    text-underline-offset: 3px;
+
+    transition:
+      color 0.18s ease,
+      text-decoration-color 0.18s ease;
+  }
+
+  .tag-clear-selection:hover,
+  .tag-clear-selection:active {
+    color: #f0f0f0;
+
+    text-decoration-color: rgba(255, 255, 255, 0.5);
+  }
+}
+
+@media (max-width: 400px) {
+  .tag-clear-selection {
+    font-size: 8px;
+
+    margin-left: 4px;
+    margin-right: 6px;
+  }
+}
+
+@media (max-width: 350px) {
+  .tag-clear-selection {
+    font-size: 8px;
+
+    margin-left: 3px;
+    margin-right: 5px;
   }
 }

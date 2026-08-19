@@ -111,6 +111,8 @@ const selectedSongCount = document.getElementById("selectedSongCount");
 
 const viewLibraryButton = document.getElementById("tagViewLibrary");
 
+const clearSelectionButton = document.getElementById("tagClearSelection");
+
 /* ==========================================================
    MODAL ROOT
    Created automatically.
@@ -423,6 +425,32 @@ function getSelectedSongCount() {
 }
 
 /* ==========================================================
+   CLEAR TAG SELECTION
+========================================================== */
+
+if (clearSelectionButton) {
+  clearSelectionButton.addEventListener("click", () => {
+    /* Uncheck every tag */
+    selectedTagIds.clear();
+
+    /* Update tag circles */
+    renderTags();
+
+    /* Update footer counts */
+    updateSelectionFooter();
+
+    /* Tell Library / Player */
+    document.dispatchEvent(
+      new CustomEvent("moonbox:tagsChanged", {
+        detail: {
+          selectedTagIds: [],
+        },
+      }),
+    );
+  });
+}
+
+/* ==========================================================
    UPDATE FOOTER
 ========================================================== */
 
@@ -432,7 +460,6 @@ function updateSelectionFooter() {
   }
 
   const tagCount = selectedTagIds.size;
-
   const songCount = getSelectedSongCount();
 
   /* ---------- Tag text ---------- */
@@ -442,6 +469,12 @@ function updateSelectionFooter() {
   /* ---------- Song text ---------- */
 
   selectedSongCount.textContent = `${songCount} ${songCount === 1 ? "song" : "songs"} match your selection`;
+
+  /* ---------- Clear selection ---------- */
+
+  if (clearSelectionButton) {
+    clearSelectionButton.style.display = tagCount > 0 ? "inline-flex" : "none";
+  }
 }
 
 /* ==========================================================
