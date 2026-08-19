@@ -445,13 +445,7 @@
   }
 }
 
-@media (max-width: 768px) {
-  .tag-screen {
-    height: 100dvh;
-    min-height: 100dvh;
-    box-sizing: border-box;
-  }
-}
+
 
 /* ==========================================================
    TAG MANAGEMENT MODALS
@@ -2230,45 +2224,7 @@
 ========================================================== */
 
 @media (max-width: 768px) {
-  .tag-selection-footer {
-    position: fixed !important;
 
-    left: 10px !important;
-    right: 10px !important;
-
-    /* Stay above Android/iOS bottom area */
-    bottom: max(12px, env(safe-area-inset-bottom)) !important;
-
-    width: auto !important;
-
-    height: 64px !important;
-
-    display: flex !important;
-    align-items: center !important;
-    justify-content: space-between !important;
-
-    padding: 8px !important;
-
-    box-sizing: border-box !important;
-
-    background: var(--bg) !important;
-
-    border: 1px solid none !important;
-
-    border-radius: 16px !important;
-
-    box-shadow:
-      0 12px 35px rgba(0, 0, 0, 0.65),
-      0 0 0 1px rgba(255, 255, 255, 0.02) !important;
-
-    backdrop-filter: blur(18px) !important;
-    -webkit-backdrop-filter: blur(18px) !important;
-
-    z-index: 99999 !important;
-
-    visibility: visible !important;
-    opacity: 1 !important;
-  }
 
   /* ========================================================
      LEFT SIDE
@@ -2375,20 +2331,6 @@
     width: 16px !important;
     height: 16px !important;
   }
-
-  /* ========================================================
-     IMPORTANT:
-     Give the page enough bottom space so the final
-     tags aren't hidden behind the footer.
-  ======================================================== */
-
-  .tag-screen {
-    padding-bottom: 110px !important;
-  }
-
-  .tag-grid {
-    padding-bottom: 90px !important;
-  }
 }
 
 /* ==========================================================
@@ -2396,16 +2338,7 @@
 ========================================================== */
 
 @media (max-width: 400px) {
-  .tag-selection-footer {
-    left: 8px !important;
-    right: 8px !important;
 
-    height: 62px !important;
-
-    padding: 7px !important;
-
-    bottom: max(10px, env(safe-area-inset-bottom)) !important;
-  }
 
   .tag-selection-icon {
     width: 36px !important;
@@ -2437,10 +2370,7 @@
 ========================================================== */
 
 @media (max-width: 350px) {
-  .tag-selection-footer {
-    left: 6px !important;
-    right: 6px !important;
-  }
+
 
   .tag-selection-icon {
     display: none !important;
@@ -2459,5 +2389,71 @@
     min-width: 112px !important;
 
     font-size: 9px !important;
+  }
+}
+
+
+/* ==========================================================
+   MOBILE TAG SECTION LAYOUT
+   Footer belongs to the TAG SECTION, not the viewport.
+========================================================== */
+
+@media (max-width: 768px) {
+
+  .tag-screen {
+    height: 100% !important;
+    min-height: 0 !important;
+
+    box-sizing: border-box !important;
+
+    display: flex !important;
+    flex-direction: column !important;
+
+    overflow: hidden !important;
+  }
+
+  /* The tag grid occupies the remaining space */
+  .tag-grid {
+    flex: 1 1 auto !important;
+    min-height: 0 !important;
+
+    overflow-y: auto !important;
+    overflow-x: hidden !important;
+
+    padding-bottom: 20px !important;
+    margin-bottom: 0 !important;
+
+    -webkit-overflow-scrolling: touch;
+  }
+
+  /* Footer is now part of the tag section */
+  .tag-selection-footer {
+    position: relative !important;
+
+    left: auto !important;
+    right: auto !important;
+    bottom: auto !important;
+
+    flex: 0 0 64px !important;
+
+    width: 100% !important;
+    height: 64px !important;
+
+    margin-top: 12px !important;
+
+    box-sizing: border-box !important;
+
+    z-index: 20 !important;
+  }
+
+  /*
+     No artificial space for a fixed footer anymore.
+  */
+  .tag-screen {
+    padding-bottom: 18px !important;
+  }
+
+  .tag-grid {
+    padding-bottom: 10px !important;
   }
 }
