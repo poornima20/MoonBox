@@ -26,6 +26,110 @@ const folderPicker = document.getElementById("folderPicker");
 const filePicker = document.getElementById("filePicker");
 
 const folderSongCount = document.getElementById("folderSongCount");
+const syncFolderButton = document.getElementById("syncFolderButton");
+const removeFolderButton = document.getElementById("removeFolderButton");
+
+/* ==========================================================
+   MOONBOX LOCAL DATABASE
+========================================================== */
+
+const DB_NAME = "moonbox";
+const DB_VERSION = 1;
+
+let db;
+
+function openMoonboxDB() {
+  return new Promise((resolve, reject) => {
+    const request = indexedDB.open(DB_NAME, DB_VERSION);
+
+    request.onupgradeneeded = (event) => {
+      const database = event.target.result;
+
+      if (!database.objectStoreNames.contains("folders")) {
+        database.createObjectStore("folders", {
+          keyPath: "id",
+        });
+      }
+
+      if (!database.objectStoreNames.contains("songs")) {
+        const songStore = database.createObjectStore("songs", {
+          keyPath: "id",
+        });
+
+        songStore.createIndex("folderId", "folderId", {
+          unique: false,
+        });
+      }
+    };
+
+    request.onsuccess = () => {
+      db = request.result;
+      resolve(db);
+    };
+
+    request.onerror = () => {
+      reject(request.error);
+    };
+  });
+}
+
+/* ==========================================================
+   DATABASE HELPERS
+========================================================== */
+
+function saveFolder(folder) {
+  return new Promise((resolve, reject) => {
+    const transaction = db.transaction("folders", "readwrite");
+
+    transaction.objectStore("folders").put(folder);
+
+    transaction.oncomplete = resolve;
+    transaction.onerror = () => reject(transaction.error);
+  });
+}
+
+function saveSong(song) {
+  return new Promise((resolve, reject) => {
+    const transaction = db.transaction("songs", "readwrite");
+
+    transaction.objectStore("songs").put(song);
+
+    transaction.oncomplete = resolve;
+    transaction.onerror = () => reject(transaction.error);
+  });
+}
+
+function getAllFolders() {
+  return new Promise((resolve, reject) => {
+    const transaction = db.transaction("folders", "readonly");
+
+    const request = transaction.objectStore("folders").getAll();
+
+    request.onsuccess = () => {
+      resolve(request.result);
+    };
+
+    request.onerror = () => {
+      reject(request.error);
+    };
+  });
+}
+
+function getAllSongs() {
+  return new Promise((resolve, reject) => {
+    const transaction = db.transaction("songs", "readonly");
+
+    const request = transaction.objectStore("songs").getAll();
+
+    request.onsuccess = () => {
+      resolve(request.result);
+    };
+
+    request.onerror = () => {
+      reject(request.error);
+    };
+  });
+}
 
 /* ==========================================================
    MASTER DATA
@@ -187,9 +291,11 @@ function getOrCreateFolder(folderName) {
   const tagId = createFolderTagId(normalizedName);
 
   folder = {
+    id: createId(),
     name: normalizedName,
     tagId: tagId,
     songs: [],
+    handle: null,
   };
 
   folders.push(folder);
@@ -254,113 +360,297 @@ function createSong(file, folderName, duration) {
     with a more reliable file identity/hash system.
 */
 
-function isDuplicateFile(file) {
+function isDuplicateFile(file, folder) {
   return songs.some((song) => {
     return (
+      song.folderId === folder.id &&
       song.name === file.name &&
-      song.file.size === file.size &&
-      song.file.lastModified === file.lastModified
+      song.size === file.size &&
+      song.lastModified === file.lastModified
     );
   });
+}
+
+/* ==========================================================
+   IMPORT the Directory
+========================================================== */
+async function importDirectory(directoryHandle) {
+  const folderName = directoryHandle.name;
+
+  let folder = folders.find(
+    (item) => item.name.toLowerCase() === folderName.toLowerCase(),
+  );
+
+  if (!folder) {
+    folder = {
+      id: createId(),
+      name: folderName,
+      tagId: createFolderTagId(folderName),
+      songs: [],
+      handle: directoryHandle,
+    };
+
+    folders.push(folder);
+  } else {
+    folder.handle = directoryHandle;
+  }
+
+  await saveFolder({
+    id: folder.id,
+    name: folder.name,
+    tagId: folder.tagId,
+    handle: folder.handle,
+  });
+
+  for await (const [name, entry] of directoryHandle.entries()) {
+    if (entry.kind !== "file") {
+      continue;
+    }
+
+    const file = await entry.getFile();
+
+    if (!isAudioFile(file)) {
+      continue;
+    }
+
+    await importSong(file, folder);
+  }
+
+  currentFolder = folders.indexOf(folder);
+
+  renderFolders();
+  notifyFolderDataChanged();
 }
 
 /* ==========================================================
    IMPORT ONE FILE
 ========================================================== */
 
-async function importSong(file, folderName) {
+async function importSong(file, folder) {
   if (!isAudioFile(file)) {
     return null;
   }
 
-  if (isDuplicateFile(file)) {
+  if (isDuplicateFile(file, folder)) {
     return null;
   }
 
   const duration = await getAudioDuration(file);
 
-  const song = createSong(file, folderName, duration);
+  const song = {
+    id: createId(),
+    name: file.name,
+    title: getTitleFromFileName(file.name),
+    duration,
+    artist: folder.name,
+    folderId: folder.id,
+    folderName: folder.name,
+    size: file.size,
+    lastModified: file.lastModified,
+    tags: ["all", folder.tagId],
+  };
 
-  /*
-        Add to master song collection.
-    */
   songs.push(song);
 
-  /*
-        Add to its actual folder.
-    */
-  const folder = getOrCreateFolder(folderName);
+  await saveSong(song);
 
-  folder.songs.push(song);
+  rebuildFolderSongs();
 
   return song;
 }
-
 /* ==========================================================
-   ADD FOLDER
+  Sync folder with delete 
 ========================================================== */
 
-addFolderButton.addEventListener("click", () => {
-  folderPicker.value = "";
-  folderPicker.click();
+async function syncFolder(folder) {
+  if (!folder || !folder.handle) {
+    alert("This folder cannot be synced.");
+    return;
+  }
+
+  try {
+    const permission = await folder.handle.requestPermission({
+      mode: "read",
+    });
+
+    if (permission !== "granted") {
+      alert(`MoonBox needs permission to access "${folder.name}".`);
+
+      return;
+    }
+
+    let added = 0;
+
+    for await (const [name, entry] of folder.handle.entries()) {
+      if (entry.kind !== "file") {
+        continue;
+      }
+
+      const file = await entry.getFile();
+
+      if (!isAudioFile(file)) {
+        continue;
+      }
+
+      const alreadyExists = isDuplicateFile(file, folder);
+
+      if (alreadyExists) {
+        continue;
+      }
+
+      await importSong(file, folder);
+
+      added++;
+    }
+
+    await saveFolder({
+      id: folder.id,
+      name: folder.name,
+      tagId: folder.tagId,
+      handle: folder.handle,
+    });
+
+    renderFolders();
+    notifyFolderDataChanged();
+
+    alert(
+      added === 0
+        ? `"${folder.name}" is already up to date.`
+        : `Added ${added} new song${added === 1 ? "" : "s"} from "${folder.name}".`,
+    );
+  } catch (error) {
+    console.error("Folder sync failed:", error);
+
+    alert(`MoonBox couldn't sync "${folder.name}".`);
+  }
+}
+
+syncFolderButton.addEventListener("click", async () => {
+  const folder = folders[currentFolder];
+
+  if (!folder) {
+    return;
+  }
+
+  if (folder.id === "all") {
+    return;
+  }
+
+  if (!folder.handle) {
+    alert(`"${folder.name}" does not have a folder to sync.`);
+
+    return;
+  }
+
+  await syncFolder(folder);
 });
+
+async function removeFolder(folder) {
+  if (!folder || folder.id === "all") {
+    return;
+  }
+
+  const confirmed = confirm(
+    `Remove "${folder.name}" from MoonBox?\n\n` +
+      `This will remove the folder and its songs from MoonBox, ` +
+      `but will NOT delete your music files from your computer.`,
+  );
+
+  if (!confirmed) {
+    return;
+  }
+
+  // Get all songs belonging to this folder
+  const folderSongs = songs.filter((song) => song.folderId === folder.id);
+
+  // Remove songs from IndexedDB
+  for (const song of folderSongs) {
+    await deleteSongFromDB(song.id);
+  }
+
+  // Remove folder from IndexedDB
+  await deleteFolderFromDB(folder.id);
+
+  // Remove folder from memory
+  const folderIndex = folders.findIndex((item) => item.id === folder.id);
+
+  if (folderIndex !== -1) {
+    folders.splice(folderIndex, 1);
+  }
+
+  // Remove its songs from master songs[]
+  for (let i = songs.length - 1; i >= 0; i--) {
+    if (songs[i].folderId === folder.id) {
+      songs.splice(i, 1);
+    }
+  }
+
+  // IMPORTANT:
+  // Rebuild All Files and every remaining folder
+  rebuildFolderSongs();
+
+  // Go back to All Files
+  currentFolder = 0;
+
+  renderFolders();
+
+  notifyFolderDataChanged();
+}
+
+removeFolderButton.addEventListener("click", async () => {
+  const folder = folders[currentFolder];
+
+  if (!folder) {
+    return;
+  }
+
+  if (folder.id === "all") {
+    return;
+  }
+
+  await removeFolder(folder);
+});
+
+function deleteSongFromDB(songId) {
+  return new Promise((resolve, reject) => {
+    const transaction = db.transaction("songs", "readwrite");
+
+    transaction.objectStore("songs").delete(songId);
+
+    transaction.oncomplete = resolve;
+    transaction.onerror = () => reject(transaction.error);
+  });
+}
+
+function deleteFolderFromDB(folderId) {
+  return new Promise((resolve, reject) => {
+    const transaction = db.transaction("folders", "readwrite");
+
+    transaction.objectStore("folders").delete(folderId);
+
+    transaction.oncomplete = resolve;
+    transaction.onerror = () => reject(transaction.error);
+  });
+}
 
 /* ==========================================================
    FOLDER PICKER
 ========================================================== */
 
-folderPicker.addEventListener("change", async () => {
-  const files = Array.from(folderPicker.files);
+addFolderButton.addEventListener("click", async () => {
+  try {
+    const directoryHandle = await window.showDirectoryPicker({
+      mode: "read",
+    });
 
-  if (!files.length) {
-    return;
+    await importDirectory(directoryHandle);
+  } catch (error) {
+    if (error.name === "AbortError") {
+      return;
+    }
+
+    console.error("Folder selection failed:", error);
   }
-
-  /*
-        webkitRelativePath looks like:
-
-        Christopher Cross/Sailing.flac
-
-        We take the first folder as the selected folder.
-    */
-
-  const firstPath = files[0].webkitRelativePath || "";
-
-  const pathParts = firstPath.split("/").filter(Boolean);
-
-  const folderName = pathParts.length > 1 ? pathParts[0] : "MoonBox";
-
-  /*
-        Only audio files.
-    */
-  const audioFiles = files.filter(isAudioFile);
-
-  if (!audioFiles.length) {
-    alert("No supported music files were found in this folder.");
-    return;
-  }
-
-  /*
-        Import one by one.
-    */
-  for (const file of audioFiles) {
-    await importSong(file, folderName);
-  }
-
-  /*
-        Select the imported folder.
-    */
-  const folderIndex = folders.findIndex(
-    (folder) => folder.name.toLowerCase() === folderName.toLowerCase(),
-  );
-
-  if (folderIndex !== -1) {
-    currentFolder = folderIndex;
-  }
-
-  renderFolders();
-
-  notifyFolderDataChanged();
 });
 
 /* ==========================================================
@@ -383,27 +673,20 @@ filePicker.addEventListener("change", async () => {
     return;
   }
 
-  /*
-        Individual files always go into MoonBox.
-    */
+  const folder = getOrCreateFolder("MoonBox");
 
-  const folderName = "MoonBox";
+  await saveFolder({
+    id: folder.id,
+    name: folder.name,
+    tagId: folder.tagId,
+    handle: null,
+  });
 
   for (const file of files) {
-    await importSong(file, folderName);
+    await importSong(file, folder);
   }
 
-  /*
-        Select MoonBox.
-    */
-
-  const folderIndex = folders.findIndex(
-    (folder) => folder.name.toLowerCase() === "moonbox",
-  );
-
-  if (folderIndex !== -1) {
-    currentFolder = folderIndex;
-  }
+  currentFolder = folders.indexOf(folder);
 
   renderFolders();
 
@@ -514,6 +797,12 @@ function renderSongs() {
 
   folderSongCount.textContent = `${folder.songs.length} Songs`;
 
+  const isRealFolder = folder.id !== "all" && !!folder.handle;
+
+  syncFolderButton.style.display = isRealFolder ? "flex" : "none";
+
+  removeFolderButton.style.display = folder.id !== "all" ? "flex" : "none";
+
   songList.innerHTML = "";
 
   folder.songs.forEach((song) => {
@@ -575,30 +864,34 @@ songList.addEventListener("click", (e) => {
   deleteSong(songId);
 });
 
-function deleteSong(songId) {
+async function deleteSong(songId) {
   const songIndex = songs.findIndex((song) => song.id === songId);
 
   if (songIndex === -1) {
     return;
   }
 
-  /*
-        Remove from master songs.
-    */
+  // Remove from IndexedDB first
+  await deleteSongFromDB(songId);
+
+  // Remove from master songs array
   songs.splice(songIndex, 1);
 
-  /*
-        Remove from every folder.
-    */
+  // Rebuild every folder's song list from the master songs array
   folders.forEach((folder) => {
-    folder.songs = folder.songs.filter((song) => song.id !== songId);
+    if (folder.id === "all") {
+      // All Files always contains every song
+      folder.songs = [...songs];
+    } else {
+      // Real folder only contains its own songs
+      folder.songs = songs.filter((song) => song.folderId === folder.id);
+    }
   });
 
   renderFolders();
 
   notifyFolderDataChanged();
 }
-
 /* ==========================================================
    HTML SAFETY
 ========================================================== */
@@ -646,8 +939,69 @@ function getEstimatedBitrate(file, duration) {
 }
 
 /* ==========================================================
+   RENDER MoonBox
+========================================================== */
+
+async function initializeMoonBox() {
+  try {
+    await openMoonboxDB();
+
+    const savedFolders = await getAllFolders();
+    const savedSongs = await getAllSongs();
+
+    folders.length = 0;
+    songs.length = 0;
+
+    folders.push({
+      id: "all",
+      name: "All Files",
+      tagId: "all",
+      songs: [],
+      handle: null,
+    });
+
+    for (const savedFolder of savedFolders) {
+      folders.push({
+        ...savedFolder,
+        songs: [],
+      });
+    }
+
+    for (const song of savedSongs) {
+      songs.push(song);
+
+      const folder = folders.find((folder) => folder.id === song.folderId);
+
+      if (folder) {
+        folder.songs.push(song);
+      }
+
+      // Rebuild folder views from songs[]
+      rebuildFolderSongs();
+    }
+
+    renderFolders();
+
+    notifyFolderDataChanged();
+  } catch (error) {
+    console.error("Failed to initialize MoonBox:", error);
+  }
+}
+
+function rebuildFolderSongs() {
+  folders.forEach((folder) => {
+    if (folder.id === "all") {
+      folder.songs = [...songs];
+    } else {
+      folder.songs = songs.filter((song) => song.folderId === folder.id);
+    }
+  });
+}
+
+/* ==========================================================
    INITIAL RENDER
 ========================================================== */
 
 renderFolders();
 notifyFolderDataChanged();
+initializeMoonBox();

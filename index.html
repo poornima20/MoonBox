@@ -718,7 +718,7 @@
               <div class="folder-content-header">
                 <div class="folder-title-area">
                   <!-- MOBILE ONLY -->
-                  <button class="folder-back" id="folderBack">
+                  <button class="folder-back" id="folderBack" type="button">
                     <i data-lucide="arrow-left"></i>
                   </button>
 
@@ -729,6 +729,28 @@
                       <span id="folderSongCount">0 Songs</span>
                     </div>
                   </div>
+                </div>
+
+                <!-- FOLDER ACTIONS -->
+                <div class="folder-header-actions">
+                  <button
+                    id="syncFolderButton"
+                    class="folder-action-button"
+                    type="button"
+                    title="Sync folder"
+                  >
+                    <i data-lucide="refresh-cw"></i>
+                    <span>Sync</span>
+                  </button>
+
+                  <button
+                    id="removeFolderButton"
+                    class="folder-action-button folder-remove-button"
+                    type="button"
+                    title="Remove folder"
+                  >
+                    <i data-lucide="trash-2"></i>
+                  </button>
                 </div>
               </div>
 

@@ -70,7 +70,7 @@
 
   border: 1px solid var(--folder-border);
 
-  border-radius: 22px;
+  border-radius: 5px;
 
   overflow: hidden;
 
@@ -232,7 +232,7 @@
 
   border: 1px solid var(--folder-border);
 
-  border-radius: 10px;
+  border-radius: 5px;
 
   cursor: pointer;
 
@@ -349,8 +349,7 @@
   padding: 0 12px;
 
   margin-bottom: 2px;
-
-  border-radius: 10px;
+  border-radius: 5px;
 
   cursor: pointer;
 
@@ -507,9 +506,9 @@
 .folder-content-header h3 {
   color: var(--folder-text);
 
-  font-size: 22px;
+  font-size: 20px;
 
-  font-weight: 700;
+  font-weight: 600;
 
   margin: 0;
 }
@@ -634,7 +633,6 @@
   text-overflow: ellipsis;
 }
 
-
 /* ==========================================================
    DELETE BUTTON
    ========================================================== */
@@ -709,6 +707,83 @@
   font-size: 16px;
 
   margin-bottom: 8px;
+}
+
+/* ==========================================================
+   Folder header sync and delete
+   ========================================================== */
+
+.folder-header-actions {
+  display: flex;
+
+  align-items: center;
+
+  gap: 8px;
+
+  color: var(--folder-muted);
+
+  font-size: 13px;
+}
+
+.folder-action-button {
+  height: 32px;
+
+  display: flex;
+
+  align-items: center;
+  justify-content: center;
+
+  gap: 6px;
+
+  padding: 0 10px;
+
+  border: 1px solid var(--folder-border);
+
+  border-radius: 7px;
+
+  background: transparent;
+
+  color: var(--folder-muted);
+
+  cursor: pointer;
+
+  font-family: var(--folder-font);
+
+  font-size: 12px;
+
+  font-weight: 500;
+
+  transition:
+    background 0.15s ease,
+    color 0.15s ease;
+}
+
+.folder-action-button:hover {
+  background: var(--folder-hover);
+
+  color: var(--folder-text);
+}
+
+.folder-action-button svg {
+  width: 15px;
+  height: 15px;
+}
+
+.folder-remove-button {
+  width: 32px;
+
+  padding: 0;
+}
+
+.folder-remove-button:hover {
+  color: #ff6b6b;
+}
+
+.folder-title-area {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  min-width: 0;
 }
 
 /* ==========================================================
@@ -935,7 +1010,7 @@
 
     align-items: center;
 
-    gap: 12px;
+    gap: 15px;
   }
 
   /* ----------------------------------------------------------
@@ -1014,5 +1089,20 @@
 
   .folder-info {
     font-size: 12px;
+  }
+}
+
+@media (max-width: 720px) {
+  .folder-header-actions {
+    gap: 6px;
+  }
+
+  .folder-action-button span {
+    display: none;
+  }
+
+  .folder-action-button {
+    width: 34px;
+    padding: 0;
   }
 }
