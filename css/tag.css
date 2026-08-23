@@ -1549,6 +1549,41 @@
   padding-bottom: 90px !important;
 }
 
+.tag-clear-selection {
+  display: none;
+
+  flex-shrink: 0;
+
+  margin-left: 6px;
+  margin-right: 8px;
+
+  padding: 0;
+
+  border: none;
+  background: transparent;
+
+  color: #8f8f8f;
+
+  font-family: var(--font-main, sans-serif);
+
+  font-size: 9px;
+  font-weight: 500;
+
+  line-height: 1;
+
+  white-space: nowrap;
+
+  cursor: pointer;
+
+  text-decoration: underline;
+  text-decoration-color: rgba(255, 255, 255, 0.22);
+  text-underline-offset: 3px;
+
+  transition:
+    color 0.18s ease,
+    text-decoration-color 0.18s ease;
+}
+
 /* ==========================================================
    MOBILE
 ========================================================== */
@@ -2513,5 +2548,271 @@
 
     margin-left: 3px;
     margin-right: 5px;
+  }
+}
+
+/* ==========================================================
+   TAG SONG COUNT
+========================================================== */
+
+.tag-name {
+  font-size: 13px;
+  font-weight: 500;
+  line-height: 1.2;
+}
+
+.tag-song-count {
+  margin-top: -8px;
+
+  color: #666;
+
+  font-size: 10px;
+  font-weight: 400;
+
+  line-height: 1;
+}
+
+.tag.selected .tag-song-count {
+  color: #555;
+}
+
+@media (max-width: 768px) {
+  .tag-song-count {
+    font-size: 9px;
+    margin-top: -6px;
+  }
+}
+
+/* ==========================================================
+   MOONBOX NAVIGATION POPUP
+========================================================== */
+
+#moonboxNavigationPopup {
+  position: fixed;
+  inset: 0;
+
+  z-index: 10000000;
+
+  pointer-events: auto;
+}
+
+.moonbox-navigation-overlay {
+  position: fixed;
+  inset: 0;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  padding: 20px;
+
+  background: rgba(0, 0, 0, 0.72);
+
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+
+  animation: moonboxPopupFade 0.18s ease;
+}
+
+@keyframes moonboxPopupFade {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+.moonbox-navigation-popup {
+  width: min(390px, 100%);
+
+  box-sizing: border-box;
+
+  padding: 26px;
+
+  background: #111111;
+
+  border: 1px solid rgba(255, 255, 255, 0.08);
+
+  border-radius: 22px;
+
+  box-shadow:
+    0 30px 90px rgba(0, 0, 0, 0.7),
+    inset 0 1px rgba(255, 255, 255, 0.035);
+
+  animation: moonboxPopupIn 0.2s ease;
+}
+
+@keyframes moonboxPopupIn {
+  from {
+    opacity: 0;
+    transform: translateY(8px) scale(0.97);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+/* ==========================================================
+   LOGO
+========================================================== */
+
+.moonbox-popup-logo {
+  width: 48px;
+  height: 48px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  margin-bottom: 18px;
+
+  border-radius: 14px;
+
+  background: #181818;
+
+  border: 1px solid rgba(255, 255, 255, 0.08);
+
+  overflow: hidden;
+}
+
+.moonbox-popup-logo img {
+  width: 30px;
+  height: 30px;
+
+  object-fit: contain;
+}
+
+/* ==========================================================
+   CONTENT
+========================================================== */
+
+.moonbox-popup-content h2 {
+  margin: 0;
+
+  color: #f5f5f5;
+
+  font-size: 20px;
+  font-weight: 650;
+
+  letter-spacing: -0.2px;
+}
+
+.moonbox-popup-content p {
+  margin: 8px 0 0;
+
+  color: #858585;
+
+  font-size: 13px;
+
+  line-height: 1.55;
+}
+
+/* ==========================================================
+   ACTIONS
+========================================================== */
+
+.moonbox-popup-actions {
+  display: flex;
+
+  justify-content: flex-end;
+
+  gap: 9px;
+
+  margin-top: 24px;
+}
+
+.moonbox-popup-actions button {
+  height: 40px;
+
+  padding: 0 15px;
+
+  border-radius: 10px;
+
+  font-family: var(--font-main, sans-serif);
+
+  font-size: 12px;
+
+  font-weight: 600;
+
+  cursor: pointer;
+}
+
+.moonbox-popup-secondary {
+  border: 1px solid rgba(255, 255, 255, 0.08);
+
+  background: rgba(255, 255, 255, 0.035);
+
+  color: #999;
+}
+
+.moonbox-popup-secondary:hover {
+  background: rgba(255, 255, 255, 0.07);
+
+  color: #fff;
+}
+
+.moonbox-popup-primary {
+  border: 1px solid rgba(255, 255, 255, 0.12);
+
+  background: #f2f2f2;
+
+  color: #111;
+}
+
+.moonbox-popup-primary:hover {
+  background: #fff;
+}
+
+/* ==========================================================
+   MOBILE
+========================================================== */
+
+@media (max-width: 768px) {
+  .moonbox-navigation-overlay {
+    padding: 16px;
+  }
+
+  .moonbox-navigation-popup {
+    width: 100%;
+
+    max-width: 360px;
+
+    padding: 22px;
+
+    border-radius: 20px;
+  }
+
+  .moonbox-popup-logo {
+    width: 44px;
+    height: 44px;
+
+    margin-bottom: 16px;
+  }
+
+  .moonbox-popup-logo img {
+    width: 27px;
+    height: 27px;
+  }
+
+  .moonbox-popup-content h2 {
+    font-size: 18px;
+  }
+
+  .moonbox-popup-content p {
+    font-size: 12px;
+  }
+
+  .moonbox-popup-actions {
+    margin-top: 20px;
+  }
+
+  .moonbox-popup-actions button {
+    height: 40px;
+
+    flex: 1;
   }
 }

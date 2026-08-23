@@ -312,13 +312,21 @@ function createTagElement(tag) {
     button.classList.add("selected");
   }
 
-  button.innerHTML = `
-        <div class="tag-circle">
-            <i data-lucide="${escapeHTML(tag.icon)}"></i>
-        </div>
+  const songCount = getTagSongCount(tag.id);
 
-        <span>${escapeHTML(tag.name)}</span>
-    `;
+  button.innerHTML = `
+    <div class="tag-circle">
+      <i data-lucide="${escapeHTML(tag.icon)}"></i>
+    </div>
+
+    <span class="tag-name">
+      ${escapeHTML(tag.name)}
+    </span>
+
+    <small class="tag-song-count">
+      ${songCount} ${songCount === 1 ? "song" : "songs"}
+    </small>
+  `;
 
   button.addEventListener("click", () => {
     toggleTagSelection(tag.id);
@@ -326,7 +334,6 @@ function createTagElement(tag) {
 
   return button;
 }
-
 /* ==========================================================
    TOGGLE TAG SELECTION
 ========================================================== */
@@ -368,11 +375,31 @@ let currentFolders = [];
 ========================================================== */
 
 function getAllMoonBoxSongs() {
+  // Check whether the global songs collection exists
+  if (typeof songs === "undefined") {
+    return [];
+  }
+
   if (!Array.isArray(songs)) {
     return [];
   }
 
   return songs;
+}
+
+function getTagSongCount(tagId) {
+  const allSongs = getAllMoonBoxSongs();
+
+  // ALL shows the total number of songs
+  if (tagId === "all") {
+    return allSongs.length;
+  }
+
+  return allSongs.filter((song) => {
+    const songTags = Array.isArray(song.tags) ? song.tags : [];
+
+    return songTags.includes(tagId);
+  }).length;
 }
 
 /* ==========================================================
@@ -422,6 +449,152 @@ function getSelectedSongCount() {
   });
 
   return matchingSongs.length;
+}
+
+/* ==========================================================
+   NAVIGATION GUARD
+   Prevent Library / Player when there is nothing to show
+========================================================== */
+
+function checkMoonBoxNavigation() {
+  /*
+     No tags selected
+  */
+  if (selectedTagIds.size === 0) {
+    showMoonBoxNavigationPopup(
+      "No tags selected",
+      "Select at least one tag to continue.",
+      "Select Tags",
+    );
+
+    return false;
+  }
+
+  /*
+     Tags selected but no matching songs
+  */
+  const songCount = getSelectedSongCount();
+
+  if (songCount === 0) {
+    showMoonBoxNavigationPopup(
+      "No songs found",
+      "Add songs to a folder that match your selected tags to continue.",
+      "Open Folders",
+    );
+
+    return false;
+  }
+
+  /*
+     Everything is ready
+  */
+  return true;
+}
+
+/* ==========================================================
+   NAVIGATION POPUP
+========================================================== */
+
+function showMoonBoxNavigationPopup(title, message, actionText) {
+  const existingPopup = document.getElementById("moonboxNavigationPopup");
+
+  if (existingPopup) {
+    existingPopup.remove();
+  }
+
+  const popup = document.createElement("div");
+
+  popup.id = "moonboxNavigationPopup";
+
+  popup.innerHTML = `
+    <div class="moonbox-navigation-overlay">
+
+      <div class="moonbox-navigation-popup">
+
+        <div class="moonbox-popup-logo">
+          <img
+            src="assets/moonboxlogo.png"
+            alt="MoonBox"
+          />
+        </div>
+
+        <div class="moonbox-popup-content">
+
+          <h2>${escapeHTML(title)}</h2>
+
+          <p>${escapeHTML(message)}</p>
+
+        </div>
+
+        <div class="moonbox-popup-actions">
+
+          <button
+            type="button"
+            class="moonbox-popup-secondary"
+            id="moonboxPopupCancel"
+          >
+            Cancel
+          </button>
+
+          <button
+            type="button"
+            class="moonbox-popup-primary"
+            id="moonboxPopupAction"
+          >
+            ${escapeHTML(actionText)}
+          </button>
+
+        </div>
+
+      </div>
+
+    </div>
+  `;
+
+  document.body.appendChild(popup);
+
+  refreshIcons();
+
+  const overlay = popup.querySelector(".moonbox-navigation-overlay");
+
+  const cancelButton = document.getElementById("moonboxPopupCancel");
+
+  const actionButton = document.getElementById("moonboxPopupAction");
+
+  function closePopup() {
+    popup.remove();
+  }
+
+  cancelButton.addEventListener("click", closePopup);
+
+  overlay.addEventListener("click", (event) => {
+    if (event.target === overlay) {
+      closePopup();
+    }
+  });
+
+  actionButton.addEventListener("click", () => {
+    /*
+       No tags selected:
+       simply close and let user select tags.
+    */
+    if (selectedTagIds.size === 0) {
+      closePopup();
+      return;
+    }
+
+    /*
+       Songs missing:
+       open the Folder manager.
+    */
+    const folderButton = document.getElementById("openFolders");
+
+    closePopup();
+
+    if (folderButton) {
+      folderButton.click();
+    }
+  });
 }
 
 /* ==========================================================
@@ -591,6 +764,10 @@ if (searchInput) {
 
 if (viewLibraryButton) {
   viewLibraryButton.addEventListener("click", () => {
+    if (!checkMoonBoxNavigation()) {
+      return;
+    }
+
     const libraryButton = document.querySelector(
       '.nav-button[data-screen="1"]',
     );

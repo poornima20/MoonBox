@@ -47,11 +47,37 @@ document.addEventListener("DOMContentLoaded", () => {
   /* ======================================================
         CHANGE SCREEN
     ====================================================== */
+  /* ======================================================
+      CHANGE SCREEN
+  ====================================================== */
 
   function goToScreen(index) {
     if (index < 0) index = 0;
 
-    if (index >= TOTAL_SCREENS) index = TOTAL_SCREENS - 1;
+    if (index >= TOTAL_SCREENS) {
+      index = TOTAL_SCREENS - 1;
+    }
+
+    /* ==================================================
+        MOONBOX NAVIGATION GUARD
+
+        Screen 0 = Tags
+        Screen 1 = Library
+        Screen 2 = Player
+     ================================================== */
+
+    if (
+      (index === 1 || index === 2) &&
+      typeof checkMoonBoxNavigation === "function"
+    ) {
+      if (!checkMoonBoxNavigation()) {
+        return;
+      }
+    }
+
+    /* ==================================================
+        ACTUAL SCREEN CHANGE
+     ================================================== */
 
     currentScreen = index;
 
@@ -196,7 +222,6 @@ document.addEventListener("DOMContentLoaded", () => {
     ====================================================== */
 
   const folderButton = document.querySelector(".folder-button");
-
 
   /* ======================================================
         INITIALIZE
