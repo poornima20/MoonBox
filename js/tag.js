@@ -225,8 +225,6 @@ function syncFolderTags(folders) {
 
   if (changed) {
     saveTags();
-
-    renderTags();
   }
 }
 
@@ -375,16 +373,24 @@ let currentFolders = [];
 ========================================================== */
 
 function getAllMoonBoxSongs() {
-  // Check whether the global songs collection exists
-  if (typeof songs === "undefined") {
+  /*
+     The "all" folder is the master collection.
+     currentFolders is populated by moonbox:foldersReady.
+  */
+
+  if (!Array.isArray(currentFolders)) {
     return [];
   }
 
-  if (!Array.isArray(songs)) {
+  const allFilesFolder = currentFolders.find(
+    (folder) => folder.tagId === "all",
+  );
+
+  if (!allFilesFolder) {
     return [];
   }
 
-  return songs;
+  return Array.isArray(allFilesFolder.songs) ? allFilesFolder.songs : [];
 }
 
 function getTagSongCount(tagId) {
@@ -1642,16 +1648,20 @@ document.addEventListener("moonbox:foldersReady", (event) => {
 
   if (!folders) return;
 
-  /* Keep folders available for footer counting */
-
+  /* Store the current folder/song data */
   currentFolders = folders;
 
-  /* Create folder-based tags */
-
+  /* Create folder-based tags if needed */
   syncFolderTags(folders);
 
-  /* Update footer */
+  /*
+     IMPORTANT:
+     Re-render the tags now that the songs
+     are available.
+  */
+  renderTags();
 
+  /* Update selected-tag footer */
   updateSelectionFooter();
 });
 

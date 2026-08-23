@@ -14,11 +14,18 @@ document.addEventListener("DOMContentLoaded", () => {
 
   const searchInput = document.getElementById("librarySearch");
 
-  const editButton = document.getElementById("libraryEditButton");
-
-  const editStatus = document.getElementById("libraryEditStatus");
-
   const libraryFooter = document.getElementById("libraryFooter");
+  const librarySongCount = document.getElementById("librarySongCount");
+
+  const libraryTotalDuration = document.getElementById("libraryTotalDuration");
+
+  const librarySortButton = document.getElementById("librarySortButton");
+
+  const librarySortLabel = document.getElementById("librarySortLabel");
+
+  const librarySortMenu = document.getElementById("librarySortMenu");
+
+  const librarySortOptions = document.querySelectorAll(".library-sort-option");
 
   const filterButton = document.getElementById("libraryFilterButton");
 
@@ -34,11 +41,10 @@ document.addEventListener("DOMContentLoaded", () => {
        STATE
     ====================================================== */
 
-  let editMode = false;
-
   let searchText = "";
 
   let filterMode = "union";
+  let sortMode = "alphabetical";
 
   let playingSong = -1;
 
@@ -70,15 +76,44 @@ document.addEventListener("DOMContentLoaded", () => {
    UPDATE LIBRARY FOOTER
 ====================================================== */
 
-  function updateLibraryFooter(songCount) {
-    if (!libraryFooter) return;
+  function formatTotalDuration(songs) {
+    let totalSeconds = 0;
 
-    const songText = songCount === 1 ? "Song" : "Songs";
+    songs.forEach((song) => {
+      const duration = Number(song.duration);
 
-    libraryFooter.innerHTML = `
-    <span>${songCount} ${songText}</span>
-  `;
+      if (Number.isFinite(duration) && duration > 0) {
+        totalSeconds += duration;
+      }
+    });
+
+    if (totalSeconds <= 0) {
+      return "0m";
+    }
+
+    const hours = Math.floor(totalSeconds / 3600);
+
+    const minutes = Math.floor((totalSeconds % 3600) / 60);
+
+    if (hours > 0) {
+      return `${hours}h ${minutes}m`;
+    }
+
+    return `${minutes}m`;
   }
+
+  function updateLibraryStats(songs) {
+    if (!librarySongCount || !libraryTotalDuration) {
+      return;
+    }
+
+    const count = songs.length;
+
+    librarySongCount.textContent = `${count} ${count === 1 ? "Song" : "Songs"}`;
+
+    libraryTotalDuration.textContent = formatTotalDuration(songs);
+  }
+
   /* ======================================================
    RENDER SELECTED TAGS
 ====================================================== */
@@ -189,6 +224,26 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 
   /* ======================================================
+    SONG Duration
+    ====================================================== */
+
+  function formatSongDuration(seconds) {
+    const value = Number(seconds);
+
+    if (!Number.isFinite(value) || value <= 0) {
+      return "--:--";
+    }
+
+    const totalSeconds = Math.floor(value);
+
+    const minutes = Math.floor(totalSeconds / 60);
+
+    const remainingSeconds = totalSeconds % 60;
+
+    return `${minutes}:${String(remainingSeconds).padStart(2, "0")}`;
+  }
+
+  /* ======================================================
 SONG TEMPLATE
 ====================================================== */
 
@@ -224,31 +279,33 @@ SONG TEMPLATE
 
       <div class="song-right">
 
-        ${
-          editMode
-            ? `
-
-              <div class="song-drag">
-
-                <i data-lucide="grip"></i>
-
-              </div>
-
-            `
-            : `
-
-              <span class="song-duration">
-                --:--
-              </span>
-
-            `
-        }
+       <span class="song-duration">
+        ${formatSongDuration(song.duration)}
+      </span>
 
       </div>
 
     </div>
 
   `;
+  }
+
+  /* ======================================================
+Sort the Songs
+====================================================== */
+  function sortSongs(songs) {
+    const sorted = [...songs];
+
+    if (sortMode === "alphabetical") {
+      sorted.sort((a, b) =>
+        String(a.name || "").localeCompare(String(b.name || ""), undefined, {
+          sensitivity: "base",
+          numeric: true,
+        }),
+      );
+    }
+
+    return sorted;
   }
 
   /* ======================================================
@@ -329,7 +386,9 @@ RENDER SONGS
       return matchesSearch;
     });
 
-    updateLibraryFooter(filtered.length);
+    const sortedSongs = sortSongs(filtered);
+
+    updateLibraryStats(sortedSongs);
     /* ====================================================
    SEND CURRENT LIBRARY QUEUE TO PLAYER
 ==================================================== */
@@ -337,7 +396,7 @@ RENDER SONGS
     document.dispatchEvent(
       new CustomEvent("moonbox:libraryQueueChanged", {
         detail: {
-          songs: filtered,
+          songs: sortedSongs,
         },
       }),
     );
@@ -346,7 +405,7 @@ RENDER SONGS
      RENDER
   ==================================================== */
 
-    filtered.forEach((song, index) => {
+    sortedSongs.forEach((song, index) => {
       songList.insertAdjacentHTML("beforeend", songHTML(song, index));
     });
 
@@ -358,13 +417,11 @@ RENDER SONGS
       button.addEventListener("click", (e) => {
         e.stopPropagation();
 
-        if (editMode) return;
-
         /* -----------------------------------------------
        Get the song from the CURRENT rendered list
     ------------------------------------------------ */
 
-        const clickedSong = filtered[index];
+        const clickedSong = sortedSongs[index];
 
         if (!clickedSong) return;
 
@@ -385,7 +442,7 @@ RENDER SONGS
         document.dispatchEvent(
           new CustomEvent("moonbox:playFromLibrary", {
             detail: {
-              songs: filtered,
+              songs: sortedSongs,
               index: index,
             },
           }),
@@ -408,44 +465,12 @@ RENDER SONGS
     lucide.createIcons();
   }
 
-  document.addEventListener("moonbox:playFromLibrary", (event) => {
-    const queue = event.detail.songs || [];
-
-    const index = event.detail.index ?? 0;
-
-    if (queue.length === 0) {
-      return;
-    }
-
-    songs = queue;
-
-    currentSong = index;
-
-    loadSong(currentSong);
-
-    playSong();
-  });
-
   /* ======================================================
        SEARCH
     ====================================================== */
 
   searchInput.addEventListener("input", (e) => {
     searchText = e.target.value.toLowerCase();
-
-    renderSongs();
-  });
-
-  /* ======================================================
-       EDIT MODE
-    ====================================================== */
-
-  editButton.addEventListener("click", () => {
-    editMode = !editMode;
-
-    editButton.classList.toggle("active", editMode);
-
-    editStatus.classList.toggle("show", editMode);
 
     renderSongs();
   });
@@ -492,6 +517,87 @@ RENDER SONGS
     if (!filterMenu.contains(e.target) && !filterButton.contains(e.target)) {
       filterMenu.classList.remove("show");
     }
+  });
+
+  /* ======================================================
+   SORT MENU
+====================================================== */
+
+  if (librarySortButton) {
+    librarySortButton.addEventListener("click", (e) => {
+      e.stopPropagation();
+
+      librarySortMenu?.classList.toggle("show");
+    });
+  }
+
+  librarySortOptions.forEach((option) => {
+    option.addEventListener("click", () => {
+      if (option.disabled) {
+        return;
+      }
+
+      sortMode = option.dataset.sort;
+
+      librarySortLabel.textContent = option.querySelector("span").textContent;
+
+      librarySortOptions.forEach((item) => {
+        item.classList.remove("active");
+      });
+
+      option.classList.add("active");
+
+      librarySortMenu.classList.remove("show");
+
+      renderSongs();
+    });
+  });
+
+  document.addEventListener("click", (e) => {
+    if (
+      !librarySortMenu.contains(e.target) &&
+      !librarySortButton.contains(e.target)
+    ) {
+      librarySortMenu.classList.remove("show");
+    }
+  });
+
+  songList.querySelectorAll(".song-action").forEach((button, index) => {
+    button.addEventListener("click", (e) => {
+      e.stopPropagation();
+
+      const clickedSong = sortedSongs[index];
+
+      if (!clickedSong) {
+        return;
+      }
+
+      /* Pause current song */
+      if (playerIsPlaying && playingSongId === clickedSong.id) {
+        document.dispatchEvent(new CustomEvent("moonbox:pausePlayer"));
+
+        return;
+      }
+
+      /* Send queue to Player */
+      document.dispatchEvent(
+        new CustomEvent("moonbox:playFromLibrary", {
+          detail: {
+            songs: sortedSongs,
+            index: index,
+          },
+        }),
+      );
+
+      /* Open Player */
+      const playerButton = document.querySelector(
+        '.nav-button[data-screen="2"]',
+      );
+
+      if (playerButton) {
+        playerButton.click();
+      }
+    });
   });
 
   /* ======================================================
