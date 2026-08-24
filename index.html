@@ -152,48 +152,46 @@
 
           <div class="tag-grid" id="tagGrid"></div>
 
-          <!-- ==========================================================
+          <div id="tagModalRoot"></div>
+        </section>
+
+        <!-- ==========================================================
      TAG SELECTION FOOTER
 ========================================================== -->
 
-          <div class="tag-selection-footer" id="tagSelectionFooter">
-            <!-- LEFT: Selection information -->
+        <div class="tag-selection-footer" id="tagSelectionFooter">
+          <!-- LEFT: Selection information -->
 
-            <div class="tag-selection-info">
-              <div class="tag-selection-icon">
-                <i data-lucide="tag"></i>
-              </div>
-
-              <div class="tag-selection-text">
-                <strong id="selectedTagCount"> 0 tags selected </strong>
-
-                <span id="selectedSongCount">
-                  0 songs match your selection
-                </span>
-              </div>
+          <div class="tag-selection-info">
+            <div class="tag-selection-icon">
+              <i data-lucide="tag"></i>
             </div>
 
-            <!-- RIGHT: View Library -->
+            <div class="tag-selection-text">
+              <strong id="selectedTagCount"> 0 tags selected </strong>
 
-            <!-- CLEAR + VIEW LIBRARY -->
-
-            <button
-              class="tag-clear-selection"
-              id="tagClearSelection"
-              type="button"
-            >
-              Clear Tags
-            </button>
-
-            <button class="tag-view-library" id="tagViewLibrary" type="button">
-              <span>View Library</span>
-
-              <i data-lucide="list-music"></i>
-            </button>
+              <span id="selectedSongCount"> 0 songs match your selection </span>
+            </div>
           </div>
 
-          <div id="tagModalRoot"></div>
-        </section>
+          <!-- RIGHT: View Library -->
+
+          <!-- CLEAR + VIEW LIBRARY -->
+
+          <button
+            class="tag-clear-selection"
+            id="tagClearSelection"
+            type="button"
+          >
+            Clear Tags
+          </button>
+
+          <button class="tag-view-library" id="tagViewLibrary" type="button">
+            <span>View Library</span>
+
+            <i data-lucide="list-music"></i>
+          </button>
+        </div>
 
         <!-- ======================================================
                     LIBRARY SCREEN

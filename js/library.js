@@ -54,6 +54,19 @@ document.addEventListener("DOMContentLoaded", () => {
   let playerIsPlaying = false;
 
   /* ======================================================
+   PLAYER NAVIGATION PERMISSION
+
+   Player becomes available after a song has been
+   played from the Library.
+====================================================== */
+
+  let playerAllowed = false;
+
+  const playerNavigationButton = document.querySelector(
+    '.nav-button[data-screen="2"]',
+  );
+
+  /* ======================================================
    GET ALL MASTER SONGS
    All Files is the master library
 ====================================================== */
@@ -409,21 +422,19 @@ RENDER SONGS
       songList.insertAdjacentHTML("beforeend", songHTML(song, index));
     });
 
-    /* ====================================================
+    /* ==================================================
    PLAY / PAUSE BUTTONS
-==================================================== */
+================================================== */
 
     songList.querySelectorAll(".song-action").forEach((button, index) => {
       button.addEventListener("click", (e) => {
         e.stopPropagation();
 
-        /* -----------------------------------------------
-       Get the song from the CURRENT rendered list
-    ------------------------------------------------ */
-
         const clickedSong = sortedSongs[index];
 
-        if (!clickedSong) return;
+        if (!clickedSong) {
+          return;
+        }
 
         /* ==================================================
        PAUSE CURRENT SONG
@@ -436,7 +447,16 @@ RENDER SONGS
         }
 
         /* ==================================================
-       PLAY SONG
+       PLAYER IS NOW ALLOWED
+       
+       Once a song has been played from Library,
+       the Player navigation button remains available.
+    ================================================== */
+
+        playerAllowed = true;
+
+        /* ==================================================
+       SEND SONG TO PLAYER
     ================================================== */
 
         document.dispatchEvent(
@@ -463,6 +483,25 @@ RENDER SONGS
     });
 
     lucide.createIcons();
+  }
+
+  /* ======================================================
+   BLOCK PLAYER UNTIL A LIBRARY SONG HAS BEEN PLAYED
+====================================================== */
+
+  if (playerNavigationButton) {
+    playerNavigationButton.addEventListener(
+      "click",
+      (event) => {
+        if (!playerAllowed) {
+          event.preventDefault();
+          event.stopImmediatePropagation();
+
+          return;
+        }
+      },
+      true,
+    );
   }
 
   /* ======================================================
@@ -560,44 +599,6 @@ RENDER SONGS
     ) {
       librarySortMenu.classList.remove("show");
     }
-  });
-
-  songList.querySelectorAll(".song-action").forEach((button, index) => {
-    button.addEventListener("click", (e) => {
-      e.stopPropagation();
-
-      const clickedSong = sortedSongs[index];
-
-      if (!clickedSong) {
-        return;
-      }
-
-      /* Pause current song */
-      if (playerIsPlaying && playingSongId === clickedSong.id) {
-        document.dispatchEvent(new CustomEvent("moonbox:pausePlayer"));
-
-        return;
-      }
-
-      /* Send queue to Player */
-      document.dispatchEvent(
-        new CustomEvent("moonbox:playFromLibrary", {
-          detail: {
-            songs: sortedSongs,
-            index: index,
-          },
-        }),
-      );
-
-      /* Open Player */
-      const playerButton = document.querySelector(
-        '.nav-button[data-screen="2"]',
-      );
-
-      if (playerButton) {
-        playerButton.click();
-      }
-    });
   });
 
   /* ======================================================

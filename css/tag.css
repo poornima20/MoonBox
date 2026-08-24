@@ -1,79 +1,122 @@
 /* ==========================================================
-   Header
+   MOONBOX — TAGS
+   Clean / Consolidated Stylesheet
    ========================================================== */
 
-.tag-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
+/* ==========================================================
+   1. TAG SCREEN
+   ========================================================== */
 
-  margin-bottom: 30px;
-
+.tag-screen {
   position: relative;
-}
-
-.tag-header h1 {
-  font-size: 32px;
-  margin-bottom: 10px;
-  color: var(--section-title-color);
-}
-
-.tag-header p {
-  color: var(--section-sub-title-color);
-  font-size: 13px;
+  box-sizing: border-box;
 }
 
 /* ==========================================================
-   Search
+   2. HEADER
+   ========================================================== */
+
+.tag-header {
+  position: relative;
+
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+
+  margin-bottom: 30px;
+}
+
+.tag-header h1 {
+  margin: 0 0 10px;
+
+  color: var(--section-title-color);
+
+  font-size: 32px;
+  line-height: 1.2;
+}
+
+.tag-header p {
+  margin: 0;
+
+  color: var(--section-sub-title-color);
+
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+/* ==========================================================
+   3. SEARCH
    ========================================================== */
 
 .tag-search {
   height: 48px;
+
   display: flex;
   align-items: center;
+
   gap: 14px;
+
   padding: 0 16px;
-  background: #111;
-  border-radius: 22px;
   margin-bottom: 42px;
 
+  box-sizing: border-box;
+
+  background: #111;
   border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 22px;
 }
 
 .tag-search input {
   flex: 1;
-  background: none;
+
+  min-width: 0;
+
+  padding: 0;
+
   border: none;
   outline: none;
-  color: white;
+
+  background: transparent;
+
+  color: #fff;
+
+  font-family: var(--font-main, sans-serif);
   font-size: 15px;
-  font-family: var(--font-main);
+}
+
+.tag-search input::placeholder {
+  color: #666;
 }
 
 /* ==========================================================
-   MANAGE BUTTON
+   4. MANAGE TAGS BUTTON
    ========================================================== */
 
 .tag-manage-button {
   height: 52px;
-  padding: 0 18px;
 
   display: flex;
   align-items: center;
   justify-content: center;
+
   gap: 10px;
 
-  border: none;
+  padding: 0 18px;
+
+  border: 1px solid var(--border);
   border-radius: 16px;
 
-  cursor: pointer;
-
   background: var(--gradient-nav);
-  border: 1px solid var(--border);
-
   color: var(--text-muted);
 
   box-shadow: var(--shadow-nav);
+
+  cursor: pointer;
+
+  transition:
+    background 0.2s ease,
+    color 0.2s ease,
+    transform 0.2s ease;
 }
 
 .tag-manage-button:hover {
@@ -84,22 +127,24 @@
 .tag-manage-button svg {
   width: 22px;
   height: 22px;
-  color: var(--text-muted);
+
+  color: inherit;
 
   stroke-width: 2;
 }
 
 .tag-manage-button span {
+  color: inherit;
+
+  font-family: var(--font-main, sans-serif);
   font-size: 14px;
   font-weight: 600;
-  font-family: var(--font-main);
 
-  color: inherit;
   white-space: nowrap;
 }
 
 /* ==========================================================
-   Popup Menu
+   5. MANAGE TAGS POPUP
    ========================================================== */
 
 .tag-menu {
@@ -110,166 +155,181 @@
 
   width: 290px;
 
-  background: linear-gradient(180deg, #141414, #111111);
+  box-sizing: border-box;
 
-  border-radius: 24px;
+  padding: 18px;
+
+  background: linear-gradient(180deg, #141414, #111);
 
   border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 24px;
 
   box-shadow:
     0 25px 60px rgba(0, 0, 0, 0.55),
     inset 0 1px rgba(255, 255, 255, 0.03);
 
-  padding: 18px;
-
-  display: none;
-
   z-index: 100;
+
+  opacity: 0;
+  transform: translateY(10px) scale(0.98);
+
+  pointer-events: none;
+
+  transition:
+    opacity 0.18s ease,
+    transform 0.18s ease;
+}
+
+.tag-menu.show {
+  opacity: 1;
+
+  transform: translateY(0) scale(1);
+
+  pointer-events: auto;
 }
 
 .tag-menu-title {
-  font-size: 11px;
-  letter-spacing: 1.4px;
-  text-transform: uppercase;
-  color: #8b8b8b;
-  margin-bottom: 18px;
+  margin: 0 0 18px;
   padding-left: 8px;
+
+  color: #8b8b8b;
+
+  font-size: 11px;
   font-weight: 600;
+
+  letter-spacing: 1.4px;
+
+  text-transform: uppercase;
 }
 
 .tag-divider {
   height: 1px;
-  background: rgba(255, 255, 255, 0.06);
-  margin: 10px 0;
-}
 
-.tag-menu.show {
-  display: block;
+  margin: 10px 0;
+
+  background: rgba(255, 255, 255, 0.06);
 }
 
 .tag-menu button {
   width: 100%;
 
-  border: none;
-
-  background: none;
-
   display: flex;
-
   align-items: flex-start;
 
   gap: 16px;
 
   padding: 12px 8px;
 
-  cursor: pointer;
-
+  border: none;
   border-radius: 14px;
 
-  transition: 0.25s;
+  background: transparent;
+
+  cursor: pointer;
+
+  transition: background 0.2s ease;
 }
 
 .tag-menu button:hover {
   background: rgba(255, 255, 255, 0.03);
 }
 
-.tag-menu small {
-  display: block;
-  color: #8d8d8d;
-  margin-top: 3px;
-}
-
 .tag-menu button svg {
   width: 18px;
   height: 18px;
 
-  margin-top: 3px;
-  color: #f3f3f3;
-  stroke-width: 2;
   flex-shrink: 0;
+
+  margin-top: 3px;
+
+  color: #f3f3f3;
+
+  stroke-width: 2;
 }
 
 .tag-menu button div {
   display: flex;
   flex-direction: column;
   align-items: flex-start;
+
+  min-width: 0;
 }
 
 .tag-menu button span {
+  color: #f2f2f2;
+
   font-size: 15px;
   font-weight: 500;
-  color: #f2f2f2;
 }
 
 .tag-menu button small {
-  margin-top: 3px;
-  font-size: 12px;
-  color: #8d8d8d;
-}
-
-.tag-menu {
-  opacity: 0;
-
-  transform: translateY(10px) scale(0.98);
-
-  pointer-events: none;
-
-  transition:
-    opacity 0.18s,
-    transform 0.18s;
-}
-
-.tag-menu.show {
   display: block;
 
-  opacity: 1;
+  margin-top: 3px;
 
-  transform: none;
+  color: #8d8d8d;
 
-  pointer-events: auto;
+  font-size: 12px;
 }
 
 /* ==========================================================
-   Popup Menu
+   6. TAG GRID
    ========================================================== */
 
 .tag-grid {
   display: grid;
 
-  padding: 5px;
-
   grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
 
   gap: 22px;
+
+  padding: 5px;
+  box-sizing: border-box;
 }
 
 /* ==========================================================
-   Popup Menu
+   7. TAG
    ========================================================== */
 
 .tag {
-  background: none;
-  border: none;
-  cursor: pointer;
   display: flex;
   flex-direction: column;
   align-items: center;
+
   gap: 14px;
-  color: white;
+
+  padding: 0;
+
+  border: none;
+
+  background: transparent;
+
+  color: #fff;
+
+  cursor: pointer;
 }
 
 .tag-circle {
   width: 96px;
   height: 96px;
 
-  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  flex-shrink: 0;
+
+  box-sizing: border-box;
+
   background: #101010;
 
   border: 1px solid rgba(255, 255, 255, 0.06);
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  transition: 0.3s;
+  border-radius: 50%;
+
+  transition:
+    transform 0.25s ease,
+    background 0.25s ease,
+    box-shadow 0.25s ease;
 }
 
 .tag-circle svg {
@@ -278,183 +338,259 @@
 }
 
 .tag.selected .tag-circle {
-  background: white;
-  color: black;
+  background: #fff;
+
+  color: #000;
+
   transform: scale(1.05);
+
   box-shadow: 0 0 25px rgba(255, 255, 255, 0.18);
 }
 
-/* ==========================================================
-   MOBILE RESPONSIVE
-   ========================================================== */
+.tag-name {
+  max-width: 100%;
 
-@media (max-width: 768px) {
-  /* ---------- Header ---------- */
-  .screen {
-    padding: 18px 28px; /*check for mobile*/
-  }
+  color: inherit;
 
-  .tag-header {
-    margin-bottom: 20px;
-  }
+  font-size: 13px;
+  font-weight: 500;
 
-  .tag-header h1 {
-    font-size: 28px;
-    margin-bottom: 8px;
-  }
+  line-height: 1.2;
 
-  .tag-header p {
-    font-size: 12px;
-    line-height: 1.5;
-    max-width: 380px;
-  }
+  text-align: center;
+}
 
-  /* ---------- Manage Button ---------- */
+.tag-song-count {
+  margin-top: -8px;
 
-  .tag-manage-button {
-    width: 44px;
-    height: 44px;
+  color: #666;
 
-    padding: 0;
+  font-size: 10px;
+  font-weight: 400;
 
-    border-radius: 14px;
-  }
+  line-height: 1;
+}
 
-  /* Hide text on mobile */
-
-  .tag-manage-button span {
-    display: none;
-  }
-
-  .tag-manage-button svg {
-    width: 20px;
-    height: 20px;
-  }
-
-  /* ---------- Search ---------- */
-
-  .tag-search {
-    height: 44px;
-
-    padding: 0 14px;
-
-    gap: 10px;
-
-    margin-bottom: 30px;
-
-    border-radius: 18px;
-  }
-
-  .tag-search svg {
-    width: 18px;
-    height: 18px;
-  }
-
-  .tag-search input {
-    font-size: 14px;
-  }
-
-  /* ---------- Popup ---------- */
-
-  .tag-menu {
-    width: 250px;
-
-    top: 70px;
-    right: 35px;
-
-    padding: 14px;
-
-    border-radius: 20px;
-  }
-
-  .tag-menu-title {
-    font-size: 10px;
-
-    margin-bottom: 14px;
-  }
-
-  .tag-menu button {
-    gap: 14px;
-
-    padding: 10px 6px;
-  }
-
-  .tag-menu button svg {
-    width: 17px;
-    height: 17px;
-  }
-
-  .tag-menu button span {
-    font-size: 14px;
-  }
-
-  .tag-menu button small {
-    font-size: 11px;
-  }
-
-  /* ---------- Grid ---------- */
-
-  .tag-grid {
-    grid-template-columns: repeat(auto-fill, minmax(90px, 1fr));
-
-    gap: 18px;
-    margin-bottom: 30px;
-  }
-
-  /* ---------- Tag ---------- */
-
-  .tag {
-    gap: 10px;
-  }
-
-  .tag-circle {
-    width: 82px;
-    height: 82px;
-  }
-
-  .tag-circle svg {
-    width: 28px;
-    height: 28px;
-  }
-
-  .tag span {
-    font-size: 13px;
-  }
+.tag.selected .tag-song-count {
+  color: #555;
 }
 
 /* ==========================================================
-   SMALL PHONES
+   8. TAG SELECTION FOOTER — DESKTOP
    ========================================================== */
 
-@media (max-width: 420px) {
-  .tag-grid {
-    grid-template-columns: repeat(3, 1fr);
-    gap: 16px;
-  }
+.tag-selection-footer {
+  position: fixed;
 
-  .tag-circle {
-    width: 76px;
-    height: 76px;
-  }
+  left: 10px;
+  right: 10px;
+  bottom: max(10px, env(safe-area-inset-bottom));
 
-  .tag-circle svg {
-    width: 26px;
-    height: 26px;
-  }
+  width: auto;
+  height: 64px;
 
-  .tag span {
-    font-size: 12px;
-  }
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  padding: 8px;
+
+  box-sizing: border-box;
+
+  background: var(--bg);
+
+  border: 1px solid rgba(255, 255, 255, 0.04);
+  border-radius: 16px;
+
+  box-shadow:
+    0 12px 35px rgba(0, 0, 0, 0.65),
+    0 0 0 1px rgba(255, 255, 255, 0.02);
+
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+
+  z-index: 99999;
+
+  visibility: visible;
+  opacity: 1;
 }
 
 /* ==========================================================
-   TAG MANAGEMENT MODALS
-   Add Tag / Edit Tags / Custom Order
-========================================================== */
+   9. SELECTION FOOTER — INFO
+   ========================================================== */
+
+.tag-selection-info {
+  display: flex;
+  align-items: center;
+
+  gap: 9px;
+
+  min-width: 0;
+
+  flex: 1;
+}
+
+.tag-selection-icon {
+  width: 38px;
+  height: 38px;
+
+  min-width: 38px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  box-sizing: border-box;
+
+  background: #151515;
+
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  border-radius: 11px;
+}
+
+.tag-selection-icon svg {
+  width: 18px;
+  height: 18px;
+}
+
+.tag-selection-text {
+  display: flex;
+  flex-direction: column;
+
+  gap: 3px;
+
+  min-width: 0;
+}
+
+.tag-selection-text strong {
+  color: #f2f2f2;
+
+  font-size: 12px;
+
+  white-space: nowrap;
+}
+
+.tag-selection-text span {
+  color: #777;
+
+  font-size: 9px;
+
+  white-space: nowrap;
+}
 
 /* ==========================================================
-   MODAL OVERLAY
-========================================================== */
+   10. CLEAR SELECTION
+   ========================================================== */
+
+.tag-clear-selection {
+  display: none;
+
+  flex-shrink: 0;
+
+  margin: 0 8px;
+
+  padding: 0;
+
+  border: none;
+
+  background: transparent;
+
+  color: #8f8f8f;
+
+  font-family: var(--font-main, sans-serif);
+  font-size: 9px;
+  font-weight: 500;
+
+  line-height: 1;
+
+  white-space: nowrap;
+
+  cursor: pointer;
+
+  text-decoration: underline;
+  text-decoration-color: rgba(255, 255, 255, 0.22);
+  text-underline-offset: 3px;
+
+  transition:
+    color 0.18s ease,
+    text-decoration-color 0.18s ease;
+}
+
+.tag-clear-selection:hover,
+.tag-clear-selection:active {
+  color: #f0f0f0;
+
+  text-decoration-color: rgba(255, 255, 255, 0.5);
+}
+
+/* ==========================================================
+   11. VIEW LIBRARY BUTTON
+   ========================================================== */
+
+.tag-view-library {
+  width: 132px;
+  min-width: 132px;
+  height: 46px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  flex-shrink: 0;
+
+  gap: 9px;
+
+  padding: 0 12px;
+
+  box-sizing: border-box;
+
+  border: none;
+  border-radius: 12px;
+
+  background: #f4f4f4;
+  color: #111;
+
+  font-size: 11px;
+  font-weight: 650;
+
+  cursor: pointer;
+}
+
+.tag-view-library svg {
+  width: 16px;
+  height: 16px;
+}
+
+/* ==========================================================
+   12. TAG MODALS — ROOT
+   ========================================================== */
+
+#tagModalRoot {
+  position: fixed;
+
+  inset: 0;
+
+  width: 100%;
+  height: 100%;
+
+  z-index: 999999;
+
+  pointer-events: none;
+}
+
+#tagModalRoot .tag-modal-overlay {
+  position: fixed;
+
+  inset: 0;
+
+  z-index: 1000000;
+
+  pointer-events: auto;
+}
+
+/* ==========================================================
+   13. MODAL OVERLAY
+   ========================================================== */
 
 .tag-modal-overlay {
   position: fixed;
@@ -466,12 +602,12 @@
 
   padding: 24px;
 
+  box-sizing: border-box;
+
   background: rgba(0, 0, 0, 0.72);
 
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
-
-  z-index: 9999;
 
   animation: tagModalFadeIn 0.18s ease;
 }
@@ -487,31 +623,37 @@
 }
 
 /* ==========================================================
-   MODAL WINDOW
-========================================================== */
+   14. MODAL
+   ========================================================== */
 
 .tag-modal {
+  position: relative;
+
   width: min(620px, 100%);
 
   max-height: min(760px, calc(100dvh - 48px));
 
   display: flex;
   flex-direction: column;
+
+  min-height: 0;
+
   overflow: hidden;
+
+  box-sizing: border-box;
 
   background: linear-gradient(180deg, #151515 0%, #101010 100%);
 
   border: 1px solid rgba(255, 255, 255, 0.08);
-
   border-radius: 24px;
 
   box-shadow:
     0 30px 90px rgba(0, 0, 0, 0.65),
     inset 0 1px rgba(255, 255, 255, 0.035);
 
-  overflow: hidden;
-
   animation: tagModalScaleIn 0.2s ease;
+
+  z-index: 1000001;
 }
 
 @keyframes tagModalScaleIn {
@@ -527,8 +669,8 @@
 }
 
 /* ==========================================================
-   MODAL HEADER
-========================================================== */
+   15. MODAL HEADER
+   ========================================================== */
 
 .tag-modal-header {
   display: flex;
@@ -566,8 +708,8 @@
 }
 
 /* ==========================================================
-   CLOSE BUTTON
-========================================================== */
+   16. MODAL CLOSE
+   ========================================================== */
 
 .tag-modal-close {
   width: 38px;
@@ -582,7 +724,6 @@
   padding: 0;
 
   border: 1px solid rgba(255, 255, 255, 0.08);
-
   border-radius: 11px;
 
   background: rgba(255, 255, 255, 0.035);
@@ -601,7 +742,7 @@
 .tag-modal-close:hover {
   background: rgba(255, 255, 255, 0.08);
 
-  color: #ffffff;
+  color: #fff;
 
   border-color: rgba(255, 255, 255, 0.14);
 
@@ -614,11 +755,12 @@
 }
 
 /* ==========================================================
-   MODAL BODY
-========================================================== */
+   17. MODAL BODY
+   ========================================================== */
 
 .tag-modal-body {
   flex: 1 1 auto;
+
   min-height: 0;
 
   overflow-y: auto;
@@ -650,14 +792,13 @@
 }
 
 /* ==========================================================
-   FIXED FOOTER
-========================================================== */
+   18. MODAL FOOTER
+   ========================================================== */
 
-.tag-modal > .tag-modal-footer {
+.tag-modal-footer {
   flex: 0 0 auto;
 
   display: flex;
-
   align-items: center;
   justify-content: flex-end;
 
@@ -669,23 +810,19 @@
 
   border-top: 1px solid rgba(255, 255, 255, 0.07);
 
-  background: linear-gradient(180deg, #111111, #101010);
+  background: #111;
 
   z-index: 5;
 }
 
 /* ==========================================================
-   FORM
-========================================================== */
+   19. FORM
+   ========================================================== */
 
 .tag-form {
   display: flex;
   flex-direction: column;
 }
-
-/* ==========================================================
-   FORM LABEL
-========================================================== */
 
 .tag-form-label {
   display: block;
@@ -695,7 +832,6 @@
   color: #858585;
 
   font-size: 10px;
-
   font-weight: 600;
 
   letter-spacing: 1.1px;
@@ -707,10 +843,6 @@
   margin-top: 27px;
 }
 
-/* ==========================================================
-   INPUT
-========================================================== */
-
 .tag-form-input {
   width: 100%;
   height: 44px;
@@ -720,7 +852,6 @@
   padding: 0 14px;
 
   border: 1px solid rgba(255, 255, 255, 0.08);
-
   border-radius: 12px;
 
   outline: none;
@@ -730,7 +861,6 @@
   color: #f5f5f5;
 
   font-family: var(--font-main, sans-serif);
-
   font-size: 14px;
 
   transition:
@@ -751,14 +881,10 @@
   box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.035);
 }
 
-/* ==========================================================
-   FORM HINT
-========================================================== */
-
 .tag-form-hint {
   margin-top: 8px;
 
-  color: #777777;
+  color: #777;
 
   font-size: 11px;
 
@@ -766,8 +892,8 @@
 }
 
 /* ==========================================================
-   ICON PICKER
-========================================================== */
+   20. ICON PICKER
+   ========================================================== */
 
 .tag-icon-picker {
   display: grid;
@@ -779,12 +905,9 @@
   padding: 2px 0;
 }
 
-/* ==========================================================
-   ICON OPTION
-========================================================== */
-
 .tag-icon-option {
   width: 100%;
+
   aspect-ratio: 1;
 
   min-width: 0;
@@ -795,8 +918,9 @@
 
   padding: 0;
 
-  border: 1px solid rgba(255, 255, 255, 0.07);
+  box-sizing: border-box;
 
+  border: 1px solid rgba(255, 255, 255, 0.07);
   border-radius: 12px;
 
   background: rgba(255, 255, 255, 0.025);
@@ -817,7 +941,7 @@
 
   border-color: rgba(255, 255, 255, 0.14);
 
-  color: #ffffff;
+  color: #fff;
 
   transform: translateY(-1px);
 }
@@ -825,9 +949,9 @@
 .tag-icon-option.selected {
   background: #f3f3f3;
 
-  border-color: #ffffff;
+  border-color: #fff;
 
-  color: #111111;
+  color: #111;
 
   box-shadow:
     0 0 0 2px rgba(255, 255, 255, 0.08),
@@ -842,45 +966,30 @@
 }
 
 /* ==========================================================
-   MODAL FOOTER
-========================================================== */
+   21. MODAL BUTTONS
+   ========================================================== */
 
-.tag-modal-footer {
-  display: flex;
-  justify-content: flex-end;
-  align-items: center;
-
-  gap: 10px;
-
-  margin-top: 26px;
-  padding-top: 18px;
-
-  border-top: 1px solid rgba(255, 255, 255, 0.06);
-}
-
-/* ==========================================================
-   SECONDARY BUTTON
-========================================================== */
-
-.tag-secondary-button {
+.tag-secondary-button,
+.tag-primary-button {
   height: 40px;
-
-  padding: 0 16px;
-
-  border: 1px solid rgba(255, 255, 255, 0.08);
 
   border-radius: 11px;
 
-  background: rgba(255, 255, 255, 0.035);
-
-  color: #a5a5a5;
-
   font-family: var(--font-main, sans-serif);
-
   font-size: 13px;
   font-weight: 600;
 
   cursor: pointer;
+}
+
+.tag-secondary-button {
+  padding: 0 16px;
+
+  border: 1px solid rgba(255, 255, 255, 0.08);
+
+  background: rgba(255, 255, 255, 0.035);
+
+  color: #a5a5a5;
 
   transition:
     background 0.2s ease,
@@ -893,32 +1002,19 @@
 
   border-color: rgba(255, 255, 255, 0.14);
 
-  color: #ffffff;
+  color: #fff;
 }
 
-/* ==========================================================
-   PRIMARY BUTTON
-========================================================== */
-
 .tag-primary-button {
-  height: 40px;
-
   padding: 0 18px;
 
   border: 1px solid rgba(255, 255, 255, 0.12);
 
-  border-radius: 11px;
-
   background: #f2f2f2;
 
-  color: #111111;
+  color: #111;
 
-  font-family: var(--font-main, sans-serif);
-
-  font-size: 13px;
   font-weight: 650;
-
-  cursor: pointer;
 
   transition:
     background 0.2s ease,
@@ -927,7 +1023,7 @@
 }
 
 .tag-primary-button:hover {
-  background: #ffffff;
+  background: #fff;
 
   transform: translateY(-1px);
 
@@ -939,8 +1035,8 @@
 }
 
 /* ==========================================================
-   EDIT TAG SEARCH
-========================================================== */
+   22. EDIT TAG SEARCH
+   ========================================================== */
 
 .tag-edit-toolbar {
   margin-bottom: 14px;
@@ -959,7 +1055,6 @@
   box-sizing: border-box;
 
   border: 1px solid rgba(255, 255, 255, 0.07);
-
   border-radius: 12px;
 
   background: rgba(255, 255, 255, 0.035);
@@ -969,23 +1064,24 @@
   width: 17px;
   height: 17px;
 
-  color: #777777;
-
   flex-shrink: 0;
+
+  color: #777;
 }
 
 .tag-edit-search input {
   width: 100%;
+
+  min-width: 0;
 
   border: none;
   outline: none;
 
   background: transparent;
 
-  color: #eeeeee;
+  color: #eee;
 
   font-family: var(--font-main, sans-serif);
-
   font-size: 13px;
 }
 
@@ -994,8 +1090,8 @@
 }
 
 /* ==========================================================
-   EDIT TAG LIST
-========================================================== */
+   23. EDIT TAG LIST
+   ========================================================== */
 
 .tag-edit-list {
   display: flex;
@@ -1003,10 +1099,6 @@
 
   gap: 6px;
 }
-
-/* ==========================================================
-   EDIT TAG ROW
-========================================================== */
 
 .tag-edit-row {
   min-height: 58px;
@@ -1024,7 +1116,6 @@
   box-sizing: border-box;
 
   border: 1px solid transparent;
-
   border-radius: 13px;
 
   background: rgba(255, 255, 255, 0.025);
@@ -1039,10 +1130,6 @@
 
   border-color: rgba(255, 255, 255, 0.06);
 }
-
-/* ==========================================================
-   EDIT ROW ICON
-========================================================== */
 
 .tag-edit-icon {
   width: 38px;
@@ -1066,10 +1153,6 @@
   height: 18px;
 }
 
-/* ==========================================================
-   EDIT ROW NAME
-========================================================== */
-
 .tag-edit-name {
   min-width: 0;
 
@@ -1086,8 +1169,8 @@
 }
 
 /* ==========================================================
-   ROW ACTION BUTTONS
-========================================================== */
+   24. EDIT ROW ACTIONS
+   ========================================================== */
 
 .tag-row-action {
   width: 34px;
@@ -1100,12 +1183,11 @@
   padding: 0;
 
   border: 1px solid transparent;
-
   border-radius: 9px;
 
   background: transparent;
 
-  color: #777777;
+  color: #777;
 
   cursor: pointer;
 
@@ -1120,15 +1202,13 @@
 
   border-color: rgba(255, 255, 255, 0.07);
 
-  color: #ffffff;
+  color: #fff;
 }
 
 .tag-row-action svg {
   width: 16px;
   height: 16px;
 }
-
-/* Delete gets a subtle red hover */
 
 .tag-row-delete:hover {
   background: rgba(255, 70, 70, 0.09);
@@ -1139,8 +1219,8 @@
 }
 
 /* ==========================================================
-   CUSTOM ORDER LIST
-========================================================== */
+   25. CUSTOM ORDER
+   ========================================================== */
 
 .tag-order-list {
   display: flex;
@@ -1149,13 +1229,8 @@
   gap: 6px;
 
   user-select: none;
-
   -webkit-user-select: none;
 }
-
-/* ==========================================================
-   CUSTOM ORDER ROW
-========================================================== */
 
 .tag-order-row {
   min-height: 58px;
@@ -1170,8 +1245,9 @@
 
   padding: 7px 10px;
 
-  border: 1px solid rgba(255, 255, 255, 0.045);
+  box-sizing: border-box;
 
+  border: 1px solid rgba(255, 255, 255, 0.045);
   border-radius: 13px;
 
   background: rgba(255, 255, 255, 0.025);
@@ -1189,10 +1265,6 @@
   border-color: rgba(255, 255, 255, 0.07);
 }
 
-/* ==========================================================
-   DRAGGING STATE
-========================================================== */
-
 .tag-order-row.dragging {
   opacity: 0.55;
 
@@ -1204,10 +1276,6 @@
 
   z-index: 10;
 }
-
-/* ==========================================================
-   DRAG HANDLE
-========================================================== */
 
 .tag-drag-handle {
   width: 34px;
@@ -1223,7 +1291,7 @@
 
   background: transparent;
 
-  color: #666666;
+  color: #666;
 
   cursor: grab;
 
@@ -1235,17 +1303,13 @@
 .tag-drag-handle:active {
   cursor: grabbing;
 
-  color: #ffffff;
+  color: #fff;
 }
 
 .tag-drag-handle svg {
   width: 18px;
   height: 18px;
 }
-
-/* ==========================================================
-   ORDER ICON
-========================================================== */
 
 .tag-order-icon {
   width: 40px;
@@ -1261,17 +1325,13 @@
 
   border: 1px solid rgba(255, 255, 255, 0.07);
 
-  color: #cccccc;
+  color: #ccc;
 }
 
 .tag-order-icon svg {
   width: 18px;
   height: 18px;
 }
-
-/* ==========================================================
-   ORDER NAME
-========================================================== */
 
 .tag-order-name {
   min-width: 0;
@@ -1289,23 +1349,20 @@
 }
 
 /* ==========================================================
-   ALPHABETICAL LETTER HEADINGS
-========================================================== */
+   26. ALPHABETICAL LETTER HEADINGS
+   ========================================================== */
 
 .tag-letter {
   grid-column: 1 / -1;
 
   width: 100%;
 
-  margin-top: 12px;
-  margin-bottom: -6px;
-
+  margin: 12px 0 -6px;
   padding: 0 4px;
 
   color: #858585;
 
   font-size: 11px;
-
   font-weight: 700;
 
   letter-spacing: 1.4px;
@@ -1332,1263 +1389,12 @@
 }
 
 /* ==========================================================
-   TAG MODAL — FORCE ABOVE ENTIRE APP
-========================================================== */
-
-/*
-   tag.js creates #tagModalRoot dynamically.
-   Give the root its own top-level stacking layer.
-*/
-
-#tagModalRoot {
-  position: fixed;
-
-  inset: 0;
-
-  width: 100%;
-  height: 100%;
-
-  z-index: 999999;
-
-  pointer-events: none;
-}
-
-/*
-   The actual overlay receives pointer events.
-*/
-
-#tagModalRoot .tag-modal-overlay {
-  position: fixed;
-
-  inset: 0;
-
-  z-index: 1000000;
-
-  pointer-events: auto;
-}
-
-/*
-   Make sure the modal itself is above
-   everything inside the overlay.
-*/
-
-#tagModalRoot .tag-modal {
-  position: relative;
-
-  z-index: 1000001;
-}
-
-.tag-modal-overlay {
-  z-index: 9999;
-}
-
-#tagModalRoot {
-  position: fixed;
-  inset: 0;
-  z-index: 999999;
-}
-
-/* ==========================================================
-   Tag Selection Footer
-========================================================== */
-.tag-selection-footer {
-  position: fixed !important;
-
-  left: 10px !important;
-  right: 10px !important;
-
-  /* Stay above Android/iOS bottom area */
-  bottom: max(12px, env(safe-area-inset-bottom)) !important;
-
-  width: auto !important;
-
-  height: 64px !important;
-
-  display: flex !important;
-  align-items: center !important;
-  justify-content: space-between !important;
-
-  padding: 8px !important;
-
-  box-sizing: border-box !important;
-
-  background: var(--bg) !important;
-
-  border: 1px solid none !important;
-
-  border-radius: 16px !important;
-
-  box-shadow:
-    0 12px 35px rgba(0, 0, 0, 0.65),
-    0 0 0 1px rgba(255, 255, 255, 0.02) !important;
-
-  backdrop-filter: blur(18px) !important;
-  -webkit-backdrop-filter: blur(18px) !important;
-
-  z-index: 99999 !important;
-
-  visibility: visible !important;
-  opacity: 1 !important;
-}
-
-.tag-selection-info {
-  display: flex !important;
-  align-items: center !important;
-
-  gap: 9px !important;
-
-  min-width: 0 !important;
-
-  flex: 1 !important;
-}
-
-.tag-selection-icon {
-  width: 38px !important;
-  height: 38px !important;
-
-  min-width: 38px !important;
-
-  display: flex !important;
-  align-items: center !important;
-  justify-content: center !important;
-
-  border-radius: 11px !important;
-
-  background: #151515 !important;
-
-  border: 1px solid rgba(255, 255, 255, 0.16) !important;
-}
-
-.tag-selection-icon svg {
-  width: 18px !important;
-  height: 18px !important;
-}
-
-/* ========================================================
-     TEXT
-  ======================================================== */
-
-.tag-selection-text {
-  display: flex !important;
-  flex-direction: column !important;
-
-  gap: 3px !important;
-
-  min-width: 0 !important;
-}
-
-.tag-selection-text strong {
-  font-size: 12px !important;
-
-  color: #f2f2f2 !important;
-
-  white-space: nowrap !important;
-}
-
-.tag-selection-text span {
-  font-size: 9px !important;
-
-  color: #777 !important;
-
-  white-space: nowrap !important;
-}
-
-/* ========================================================
-     VIEW LIBRARY
-  ======================================================== */
-
-.tag-view-library {
-  display: flex !important;
-  align-items: center !important;
-  justify-content: center !important;
-
-  flex-shrink: 0 !important;
-
-  width: 132px !important;
-  min-width: 132px !important;
-
-  height: 46px !important;
-
-  padding: 0 12px !important;
-
-  gap: 9px !important;
-
-  border-radius: 12px !important;
-
-  background: #f4f4f4 !important;
-
-  color: #111 !important;
-
-  font-size: 11px !important;
-  font-weight: 650 !important;
-
-  border: none !important;
-
-  visibility: visible !important;
-  opacity: 1 !important;
-
-  cursor: pointer;
-}
-
-.tag-view-library svg {
-  width: 16px !important;
-  height: 16px !important;
-}
-
-/* ========================================================
-     IMPORTANT:
-     Give the page enough bottom space so the final
-     tags aren't hidden behind the footer.
-  ======================================================== */
-
-.tag-screen {
-  padding-bottom: 110px !important;
-}
-
-.tag-grid {
-  padding-bottom: 90px !important;
-}
-
-.tag-clear-selection {
-  display: none;
-
-  flex-shrink: 0;
-
-  margin-left: 6px;
-  margin-right: 8px;
-
-  padding: 0;
-
-  border: none;
-  background: transparent;
-
-  color: #8f8f8f;
-
-  font-family: var(--font-main, sans-serif);
-
-  font-size: 9px;
-  font-weight: 500;
-
-  line-height: 1;
-
-  white-space: nowrap;
-
-  cursor: pointer;
-
-  text-decoration: underline;
-  text-decoration-color: rgba(255, 255, 255, 0.22);
-  text-underline-offset: 3px;
-
-  transition:
-    color 0.18s ease,
-    text-decoration-color 0.18s ease;
-}
-
-/* ==========================================================
-   MOBILE
-========================================================== */
-
-@media (max-width: 768px) {
-  .tag-modal-overlay {
-    align-items: flex-end;
-
-    padding: 0;
-
-    background: rgba(0, 0, 0, 0.68);
-
-    backdrop-filter: blur(8px);
-    -webkit-backdrop-filter: blur(8px);
-  }
-
-  .tag-modal {
-    width: 100%;
-
-    max-width: none;
-
-    max-height: calc(100dvh - 24px);
-
-    border-radius: 24px 24px 0 0;
-
-    border-left: none;
-    border-right: none;
-    border-bottom: none;
-
-    box-shadow: 0 -20px 70px rgba(0, 0, 0, 0.5);
-
-    animation: tagModalMobileIn 0.22s ease;
-  }
-
-  @keyframes tagModalMobileIn {
-    from {
-      opacity: 0;
-      transform: translateY(30px);
-    }
-
-    to {
-      opacity: 1;
-      transform: translateY(0);
-    }
-  }
-
-  /* ------------------------------------------------------
-       MOBILE HEADER
-    ------------------------------------------------------ */
-
-  .tag-modal-header {
-    padding: 20px 20px 14px;
-  }
-
-  .tag-modal-header h2 {
-    font-size: 21px;
-  }
-
-  .tag-modal-header p {
-    max-width: 300px;
-
-    margin-top: 6px;
-
-    font-size: 12px;
-  }
-
-  .tag-modal-close {
-    width: 36px;
-    height: 36px;
-
-    border-radius: 10px;
-  }
-
-  /* ------------------------------------------------------
-       MOBILE BODY
-    ------------------------------------------------------ */
-
-  .tag-modal-body {
-    padding: 4px 20px 20px;
-    padding-bottom: max(20px, env(safe-area-inset-bottom));
-  }
-
-  /* ------------------------------------------------------
-       MOBILE INPUT
-    ------------------------------------------------------ */
-
-  .tag-form-input {
-    height: 46px;
-
-    border-radius: 12px;
-
-    font-size: 14px;
-  }
-
-  .tag-form-label {
-    font-size: 9px;
-
-    letter-spacing: 1px;
-  }
-
-  .tag-icon-label {
-    margin-top: 24px;
-  }
-
-  /* ------------------------------------------------------
-       MOBILE ICON GRID
-    ------------------------------------------------------ */
-
-  .tag-icon-picker {
-    grid-template-columns: repeat(7, minmax(0, 1fr));
-
-    gap: 8px;
-  }
-
-  .tag-icon-option {
-    border-radius: 11px;
-  }
-
-  .tag-icon-option svg {
-    width: 19px;
-    height: 19px;
-  }
-
-  /* ------------------------------------------------------
-       MOBILE FOOTER
-    ------------------------------------------------------ */
-
-  .tag-modal-footer {
-    margin-top: 22px;
-
-    padding-top: 15px;
-
-    padding-bottom: env(safe-area-inset-bottom);
-  }
-
-  .tag-secondary-button,
-  .tag-primary-button {
-    height: 42px;
-
-    border-radius: 11px;
-  }
-
-  /* ------------------------------------------------------
-       MOBILE EDIT ROW
-    ------------------------------------------------------ */
-
-  .tag-edit-row {
-    min-height: 56px;
-
-    grid-template-columns:
-      38px minmax(0, 1fr)
-      36px 36px;
-
-    gap: 7px;
-
-    padding: 6px;
-  }
-
-  .tag-edit-icon {
-    width: 36px;
-    height: 36px;
-  }
-
-  .tag-edit-name {
-    font-size: 13px;
-  }
-
-  .tag-row-action {
-    width: 32px;
-    height: 32px;
-  }
-
-  /* ------------------------------------------------------
-       MOBILE ORDER ROW
-    ------------------------------------------------------ */
-
-  .tag-order-row {
-    min-height: 56px;
-
-    grid-template-columns: 34px 38px minmax(0, 1fr);
-
-    gap: 8px;
-
-    padding: 6px 8px;
-
-    border-radius: 12px;
-  }
-
-  .tag-drag-handle {
-    width: 34px;
-    height: 42px;
-  }
-
-  .tag-order-icon {
-    width: 38px;
-    height: 38px;
-  }
-
-  .tag-order-name {
-    font-size: 13px;
-  }
-
-  /* ------------------------------------------------------
-       MOBILE LETTER
-    ------------------------------------------------------ */
-
-  .tag-letter {
-    margin-top: 10px;
-
-    font-size: 10px;
-
-    letter-spacing: 1.2px;
-  }
-}
-
-/* ==========================================================
-   SMALL PHONES
-========================================================== */
-
-@media (max-width: 420px) {
-  .tag-modal {
-    max-height: calc(100dvh - 12px);
-
-    border-radius: 20px 20px 0 0;
-  }
-
-  .tag-modal-header {
-    padding: 17px 16px 12px;
-  }
-
-  .tag-modal-header h2 {
-    font-size: 19px;
-  }
-
-  .tag-modal-body {
-    padding: 3px 16px 16px;
-    padding-bottom: max(16px, env(safe-area-inset-bottom));
-  }
-
-  .tag-icon-picker {
-    grid-template-columns: repeat(6, minmax(0, 1fr));
-
-    gap: 7px;
-  }
-
-  .tag-icon-option {
-    border-radius: 10px;
-  }
-
-  .tag-icon-option svg {
-    width: 18px;
-    height: 18px;
-  }
-
-  .tag-form-hint {
-    font-size: 10px;
-  }
-
-  .tag-modal-footer {
-    gap: 8px;
-  }
-
-  .tag-secondary-button,
-  .tag-primary-button {
-    flex: 1;
-
-    padding: 0 12px;
-  }
-
-  .tag-edit-row {
-    grid-template-columns:
-      36px minmax(0, 1fr)
-      32px 32px;
-
-    gap: 5px;
-  }
-
-  .tag-edit-icon {
-    width: 34px;
-    height: 34px;
-  }
-
-  .tag-row-action {
-    width: 30px;
-    height: 30px;
-  }
-
-  .tag-order-row {
-    grid-template-columns: 32px 36px minmax(0, 1fr);
-
-    gap: 7px;
-  }
-
-  .tag-drag-handle {
-    width: 32px;
-  }
-
-  .tag-order-icon {
-    width: 36px;
-    height: 36px;
-  }
-}
-
-/* ==========================================================
-   VERY SMALL PHONES
-========================================================== */
-
-@media (max-width: 360px) {
-  .tag-modal-header {
-    padding: 15px 14px 10px;
-  }
-
-  .tag-modal-header h2 {
-    font-size: 18px;
-  }
-
-  .tag-modal-header p {
-    font-size: 11px;
-  }
-
-  .tag-modal-body {
-    padding: 2px 14px 14px;
-    padding-bottom: max(14px, env(safe-area-inset-bottom));
-  }
-
-  .tag-icon-picker {
-    grid-template-columns: repeat(5, minmax(0, 1fr));
-
-    gap: 7px;
-  }
-
-  .tag-icon-option svg {
-    width: 17px;
-    height: 17px;
-  }
-}
-
-/* ==========================================================
-   ACCESSIBILITY / TOUCH
-========================================================== */
-
-.tag-modal button {
-  -webkit-tap-highlight-color: transparent;
-}
-
-.tag-modal input {
-  -webkit-tap-highlight-color: transparent;
-}
-
-@media (pointer: coarse) {
-  .tag-icon-option {
-    min-height: 42px;
-  }
-
-  .tag-row-action {
-    min-width: 32px;
-    min-height: 32px;
-  }
-
-  .tag-drag-handle {
-    min-width: 34px;
-    min-height: 42px;
-  }
-}
-
-/* ==========================================================
-   REDUCE MOTION
-========================================================== */
-
-@media (prefers-reduced-motion: reduce) {
-  .tag-modal-overlay,
-  .tag-modal,
-  .tag-icon-option,
-  .tag-edit-row,
-  .tag-order-row {
-    animation: none;
-    transition: none;
-  }
-}
-
-/* ==========================================================
-   MOBILE TAG MODAL
-   CONTAINED / CENTERED POPUP
-========================================================== */
-
-@media (max-width: 768px) {
-  /* --------------------------------------------------------
-     OVERLAY
-  -------------------------------------------------------- */
-
-  #tagModalRoot .tag-modal-overlay {
-    position: fixed !important;
-
-    inset: 0 !important;
-
-    width: 100vw !important;
-    height: 90dvh !important;
-
-    display: flex !important;
-
-    align-items: center !important;
-    justify-content: center !important;
-
-    /*
-       Space around the popup.
-       This prevents it from touching
-       the top or bottom of the screen.
-    */
-
-    padding: 18px 12px 12px !important;
-
-    box-sizing: border-box;
-
-    background: rgba(0, 0, 0, 0.62);
-
-    backdrop-filter: blur(7px);
-    -webkit-backdrop-filter: blur(7px);
-
-    overflow: hidden !important;
-
-    z-index: 1000000 !important;
-  }
-
-  /* --------------------------------------------------------
-     POPUP
-  -------------------------------------------------------- */
-
-  #tagModalRoot .tag-modal {
-    width: 100% !important;
-
-    max-width: 560px !important;
-
-    /*
-       This is the important part.
-
-       The popup can NEVER extend into
-       the reserved top/bottom space.
-    */
-
-    max-height: calc(100dvh - 90px) !important;
-
-    height: auto !important;
-
-    min-height: 0 !important;
-
-    margin: 0 !important;
-
-    border-radius: 20px !important;
-
-    border: 1px solid rgba(255, 255, 255, 0.08) !important;
-
-    background: linear-gradient(180deg, #151515 0%, #101010 100%) !important;
-
-    box-shadow: 0 20px 70px rgba(0, 0, 0, 0.65) !important;
-
-    overflow: hidden !important;
-
-    display: flex !important;
-
-    flex-direction: column !important;
-
-    animation: tagModalMobileCenterIn 0.2s ease !important;
-  }
-
-  @keyframes tagModalMobileCenterIn {
-    from {
-      opacity: 0;
-      transform: scale(0.97) translateY(8px);
-    }
-
-    to {
-      opacity: 1;
-      transform: scale(1) translateY(0);
-    }
-  }
-
-  /* --------------------------------------------------------
-     HEADER
-  -------------------------------------------------------- */
-
-  #tagModalRoot .tag-modal-header {
-    flex-shrink: 0;
-
-    padding: 17px 18px 11px !important;
-  }
-
-  #tagModalRoot .tag-modal-header h2 {
-    font-size: 20px !important;
-
-    line-height: 1.2;
-  }
-
-  #tagModalRoot .tag-modal-header p {
-    margin-top: 4px;
-
-    font-size: 11px !important;
-
-    line-height: 1.4;
-  }
-
-  #tagModalRoot .tag-modal-close {
-    width: 36px !important;
-    height: 36px !important;
-
-    border-radius: 10px;
-  }
-
-  /* --------------------------------------------------------
-     BODY
-  -------------------------------------------------------- */
-
-  #tagModalRoot .tag-modal-body {
-    flex: 1 1 auto;
-
-    min-height: 0;
-
-    /*
-       Only the content scrolls.
-       Header and footer stay visible.
-    */
-
-    overflow-y: auto !important;
-    overflow-x: hidden !important;
-
-    padding: 3px 18px 8px !important;
-
-    -webkit-overflow-scrolling: touch;
-  }
-
-  /* --------------------------------------------------------
-     FOOTER
-  -------------------------------------------------------- */
-
-  #tagModalRoot .tag-modal-footer {
-    flex-shrink: 0;
-
-    margin-top: 8px !important;
-
-    padding: 10px 18px 12px !important;
-
-    border-top: 1px solid rgba(255, 255, 255, 0.06);
-
-    background: #111111;
-  }
-
-  /* --------------------------------------------------------
-     FORM
-  -------------------------------------------------------- */
-
-  #tagModalRoot .tag-form-label {
-    margin-top: 5px;
-
-    margin-bottom: 7px;
-
-    font-size: 9px;
-  }
-
-  #tagModalRoot .tag-icon-label {
-    margin-top: 17px;
-  }
-
-  #tagModalRoot .tag-form-input {
-    height: 42px;
-
-    font-size: 13px;
-  }
-
-  #tagModalRoot .tag-form-hint {
-    margin-top: 5px;
-
-    font-size: 10px;
-  }
-
-  /* --------------------------------------------------------
-     ICON GRID
-  -------------------------------------------------------- */
-
-  #tagModalRoot .tag-icon-picker {
-    grid-template-columns: repeat(7, minmax(0, 1fr));
-
-    gap: 6px;
-  }
-
-  #tagModalRoot .tag-icon-option {
-    min-height: 38px;
-
-    border-radius: 9px;
-  }
-
-  #tagModalRoot .tag-icon-option svg {
-    width: 17px;
-    height: 17px;
-  }
-
-  /* --------------------------------------------------------
-     BUTTONS
-  -------------------------------------------------------- */
-
-  #tagModalRoot .tag-secondary-button,
-  #tagModalRoot .tag-primary-button {
-    height: 40px;
-
-    flex: 1;
-
-    font-size: 12px;
-
-    border-radius: 10px;
-  }
-}
-
-/* ==========================================================
-   SMALL PHONES
-========================================================== */
-
-@media (max-width: 420px) {
-  #tagModalRoot .tag-modal-overlay {
-    /*
-       Slightly smaller top/bottom breathing room
-       for smaller phones.
-    */
-
-    padding: 18px 10px 10px !important;
-  }
-
-  #tagModalRoot .tag-modal {
-    max-height: calc(100dvh - 82px) !important;
-
-    border-radius: 18px !important;
-  }
-
-  #tagModalRoot .tag-modal-header {
-    padding: 15px 15px 10px !important;
-  }
-
-  #tagModalRoot .tag-modal-header h2 {
-    font-size: 18px !important;
-  }
-
-  #tagModalRoot .tag-modal-body {
-    padding: 2px 15px 5px !important;
-  }
-
-  #tagModalRoot .tag-modal-footer {
-    padding: 9px 15px 11px !important;
-  }
-}
-
-/* ==========================================================
-   MOBILE FOOTER
-========================================================== */
-
-@media (max-width: 768px) {
-  .tag-modal > .tag-modal-footer {
-    padding: 11px 18px max(11px, env(safe-area-inset-bottom));
-
-    gap: 8px;
-  }
-
-  .tag-modal > .tag-modal-footer .tag-secondary-button,
-  .tag-modal > .tag-modal-footer .tag-primary-button {
-    height: 40px;
-
-    flex: 1;
-
-    border-radius: 10px;
-
-    font-size: 12px;
-  }
-}
-
-/* ==========================================================
-   MOBILE TAG FOOTER — FIXED ABOVE PHONE SYSTEM UI
-========================================================== */
-
-@media (max-width: 768px) {
-  /* ========================================================
-     LEFT SIDE
-  ======================================================== */
-
-  .tag-selection-info {
-    display: flex !important;
-    align-items: center !important;
-
-    gap: 9px !important;
-
-    min-width: 0 !important;
-
-    flex: 1 !important;
-  }
-
-  .tag-selection-icon {
-    width: 38px !important;
-    height: 38px !important;
-
-    min-width: 38px !important;
-
-    display: flex !important;
-    align-items: center !important;
-    justify-content: center !important;
-
-    border-radius: 11px !important;
-
-    background: #151515 !important;
-
-    border: 1px solid rgba(255, 255, 255, 0.16) !important;
-  }
-
-  .tag-selection-icon svg {
-    width: 18px !important;
-    height: 18px !important;
-  }
-
-  /* ========================================================
-     TEXT
-  ======================================================== */
-
-  .tag-selection-text {
-    display: flex !important;
-    flex-direction: column !important;
-
-    gap: 3px !important;
-
-    min-width: 0 !important;
-  }
-
-  .tag-selection-text strong {
-    font-size: 12px !important;
-
-    color: #f2f2f2 !important;
-
-    white-space: nowrap !important;
-  }
-
-  .tag-selection-text span {
-    font-size: 9px !important;
-
-    color: #777 !important;
-
-    white-space: nowrap !important;
-  }
-
-  /* ========================================================
-     VIEW LIBRARY
-  ======================================================== */
-
-  .tag-view-library {
-    display: flex !important;
-    align-items: center !important;
-    justify-content: center !important;
-
-    flex-shrink: 0 !important;
-
-    width: 132px !important;
-    min-width: 132px !important;
-
-    height: 46px !important;
-
-    padding: 0 12px !important;
-
-    gap: 9px !important;
-
-    border-radius: 12px !important;
-
-    background: #f4f4f4 !important;
-
-    color: #111 !important;
-
-    font-size: 11px !important;
-    font-weight: 650 !important;
-
-    border: none !important;
-
-    visibility: visible !important;
-    opacity: 1 !important;
-  }
-
-  .tag-view-library svg {
-    width: 16px !important;
-    height: 16px !important;
-  }
-}
-
-/* ==========================================================
-   SMALL PHONES
-========================================================== */
-
-@media (max-width: 400px) {
-  .tag-selection-icon {
-    width: 36px !important;
-    height: 36px !important;
-
-    min-width: 36px !important;
-  }
-
-  .tag-selection-text strong {
-    font-size: 11px !important;
-  }
-
-  .tag-selection-text span {
-    font-size: 8px !important;
-  }
-
-  .tag-view-library {
-    width: 120px !important;
-    min-width: 120px !important;
-
-    height: 44px !important;
-
-    font-size: 10px !important;
-  }
-}
-
-/* ==========================================================
-   VERY SMALL PHONES
-========================================================== */
-
-@media (max-width: 350px) {
-  .tag-selection-icon {
-    display: none !important;
-  }
-
-  .tag-selection-text strong {
-    font-size: 10px !important;
-  }
-
-  .tag-selection-text span {
-    font-size: 8px !important;
-  }
-
-  .tag-view-library {
-    width: 112px !important;
-    min-width: 112px !important;
-
-    font-size: 9px !important;
-  }
-}
-
-/* ==========================================================
-   MOBILE TAG SECTION LAYOUT
-   Footer belongs to the TAG SECTION, not the viewport.
-========================================================== */
-
-@media (max-width: 768px) {
-  .tag-screen {
-    height: 100% !important;
-    min-height: 0 !important;
-
-    box-sizing: border-box !important;
-
-    display: flex !important;
-    flex-direction: column !important;
-
-    overflow: hidden !important;
-  }
-
-  /* The tag grid occupies the remaining space */
-  .tag-grid {
-    flex: 1 1 auto !important;
-    min-height: 0 !important;
-
-    overflow-y: auto !important;
-    overflow-x: hidden !important;
-
-    padding-bottom: 20px !important;
-    margin-bottom: 0 !important;
-
-    -webkit-overflow-scrolling: touch;
-  }
-
-  /* Footer is now part of the tag section */
-  .tag-selection-footer {
-    position: relative !important;
-
-    left: auto !important;
-    right: auto !important;
-    bottom: auto !important;
-
-    flex: 0 0 64px !important;
-
-    width: 100% !important;
-    height: 64px !important;
-
-    margin-top: 12px !important;
-
-    box-sizing: border-box !important;
-
-    z-index: 20 !important;
-  }
-
-  /*
-     No artificial space for a fixed footer anymore.
-  */
-  .tag-screen {
-    padding-bottom: 18px !important;
-  }
-
-  .tag-grid {
-    padding-bottom: 10px !important;
-  }
-}
-
-/* ==========================================================
-   MOBILE — CLEAR SELECTION LINK
-========================================================== */
-
-@media (max-width: 768px) {
-  .tag-clear-selection {
-    display: none;
-
-    flex-shrink: 0;
-
-    margin-left: 6px;
-    margin-right: 8px;
-
-    padding: 0;
-
-    border: none;
-    background: transparent;
-
-    color: #8f8f8f;
-
-    font-family: var(--font-main, sans-serif);
-
-    font-size: 9px;
-    font-weight: 500;
-
-    line-height: 1;
-
-    white-space: nowrap;
-
-    cursor: pointer;
-
-    text-decoration: underline;
-    text-decoration-color: rgba(255, 255, 255, 0.22);
-    text-underline-offset: 3px;
-
-    transition:
-      color 0.18s ease,
-      text-decoration-color 0.18s ease;
-  }
-
-  .tag-clear-selection:hover,
-  .tag-clear-selection:active {
-    color: #f0f0f0;
-
-    text-decoration-color: rgba(255, 255, 255, 0.5);
-  }
-}
-
-@media (max-width: 400px) {
-  .tag-clear-selection {
-    font-size: 8px;
-
-    margin-left: 4px;
-    margin-right: 6px;
-  }
-}
-
-@media (max-width: 350px) {
-  .tag-clear-selection {
-    font-size: 8px;
-
-    margin-left: 3px;
-    margin-right: 5px;
-  }
-}
-
-/* ==========================================================
-   TAG SONG COUNT
-========================================================== */
-
-.tag-name {
-  font-size: 13px;
-  font-weight: 500;
-  line-height: 1.2;
-}
-
-.tag-song-count {
-  margin-top: -8px;
-
-  color: #666;
-
-  font-size: 10px;
-  font-weight: 400;
-
-  line-height: 1;
-}
-
-.tag.selected .tag-song-count {
-  color: #555;
-}
-
-@media (max-width: 768px) {
-  .tag-song-count {
-    font-size: 9px;
-    margin-top: -6px;
-  }
-}
-
-/* ==========================================================
-   MOONBOX NAVIGATION POPUP
-========================================================== */
+   27. MOONBOX NAVIGATION POPUP
+   ========================================================== */
 
 #moonboxNavigationPopup {
   position: fixed;
+
   inset: 0;
 
   z-index: 10000000;
@@ -2598,6 +1404,7 @@
 
 .moonbox-navigation-overlay {
   position: fixed;
+
   inset: 0;
 
   display: flex;
@@ -2605,6 +1412,8 @@
   justify-content: center;
 
   padding: 20px;
+
+  box-sizing: border-box;
 
   background: rgba(0, 0, 0, 0.72);
 
@@ -2627,14 +1436,13 @@
 .moonbox-navigation-popup {
   width: min(390px, 100%);
 
-  box-sizing: border-box;
-
   padding: 26px;
 
-  background: #111111;
+  box-sizing: border-box;
+
+  background: #111;
 
   border: 1px solid rgba(255, 255, 255, 0.08);
-
   border-radius: 22px;
 
   box-shadow:
@@ -2647,18 +1455,16 @@
 @keyframes moonboxPopupIn {
   from {
     opacity: 0;
+
     transform: translateY(8px) scale(0.97);
   }
 
   to {
     opacity: 1;
+
     transform: translateY(0) scale(1);
   }
 }
-
-/* ==========================================================
-   LOGO
-========================================================== */
 
 .moonbox-popup-logo {
   width: 48px;
@@ -2686,10 +1492,6 @@
   object-fit: contain;
 }
 
-/* ==========================================================
-   CONTENT
-========================================================== */
-
 .moonbox-popup-content h2 {
   margin: 0;
 
@@ -2711,13 +1513,8 @@
   line-height: 1.55;
 }
 
-/* ==========================================================
-   ACTIONS
-========================================================== */
-
 .moonbox-popup-actions {
   display: flex;
-
   justify-content: flex-end;
 
   gap: 9px;
@@ -2733,9 +1530,7 @@
   border-radius: 10px;
 
   font-family: var(--font-main, sans-serif);
-
   font-size: 12px;
-
   font-weight: 600;
 
   cursor: pointer;
@@ -2768,17 +1563,539 @@
 }
 
 /* ==========================================================
-   MOBILE
-========================================================== */
+   28. MOBILE — TAG SCREEN
+   ========================================================== */
 
 @media (max-width: 768px) {
+  .tag-screen {
+    position: relative;
+
+    width: 100%;
+    height: 100%;
+
+    min-height: 0;
+
+    display: flex;
+    flex-direction: column;
+
+    padding: 18px 18px 14px;
+
+    box-sizing: border-box;
+
+    overflow: hidden;
+  }
+
+  /* ---------- Header ---------- */
+
+  .tag-header {
+    flex-shrink: 0;
+
+    margin-bottom: 18px;
+  }
+
+  .tag-header h1 {
+    margin-bottom: 7px;
+
+    font-size: 28px;
+  }
+
+  .tag-header p {
+    font-size: 12px;
+
+    line-height: 1.4;
+  }
+
+  /* ---------- Manage Button ---------- */
+
+  .tag-manage-button {
+    width: 44px;
+    height: 44px;
+
+    padding: 0;
+
+    border-radius: 14px;
+  }
+
+  .tag-manage-button span {
+    display: none;
+  }
+
+  .tag-manage-button svg {
+    width: 20px;
+    height: 20px;
+  }
+
+  /* ---------- Search ---------- */
+
+  .tag-search {
+    width: 100%;
+    height: 44px;
+
+    flex-shrink: 0;
+
+    gap: 10px;
+
+    padding: 0 14px;
+
+    margin-bottom: 22px;
+
+    border-radius: 18px;
+  }
+
+  .tag-search svg {
+    width: 18px;
+    height: 18px;
+  }
+
+  .tag-search input {
+    font-size: 14px;
+  }
+
+  /* ---------- Manage Popup ---------- */
+
+  .tag-menu {
+    width: 250px;
+
+    top: 70px;
+    right: 35px;
+
+    padding: 14px;
+
+    border-radius: 20px;
+  }
+
+  .tag-menu-title {
+    margin-bottom: 14px;
+
+    font-size: 10px;
+  }
+
+  .tag-menu button {
+    gap: 14px;
+
+    padding: 10px 6px;
+  }
+
+  .tag-menu button svg {
+    width: 17px;
+    height: 17px;
+  }
+
+  .tag-menu button span {
+    font-size: 14px;
+  }
+
+  .tag-menu button small {
+    font-size: 11px;
+  }
+
+  /* ---------- Tag Grid ---------- */
+
+  .tag-grid {
+    flex: 1 1 auto;
+
+    min-height: 0;
+
+    width: 100%;
+
+    display: grid;
+
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+
+    column-gap: 8px;
+    row-gap: 18px;
+
+    align-content: start;
+
+    overflow-y: auto;
+    overflow-x: hidden;
+
+    padding: 0 2px 85px;
+
+    margin: 0;
+
+    box-sizing: border-box;
+
+    -webkit-overflow-scrolling: touch;
+  }
+
+  /* ---------- Tags ---------- */
+
+  .tag {
+    width: 100%;
+
+    min-width: 0;
+
+    gap: 7px;
+  }
+
+  .tag-circle {
+    width: 72px;
+    height: 72px;
+  }
+
+  .tag-circle svg {
+    width: 25px;
+    height: 25px;
+  }
+
+  .tag-name,
+  .tag span {
+    max-width: 100%;
+
+    font-size: 11px;
+
+    line-height: 1.2;
+
+    text-align: center;
+
+    white-space: nowrap;
+
+    overflow: hidden;
+
+    text-overflow: ellipsis;
+  }
+
+  .tag-song-count {
+    margin-top: -3px;
+
+    font-size: 8px;
+  }
+
+  /* ========================================================
+     MOBILE SELECTION FOOTER
+
+     Absolute inside .tag-screen.
+     This keeps it visible without fighting
+     the mobile viewport.
+     ======================================================== */
+
+  .tag-selection-footer {
+    position: fixed;
+    top: 600px;
+    left: 10px;
+    right: 10px;
+
+    width: auto;
+
+    height: 60px;
+    min-height: 60px;
+
+    margin: 0;
+    padding: 7px 8px;
+
+    box-sizing: border-box;
+
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    background: transparent;
+
+    border: 1px solid none;
+    border-radius: 15px;
+
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+
+    z-index: 999999;
+
+    visibility: visible;
+    opacity: 1;
+  }
+
+  .tag-selection-info {
+    gap: 8px;
+
+    flex: 1 1 auto;
+  }
+
+  .tag-selection-icon {
+    width: 36px;
+    height: 36px;
+
+    min-width: 36px;
+
+    border-radius: 10px;
+
+    background: #181818;
+  }
+
+  .tag-selection-icon svg {
+    width: 17px;
+    height: 17px;
+  }
+
+  .tag-selection-text {
+    gap: 2px;
+  }
+
+  .tag-selection-text strong {
+    font-size: 10px;
+  }
+
+  .tag-selection-text span {
+    font-size: 8px;
+  }
+
+  /* ---------- Clear Selection ---------- */
+
+  .tag-clear-selection {
+    display: block;
+
+    margin: 0 7px;
+
+    font-size: 8px;
+  }
+
+  /* ---------- View Library ---------- */
+
+  .tag-view-library {
+    width: 112px;
+    min-width: 112px;
+
+    height: 42px;
+
+    gap: 6px;
+
+    padding: 0 9px;
+
+    border-radius: 11px;
+
+    font-size: 10px;
+  }
+
+  .tag-view-library svg {
+    width: 15px;
+    height: 15px;
+  }
+
+  /* ========================================================
+     MOBILE MODAL
+     ======================================================== */
+
+  .tag-modal-overlay {
+    align-items: center;
+    justify-content: center;
+
+    padding: 18px 12px;
+
+    background: rgba(0, 0, 0, 0.62);
+
+    backdrop-filter: blur(7px);
+    -webkit-backdrop-filter: blur(7px);
+
+    overflow: hidden;
+  }
+
+  .tag-modal {
+    width: 100%;
+    max-width: 560px;
+
+    max-height: calc(100dvh - 70px);
+
+    min-height: 0;
+
+    margin: 0;
+
+    border-radius: 20px;
+
+    animation: tagModalMobileIn 0.2s ease;
+  }
+
+  @keyframes tagModalMobileIn {
+    from {
+      opacity: 0;
+
+      transform: scale(0.97) translateY(8px);
+    }
+
+    to {
+      opacity: 1;
+
+      transform: scale(1) translateY(0);
+    }
+  }
+
+  /* ---------- Modal Header ---------- */
+
+  .tag-modal-header {
+    padding: 17px 18px 11px;
+  }
+
+  .tag-modal-header h2 {
+    font-size: 20px;
+
+    line-height: 1.2;
+  }
+
+  .tag-modal-header p {
+    margin-top: 4px;
+
+    max-width: 300px;
+
+    font-size: 11px;
+
+    line-height: 1.4;
+  }
+
+  .tag-modal-close {
+    width: 36px;
+    height: 36px;
+
+    border-radius: 10px;
+  }
+
+  /* ---------- Modal Body ---------- */
+
+  .tag-modal-body {
+    flex: 1 1 auto;
+
+    min-height: 0;
+
+    overflow-y: auto;
+
+    padding: 3px 18px 8px;
+
+    -webkit-overflow-scrolling: touch;
+  }
+
+  /* ---------- Modal Footer ---------- */
+
+  .tag-modal-footer {
+    flex-shrink: 0;
+
+    gap: 8px;
+
+    padding: 10px 18px max(12px, env(safe-area-inset-bottom));
+  }
+
+  .tag-secondary-button,
+  .tag-primary-button {
+    height: 40px;
+
+    flex: 1;
+
+    font-size: 12px;
+
+    border-radius: 10px;
+  }
+
+  /* ---------- Form ---------- */
+
+  .tag-form-label {
+    margin-top: 5px;
+    margin-bottom: 7px;
+
+    font-size: 9px;
+  }
+
+  .tag-icon-label {
+    margin-top: 17px;
+  }
+
+  .tag-form-input {
+    height: 42px;
+
+    font-size: 13px;
+  }
+
+  .tag-form-hint {
+    margin-top: 5px;
+
+    font-size: 10px;
+  }
+
+  /* ---------- Icon Picker ---------- */
+
+  .tag-icon-picker {
+    grid-template-columns: repeat(7, minmax(0, 1fr));
+
+    gap: 6px;
+  }
+
+  .tag-icon-option {
+    min-height: 38px;
+
+    border-radius: 9px;
+  }
+
+  .tag-icon-option svg {
+    width: 17px;
+    height: 17px;
+  }
+
+  /* ---------- Edit Rows ---------- */
+
+  .tag-edit-row {
+    min-height: 56px;
+
+    grid-template-columns: 38px minmax(0, 1fr) 36px 36px;
+
+    gap: 7px;
+
+    padding: 6px;
+  }
+
+  .tag-edit-icon {
+    width: 36px;
+    height: 36px;
+  }
+
+  .tag-edit-name {
+    font-size: 13px;
+  }
+
+  .tag-row-action {
+    width: 32px;
+    height: 32px;
+  }
+
+  /* ---------- Order Rows ---------- */
+
+  .tag-order-row {
+    min-height: 56px;
+
+    grid-template-columns: 34px 38px minmax(0, 1fr);
+
+    gap: 8px;
+
+    padding: 6px 8px;
+
+    border-radius: 12px;
+  }
+
+  .tag-drag-handle {
+    width: 34px;
+    height: 42px;
+  }
+
+  .tag-order-icon {
+    width: 38px;
+    height: 38px;
+  }
+
+  .tag-order-name {
+    font-size: 13px;
+  }
+
+  /* ---------- Letter Headings ---------- */
+
+  .tag-letter {
+    margin-top: 10px;
+
+    font-size: 10px;
+
+    letter-spacing: 1.2px;
+  }
+
+  /* ---------- Navigation Popup ---------- */
+
   .moonbox-navigation-overlay {
     padding: 16px;
   }
 
   .moonbox-navigation-popup {
     width: 100%;
-
     max-width: 360px;
 
     padding: 22px;
@@ -2814,5 +2131,222 @@
     height: 40px;
 
     flex: 1;
+  }
+}
+
+/* ==========================================================
+   29. SMALL PHONES
+   ========================================================== */
+
+@media (max-width: 420px) {
+  .tag-screen {
+    padding-left: 14px;
+    padding-right: 14px;
+  }
+
+  .tag-grid {
+    column-gap: 5px;
+    row-gap: 15px;
+  }
+
+  .tag-circle {
+    width: 64px;
+    height: 64px;
+  }
+
+  .tag-circle svg {
+    width: 22px;
+    height: 22px;
+  }
+
+  .tag-selection-icon {
+    display: none;
+  }
+
+  .tag-selection-text strong {
+    font-size: 9px;
+  }
+
+  .tag-selection-text span {
+    font-size: 8px;
+  }
+
+  .tag-view-library {
+    width: 105px;
+    min-width: 105px;
+
+    height: 42px;
+  }
+
+  /* ---------- Small Modal ---------- */
+
+  .tag-modal {
+    max-height: calc(100dvh - 50px);
+
+    border-radius: 18px;
+  }
+
+  .tag-modal-header {
+    padding: 15px 15px 10px;
+  }
+
+  .tag-modal-header h2 {
+    font-size: 18px;
+  }
+
+  .tag-modal-body {
+    padding: 2px 15px 5px;
+  }
+
+  .tag-modal-footer {
+    padding-left: 15px;
+    padding-right: 15px;
+  }
+
+  .tag-icon-picker {
+    grid-template-columns: repeat(6, minmax(0, 1fr));
+
+    gap: 7px;
+  }
+
+  .tag-icon-option {
+    border-radius: 10px;
+  }
+
+  .tag-icon-option svg {
+    width: 18px;
+    height: 18px;
+  }
+
+  .tag-form-hint {
+    font-size: 10px;
+  }
+
+  .tag-edit-row {
+    grid-template-columns: 36px minmax(0, 1fr) 32px 32px;
+
+    gap: 5px;
+  }
+
+  .tag-edit-icon {
+    width: 34px;
+    height: 34px;
+  }
+
+  .tag-row-action {
+    width: 30px;
+    height: 30px;
+  }
+
+  .tag-order-row {
+    grid-template-columns: 32px 36px minmax(0, 1fr);
+
+    gap: 7px;
+  }
+
+  .tag-drag-handle {
+    width: 32px;
+  }
+
+  .tag-order-icon {
+    width: 36px;
+    height: 36px;
+  }
+
+  .tag-clear-selection {
+    font-size: 8px;
+
+    margin-left: 4px;
+    margin-right: 6px;
+  }
+}
+
+/* ==========================================================
+   30. VERY SMALL PHONES
+   ========================================================== */
+
+@media (max-width: 350px) {
+  .tag-circle {
+    width: 58px;
+    height: 58px;
+  }
+
+  .tag-circle svg {
+    width: 20px;
+    height: 20px;
+  }
+
+  .tag-name,
+  .tag span {
+    font-size: 9px;
+  }
+
+  .tag-view-library {
+    width: 98px;
+    min-width: 98px;
+
+    font-size: 9px;
+  }
+
+  .tag-selection-text strong {
+    font-size: 9px;
+  }
+
+  .tag-selection-text span {
+    font-size: 8px;
+  }
+
+  .tag-clear-selection {
+    font-size: 8px;
+
+    margin-left: 3px;
+    margin-right: 5px;
+  }
+
+  .tag-icon-picker {
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+  }
+}
+
+/* ==========================================================
+   31. TOUCH / ACCESSIBILITY
+   ========================================================== */
+
+.tag-modal button,
+.tag-modal input {
+  -webkit-tap-highlight-color: transparent;
+}
+
+@media (pointer: coarse) {
+  .tag-icon-option {
+    min-height: 42px;
+  }
+
+  .tag-row-action {
+    min-width: 32px;
+    min-height: 32px;
+  }
+
+  .tag-drag-handle {
+    min-width: 34px;
+    min-height: 42px;
+  }
+}
+
+/* ==========================================================
+   32. REDUCED MOTION
+   ========================================================== */
+
+@media (prefers-reduced-motion: reduce) {
+  .tag-menu,
+  .tag-modal-overlay,
+  .tag-modal,
+  .tag-icon-option,
+  .tag-edit-row,
+  .tag-order-row,
+  .moonbox-navigation-overlay,
+  .moonbox-navigation-popup {
+    animation: none !important;
+    transition: none !important;
   }
 }
