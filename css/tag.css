@@ -1772,7 +1772,7 @@
 
   .tag-selection-footer {
     position: fixed;
-    top: 600px;
+    top: calc(80vh - 10px);
     left: 10px;
     right: 10px;
 
