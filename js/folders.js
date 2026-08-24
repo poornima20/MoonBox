@@ -439,25 +439,49 @@ async function importSong(file, folder) {
 
   const song = {
     id: createId(),
+
+    file: file,
+
     name: file.name,
+
     title: getTitleFromFileName(file.name),
-    duration,
+
+    duration: duration,
+
     artist: folder.name,
+
     folderId: folder.id,
+
     folderName: folder.name,
+
+    folderTagId: folder.tagId,
+
     size: file.size,
+
     lastModified: file.lastModified,
+
     tags: ["all", folder.tagId],
   };
 
+  /* Add to memory */
+
   songs.push(song);
 
+  /* Add to folder */
+
+  folder.songs.push(song);
+
+  /* Save to IndexedDB */
+
   await saveSong(song);
+
+  /* Rebuild folder views */
 
   rebuildFolderSongs();
 
   return song;
 }
+
 /* ==========================================================
   Sync folder with delete 
 ========================================================== */

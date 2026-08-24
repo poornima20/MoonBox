@@ -35,13 +35,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
   const vinylCover = document.getElementById("playerVinylCover");
 
-  const changeCoverButton = document.getElementById("playerChangeCover");
-
-  const coverInput = document.getElementById("playerCoverInput");
-  const playerYear = document.getElementById("playerYear");
-  const playerGenre = document.getElementById("playerGenre");
-  const playerDuration = document.getElementById("playerDuration");
-
   const notesEditor = document.getElementById("journalText");
 
   const uploadLyricsButton = document.getElementById("uploadLyrics");
@@ -198,16 +191,35 @@ document.addEventListener("DOMContentLoaded", () => {
 
       button.dataset.tagId = tag.id;
 
+      /* ========================================================
+   CHECK IF TAG IS MANDATORY
+======================================================== */
+
+      const isMandatory = tag.id === "all" || tag.id === song.folderTagId;
+
+      /* ========================================================
+   TAG CONTENT
+======================================================== */
+
       button.innerHTML = `
-      <i data-lucide="${tag.icon}"></i>
+  <i data-lucide="${tag.icon}"></i>
 
-      <span>${tag.name}</span>
+  <span>${tag.name}</span>
 
-      <i
-        data-lucide="x"
-        class="remove-player-tag"
-      ></i>
-    `;
+  ${
+    isMandatory
+      ? `<i
+          data-lucide="lock"
+          class="mandatory-player-tag"
+        ></i>`
+      : `
+        <i
+          data-lucide="x"
+          class="remove-player-tag"
+        ></i>
+      `
+  }
+`;
 
       playerSelectedTags.appendChild(button);
     });
@@ -279,17 +291,40 @@ document.addEventListener("DOMContentLoaded", () => {
 ========================================================== */
 
   function togglePlayerSongTag(tagId) {
-    /* ALL is mandatory */
-    if (tagId === "all") {
-      return;
-    }
     const song = songs[currentSong];
 
     if (!song) return;
 
+    /* ========================================================
+     ALL TAG IS MANDATORY
+  ======================================================== */
+
+    if (tagId === "all") {
+      return;
+    }
+
+    /* ========================================================
+     FOLDER TAG IS MANDATORY
+     
+     The folder tag is stored on the song as folderTagId.
+     It can be selected, but never removed.
+  ======================================================== */
+
+    if (tagId === song.folderTagId) {
+      return;
+    }
+
+    /* ========================================================
+     MAKE SURE TAG ARRAY EXISTS
+  ======================================================== */
+
     if (!Array.isArray(song.tags)) {
       song.tags = [];
     }
+
+    /* ========================================================
+     TOGGLE NORMAL TAG
+  ======================================================== */
 
     const index = song.tags.indexOf(tagId);
 
@@ -299,11 +334,17 @@ document.addEventListener("DOMContentLoaded", () => {
       song.tags.splice(index, 1);
     }
 
+    /* ========================================================
+     UPDATE UI
+  ======================================================== */
+
     renderPlayerTagPicker();
 
     renderPlayerTags();
 
-    /* Tell Library to refresh */
+    /* ========================================================
+     TELL LIBRARY
+  ======================================================== */
 
     document.dispatchEvent(
       new CustomEvent("moonbox:songTagsChanged", {
@@ -511,7 +552,7 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     /* 4. Attach local file */
-    if (song.file instanceof File) {
+    if (song.file instanceof Blob) {
       currentObjectUrl = URL.createObjectURL(song.file);
 
       audio.src = currentObjectUrl;
@@ -581,76 +622,6 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   /* ==========================================================
-   CHANGE ALBUM COVER
-========================================================== */
-
-  if (changeCoverButton && coverInput) {
-    changeCoverButton.addEventListener("click", () => {
-      coverInput.click();
-    });
-
-    coverInput.addEventListener("change", (event) => {
-      const file = event.target.files?.[0];
-
-      if (!file) {
-        return;
-      }
-
-      if (!file.type.startsWith("image/")) {
-        return;
-      }
-
-      const reader = new FileReader();
-
-      reader.onload = (e) => {
-        const newCover = e.target.result;
-
-        /* -----------------------------------------------
-         Update album artwork
-      ------------------------------------------------ */
-
-        cover.src = newCover;
-
-        /* -----------------------------------------------
-         Update vinyl artwork
-      ------------------------------------------------ */
-
-        if (vinylCover) {
-          vinylCover.src = newCover;
-        }
-
-        /* -----------------------------------------------
-         Update current song data
-      ------------------------------------------------ */
-
-        const song = songs[currentSong];
-
-        if (song) {
-          song.cover = newCover;
-        }
-
-        /* -----------------------------------------------
-         Tell the rest of MoonBox
-      ------------------------------------------------ */
-
-        document.dispatchEvent(
-          new CustomEvent("moonbox:coverChanged", {
-            detail: {
-              songId: song?.id || null,
-              cover: newCover,
-            },
-          }),
-        );
-      };
-
-      reader.readAsDataURL(file);
-
-      /* Allow selecting the same image again */
-      coverInput.value = "";
-    });
-  }
-
-  /* ==========================================================
    PLAY
 ========================================================== */
 
@@ -661,8 +632,8 @@ document.addEventListener("DOMContentLoaded", () => {
       return;
     }
 
-    if (!(song.file instanceof File)) {
-      console.warn("MoonBox Player: This song has no local File object.", song);
+    if (!(song.file instanceof Blob)) {
+      console.warn("MoonBox Player: This song has no local audio data.", song);
 
       return;
     }
@@ -863,12 +834,70 @@ document.addEventListener("DOMContentLoaded", () => {
     playSong();
   }
 
+  /* ==========================================================
+   CHANGE ALBUM ART FROM ONLINE URL
+========================================================== */
+
   cover.addEventListener("click", () => {
-    if (playing) {
-      pauseSong();
-    } else {
-      playSong();
+    const song = songs[currentSong];
+
+    if (!song) {
+      return;
     }
+
+    const currentCover = song.cover || "";
+
+    const imageUrl = window.prompt("Enter album artwork URL:", currentCover);
+
+    /* User pressed Cancel */
+    if (imageUrl === null) {
+      return;
+    }
+
+    const url = imageUrl.trim();
+
+    /* Empty URL */
+    if (!url) {
+      return;
+    }
+
+    /* Only allow normal web URLs */
+    if (!/^https?:\/\//i.test(url)) {
+      alert("Please enter a valid image URL starting with http:// or https://");
+      return;
+    }
+
+    /* Test whether the image actually loads */
+    const testImage = new Image();
+
+    testImage.onload = () => {
+      /* Update current song */
+      song.cover = url;
+
+      /* Update main artwork */
+      cover.src = url;
+
+      /* Update vinyl artwork if it still exists */
+      if (vinylCover) {
+        vinylCover.src = url;
+      }
+
+      /* Tell the rest of MoonBox */
+      document.dispatchEvent(
+        new CustomEvent("moonbox:coverChanged", {
+          detail: {
+            songId: song.id || null,
+            cover: url,
+          },
+        }),
+      );
+    };
+
+    testImage.onerror = () => {
+      alert("MoonBox could not load that image. Please check the URL.");
+    };
+
+    testImage.src = url;
   });
 
   playButton.addEventListener("click", () => {
@@ -1125,29 +1154,6 @@ document.addEventListener("DOMContentLoaded", () => {
     title.textContent = song.title || "Unknown Song";
 
     artist.textContent = song.artist || "Unknown Artist";
-
-    if (playerYear) {
-      playerYear.innerHTML = `
-            <i data-lucide="calendar"></i>
-            ${song.year || new Date().getFullYear()}
-        `;
-    }
-
-    if (playerGenre) {
-      playerGenre.innerHTML = `
-            <i data-lucide="music"></i>
-            ${song.genre || "Pop"}
-        `;
-    }
-
-    if (playerDuration) {
-      playerDuration.innerHTML = `
-            <i data-lucide="clock-3"></i>
-            ${format(song.duration || 0)}
-        `;
-    }
-
-    lucide.createIcons();
   }
 
   function loadNotes(song) {
