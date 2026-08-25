@@ -1700,7 +1700,7 @@
 
     display: grid;
 
-    grid-template-columns: repeat(3, minmax(0, 1fr));
+    grid-template-columns: repeat(4, minmax(0, 1fr));
 
     column-gap: 8px;
     row-gap: 18px;
@@ -1772,7 +1772,7 @@
 
   .tag-selection-footer {
     position: fixed;
-    top: calc(80vh - 10px);
+    top: 80vh;
     left: 10px;
     right: 10px;
 
@@ -1792,7 +1792,7 @@
 
     background: transparent;
 
-    border: 1px solid none;
+    border: 1px solid transparent;
     border-radius: 15px;
 
     box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
