@@ -1637,16 +1637,13 @@
 
   .player-panel {
     display: flex;
-
     flex-direction: column;
 
     width: 100%;
-
     height: auto;
 
     min-height: 0;
-
-    max-height: 30vh;
+    max-height: none;
 
     flex-shrink: 0;
 
@@ -1655,10 +1652,9 @@
     background: rgba(16, 16, 16, 0.72);
 
     border: 1px solid rgba(255, 255, 255, 0.08);
-
     border-radius: 20px;
 
-    overflow: hidden;
+    overflow: visible;
 
     box-shadow: 0 15px 40px rgba(0, 0, 0, 0.28);
   }
@@ -1739,16 +1735,16 @@
     display: flex;
 
     flex-wrap: wrap;
-
     align-content: flex-start;
 
     gap: 7px;
 
     width: 100%;
 
-    max-height: 18vh;
+    min-height: 0;
+    max-height: none;
 
-    overflow-y: auto;
+    overflow: visible;
 
     scrollbar-width: none;
   }
@@ -1963,7 +1959,8 @@
   .player-selected-tags {
     gap: 5px;
 
-    max-height: 15vh;
+    max-height: none;
+    overflow: visible;
   }
 
   .player-selected-tag {

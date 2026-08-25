@@ -301,6 +301,7 @@
   padding: 0;
 
   border: none;
+  padding: 5px;
 
   background: transparent;
 
@@ -682,6 +683,8 @@
   padding: 24px 24px 18px;
 
   flex-shrink: 0;
+
+  z-index: 9999999;
 }
 
 .tag-modal-header h2 {
@@ -1772,9 +1775,10 @@
 
   .tag-selection-footer {
     position: fixed;
-    top: 80vh;
     left: 10px;
     right: 10px;
+    bottom: 10px;
+    top: 80vh;
 
     width: auto;
 
@@ -1874,10 +1878,19 @@
      ======================================================== */
 
   .tag-modal-overlay {
-    align-items: center;
+    position: fixed;
+    inset: 0;
+
+    width: 100vw;
+    height: 100dvh;
+
+    display: flex;
+    align-items: flex-start;
     justify-content: center;
 
     padding: 18px 12px;
+
+    box-sizing: border-box;
 
     background: rgba(0, 0, 0, 0.62);
 
@@ -1885,21 +1898,32 @@
     -webkit-backdrop-filter: blur(7px);
 
     overflow: hidden;
-  }
 
+    z-index: 1000000;
+  }
   .tag-modal {
-    width: 100%;
+    position: relative;
+
+    width: calc(100vw - 24px);
     max-width: 560px;
 
-    max-height: calc(100dvh - 70px);
+    height: calc(100dvh - 150px);
+    max-height: calc(100dvh - 36px);
 
     min-height: 0;
 
     margin: 0;
 
+    display: flex;
+    flex-direction: column;
+
+    overflow: hidden;
+
+    box-sizing: border-box;
+
     border-radius: 20px;
 
-    animation: tagModalMobileIn 0.2s ease;
+    z-index: 999999999;
   }
 
   @keyframes tagModalMobileIn {
@@ -2349,4 +2373,8 @@
     animation: none !important;
     transition: none !important;
   }
+}
+
+body:has(#tagModalRoot .tag-modal-overlay) .tag-selection-footer {
+  display: none !important;
 }
