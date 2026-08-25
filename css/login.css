@@ -1,0 +1,559 @@
+/* ==========================================================
+   MOONBOX ACCOUNT / LOGIN
+========================================================== */
+
+.moonbox-account-button {
+  cursor: pointer;
+}
+
+
+/* ==========================================================
+   ACCOUNT OVERLAY
+========================================================== */
+
+.moonbox-account-overlay {
+  position: fixed;
+  inset: 0;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  padding: 20px;
+
+  box-sizing: border-box;
+
+  background: rgba(0, 0, 0, 0.62);
+
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+
+  opacity: 0;
+  visibility: hidden;
+
+  pointer-events: none;
+
+  transition:
+    opacity 0.2s ease,
+    visibility 0.2s ease;
+
+  z-index: 2000000;
+}
+
+.moonbox-account-overlay.show {
+  opacity: 1;
+
+  visibility: visible;
+
+  pointer-events: auto;
+}
+
+
+/* ==========================================================
+   LOGIN WINDOW
+========================================================== */
+
+.moonbox-account-window {
+  position: relative;
+
+  width: 100%;
+  max-width: 390px;
+
+  padding: 28px;
+
+  box-sizing: border-box;
+
+  background:
+    linear-gradient(
+      180deg,
+      #171717 0%,
+      #111111 100%
+    );
+
+  border: 1px solid rgba(255, 255, 255, 0.09);
+
+  border-radius: 22px;
+
+  box-shadow:
+    0 30px 80px rgba(0, 0, 0, 0.65);
+
+  transform: translateY(10px) scale(0.98);
+
+  transition: transform 0.2s ease;
+}
+
+.moonbox-account-overlay.show
+.moonbox-account-window {
+  transform: translateY(0) scale(1);
+}
+
+
+/* ==========================================================
+   CLOSE
+========================================================== */
+
+.moonbox-account-close {
+  position: absolute;
+
+  top: 14px;
+  right: 14px;
+
+  width: 34px;
+  height: 34px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  padding: 0;
+
+  border: none;
+
+  border-radius: 50%;
+
+  background: transparent;
+
+  color: #777;
+
+  cursor: pointer;
+
+  transition:
+    background 0.2s ease,
+    color 0.2s ease;
+}
+
+.moonbox-account-close:hover {
+  background: rgba(255, 255, 255, 0.06);
+
+  color: #fff;
+}
+
+.moonbox-account-close svg {
+  width: 17px;
+  height: 17px;
+}
+
+
+/* ==========================================================
+   HEADER
+========================================================== */
+
+.moonbox-account-header {
+  text-align: center;
+
+  margin-bottom: 26px;
+}
+
+.moonbox-account-logo {
+  width: 46px;
+  height: 46px;
+
+  margin: 0 auto 14px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.moonbox-account-logo img {
+  width: 100%;
+  height: 100%;
+
+  object-fit: contain;
+}
+
+.moonbox-account-header h2 {
+  margin: 0;
+
+  color: #f5f5f5;
+
+  font-size: 22px;
+
+  font-weight: 600;
+
+  letter-spacing: -0.3px;
+}
+
+.moonbox-account-header p {
+  margin: 7px 0 0;
+
+  color: #777;
+
+  font-size: 12px;
+
+  line-height: 1.5;
+}
+
+
+/* ==========================================================
+   FORM
+========================================================== */
+
+.moonbox-login-form {
+  display: flex;
+
+  flex-direction: column;
+
+  gap: 14px;
+}
+
+.moonbox-field {
+  display: flex;
+
+  flex-direction: column;
+
+  gap: 7px;
+}
+
+.moonbox-field label {
+  color: #999;
+
+  font-size: 11px;
+
+  font-weight: 500;
+
+  letter-spacing: 0.3px;
+}
+
+.moonbox-field input {
+  width: 100%;
+
+  height: 46px;
+
+  padding: 0 13px;
+
+  box-sizing: border-box;
+
+  border: 1px solid rgba(255, 255, 255, 0.09);
+
+  border-radius: 11px;
+
+  outline: none;
+
+  background: #0d0d0d;
+
+  color: #f5f5f5;
+
+  font-family: var(--font-main);
+
+  font-size: 14px;
+
+  transition:
+    border-color 0.2s ease,
+    background 0.2s ease;
+}
+
+.moonbox-field input::placeholder {
+  color: #555;
+}
+
+.moonbox-field input:focus {
+  border-color: rgba(255, 255, 255, 0.24);
+
+  background: #101010;
+}
+
+
+/* ==========================================================
+   PRIMARY BUTTON
+========================================================== */
+
+.moonbox-login-submit {
+  width: 100%;
+
+  height: 46px;
+
+  margin-top: 5px;
+
+  border: none;
+
+  border-radius: 11px;
+
+  background: #f1f1f1;
+
+  color: #111;
+
+  font-family: var(--font-main);
+
+  font-size: 13px;
+
+  font-weight: 600;
+
+  cursor: pointer;
+
+  transition:
+    transform 0.2s ease,
+    background 0.2s ease;
+}
+
+.moonbox-login-submit:hover {
+  background: #fff;
+
+  transform: translateY(-1px);
+}
+
+.moonbox-login-submit:active {
+  transform: translateY(0);
+}
+
+
+/* ==========================================================
+   MESSAGE
+========================================================== */
+
+.moonbox-login-message {
+  min-height: 16px;
+
+  margin: 0;
+
+  color: #888;
+
+  font-size: 11px;
+
+  text-align: center;
+}
+
+
+/* ==========================================================
+   SWITCH LOGIN / SIGN UP
+========================================================== */
+
+.moonbox-account-switch {
+  margin-top: 20px;
+
+  text-align: center;
+
+  color: #666;
+
+  font-size: 12px;
+}
+
+.moonbox-account-switch button {
+  padding: 0;
+
+  border: none;
+
+  background: transparent;
+
+  color: #ddd;
+
+  font-family: inherit;
+
+  font-size: inherit;
+
+  cursor: pointer;
+}
+
+.moonbox-account-switch button:hover {
+  color: #fff;
+}
+
+
+/* ==========================================================
+   SIGN UP EXTRA FIELD
+========================================================== */
+
+.moonbox-name-field {
+  display: none;
+}
+
+.moonbox-login-form.signup-mode
+.moonbox-name-field {
+  display: flex;
+}
+
+
+/* ==========================================================
+   ACCOUNT MENU
+========================================================== */
+
+.moonbox-account-menu {
+  position: absolute;
+
+  top: calc(100% + 12px);
+  right: 0;
+
+  width: 260px;
+
+  padding: 12px;
+
+  box-sizing: border-box;
+
+  background:
+    linear-gradient(
+      180deg,
+      #171717,
+      #101010
+    );
+
+  border: 1px solid rgba(255, 255, 255, 0.08);
+
+  border-radius: 16px;
+
+  box-shadow:
+    0 22px 55px rgba(0, 0, 0, 0.55);
+
+  opacity: 0;
+
+  visibility: hidden;
+
+  pointer-events: none;
+
+  transform: translateY(-5px);
+
+  transition:
+    opacity 0.18s ease,
+    transform 0.18s ease,
+    visibility 0.18s ease;
+
+  z-index: 2000001;
+}
+
+.moonbox-account-menu.show {
+  opacity: 1;
+
+  visibility: visible;
+
+  pointer-events: auto;
+
+  transform: translateY(0);
+}
+
+
+/* ==========================================================
+   ACCOUNT MENU HEADER
+========================================================== */
+
+.moonbox-account-menu-header {
+  padding: 8px 9px 12px;
+}
+
+.moonbox-account-menu-header strong {
+  display: block;
+
+  color: #eee;
+
+  font-size: 13px;
+
+  font-weight: 600;
+}
+
+.moonbox-account-menu-header span {
+  display: block;
+
+  margin-top: 4px;
+
+  color: #666;
+
+  font-size: 11px;
+
+  overflow: hidden;
+
+  white-space: nowrap;
+
+  text-overflow: ellipsis;
+}
+
+
+/* ==========================================================
+   MENU DIVIDER
+========================================================== */
+
+.moonbox-account-divider {
+  height: 1px;
+
+  margin: 4px 0;
+
+  background: rgba(255, 255, 255, 0.06);
+}
+
+
+/* ==========================================================
+   MENU BUTTON
+========================================================== */
+
+.moonbox-account-menu button {
+  width: 100%;
+
+  height: 40px;
+
+  display: flex;
+
+  align-items: center;
+
+  gap: 11px;
+
+  padding: 0 9px;
+
+  border: none;
+
+  border-radius: 9px;
+
+  background: transparent;
+
+  color: #aaa;
+
+  font-family: var(--font-main);
+
+  font-size: 12px;
+
+  text-align: left;
+
+  cursor: pointer;
+
+  transition:
+    background 0.18s ease,
+    color 0.18s ease;
+}
+
+.moonbox-account-menu button:hover {
+  background: rgba(255, 255, 255, 0.05);
+
+  color: #fff;
+}
+
+.moonbox-account-menu button svg {
+  width: 16px;
+  height: 16px;
+}
+
+
+/* ==========================================================
+   MOBILE
+========================================================== */
+
+@media (max-width: 600px) {
+
+  .moonbox-account-overlay {
+    align-items: center;
+
+    padding: 12px;
+  }
+
+  .moonbox-account-window {
+    max-width: none;
+
+    padding: 24px 20px;
+
+    border-radius: 20px;
+
+    margin-bottom: env(safe-area-inset-bottom);
+  }
+
+  .moonbox-account-header {
+    margin-bottom: 22px;
+  }
+
+  .moonbox-account-header h2 {
+    font-size: 20px;
+  }
+
+  .moonbox-account-menu {
+    position: fixed;
+
+    top: 62px;
+    right: 12px;
+
+    width: min(260px, calc(100vw - 24px));
+  }
+}F
