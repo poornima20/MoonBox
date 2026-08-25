@@ -27,6 +27,11 @@ document.addEventListener("DOMContentLoaded", () => {
   const artist = document.getElementById("playerArtist");
   const cover = document.getElementById("playerCover");
 
+  const titleEditor = document.getElementById("playerTitleEditor");
+  const editTitleButton = document.getElementById("editPlayerTitle");
+  const titleInput = document.getElementById("playerTitleInput");
+  const restoreTitleButton = document.getElementById("restorePlayerTitle");
+
   const vinyl = document.querySelector(".vinyl");
   const album = document.querySelector(".player-album");
 
@@ -226,6 +231,150 @@ document.addEventListener("DOMContentLoaded", () => {
 
     lucide.createIcons();
   }
+
+  /* ==========================================================
+   CLOUD SONG TITLE EDITOR
+
+   Important:
+   This changes only MoonBox's displayed/cloud metadata title.
+
+   It NEVER changes:
+   - song.file.name
+   - the local audio file
+   - the directory/file on the user's device
+========================================================== */
+
+  function getOriginalSongTitle(song) {
+    if (!song) return "Unknown Song";
+
+    return (
+      song.originalTitle ||
+      song.name ||
+      song.file?.name?.replace(/\.[^/.]+$/, "") ||
+      song.title ||
+      "Unknown Song"
+    );
+  }
+
+  function updateTitleEditor(song) {
+    if (!song) return;
+
+    const currentTitle = song.title || getOriginalSongTitle(song);
+
+    title.textContent = currentTitle;
+
+    if (titleInput) {
+      titleInput.value = currentTitle;
+    }
+
+    titleEditor?.classList.remove("editing");
+  }
+
+  function saveSongTitle() {
+    const song = songs[currentSong];
+
+    if (!song) return;
+
+    const value = titleInput.value.trim();
+
+    if (!value) {
+      titleInput.value = song.title || getOriginalSongTitle(song);
+      titleEditor.classList.remove("editing");
+      return;
+    }
+
+    /* Store original title ONCE */
+    if (!song.originalTitle) {
+      song.originalTitle = getOriginalSongTitle(song);
+    }
+
+    /* This is the MoonBox/cloud display title */
+    song.title = value;
+
+    title.textContent = value;
+
+    titleEditor.classList.remove("editing");
+
+    /* Tell Library / Cloud layer */
+    document.dispatchEvent(
+      new CustomEvent("moonbox:songTitleChanged", {
+        detail: {
+          songId: song.id || null,
+          title: value,
+          originalTitle: song.originalTitle,
+        },
+      }),
+    );
+  }
+
+  editTitleButton?.addEventListener("click", () => {
+    const song = songs[currentSong];
+
+    if (!song) return;
+
+    if (!song.originalTitle) {
+      song.originalTitle = getOriginalSongTitle(song);
+    }
+
+    titleInput.value = song.title || song.originalTitle;
+
+    titleEditor.classList.add("editing");
+
+    titleInput.focus();
+
+    titleInput.select();
+  });
+
+  titleInput?.addEventListener("keydown", (event) => {
+    if (event.key === "Enter") {
+      event.preventDefault();
+
+      saveSongTitle();
+    }
+
+    if (event.key === "Escape") {
+      const song = songs[currentSong];
+
+      if (song) {
+        titleInput.value = song.title || getOriginalSongTitle(song);
+      }
+
+      titleEditor.classList.remove("editing");
+    }
+  });
+
+  titleInput?.addEventListener("blur", () => {
+    saveSongTitle();
+  });
+
+  restoreTitleButton?.addEventListener("click", (event) => {
+    event.preventDefault();
+
+    const song = songs[currentSong];
+
+    if (!song) return;
+
+    const originalTitle = getOriginalSongTitle(song);
+
+    song.title = originalTitle;
+
+    title.textContent = originalTitle;
+
+    titleInput.value = originalTitle;
+
+    titleEditor.classList.remove("editing");
+
+    document.dispatchEvent(
+      new CustomEvent("moonbox:songTitleChanged", {
+        detail: {
+          songId: song.id || null,
+          title: originalTitle,
+          originalTitle,
+          restored: true,
+        },
+      }),
+    );
+  });
 
   /* ==========================================================
    RENDER TAG PICKER
@@ -563,9 +712,9 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     /* 5. Basic Player information */
-    title.textContent = song.title || song.name || "Unknown Song";
+    updateTitleEditor(song);
 
-    artist.textContent = song.artist || "Unknown Artist";
+    artist.textContent = song.artist || "MoonBox";
 
     /* 6. Artwork */
     const songCover = song.cover || "assets/moon.png";
@@ -1151,9 +1300,9 @@ document.addEventListener("DOMContentLoaded", () => {
   function updatePlayerTop(song) {
     if (!song) return;
 
-    title.textContent = song.title || "Unknown Song";
+    updateTitleEditor(song);
 
-    artist.textContent = song.artist || "Unknown Artist";
+    artist.textContent = song.artist || "MoonBox";
   }
 
   function loadNotes(song) {

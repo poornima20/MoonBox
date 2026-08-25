@@ -413,9 +413,41 @@
         =================================================== -->
 
                 <div class="song-meta">
-                  <h2 id="playerTitle">Sailing</h2>
+                  <div class="player-title-editor" id="playerTitleEditor">
+                    <div class="player-title-row">
+                      <h2 id="playerTitle">Sailing</h2>
 
-                  <span id="playerArtist"> Christopher Cross </span>
+                      <button
+                        type="button"
+                        id="editPlayerTitle"
+                        class="player-title-edit"
+                        aria-label="Edit song title"
+                      >
+                        <i data-lucide="pencil"></i>
+                      </button>
+                    </div>
+
+                    <div class="player-title-editing">
+                      <input
+                        id="playerTitleInput"
+                        type="text"
+                        autocomplete="off"
+                        spellcheck="false"
+                      />
+
+                      <button
+                        type="button"
+                        id="restorePlayerTitle"
+                        class="player-title-restore"
+                        aria-label="Restore original title"
+                        title="Restore original title"
+                      >
+                        <i data-lucide="undo-2"></i>
+                      </button>
+                    </div>
+                  </div>
+
+                  <span id="playerArtist"> MoonBox </span>
                 </div>
 
                 <!-- ==================================================
