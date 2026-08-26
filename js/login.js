@@ -1,8 +1,23 @@
+import { auth, db } from "./firebase.js";
+
+import {
+  createUserWithEmailAndPassword,
+  signInWithEmailAndPassword,
+  signOut,
+  onAuthStateChanged,
+  updateProfile,
+} from "https://www.gstatic.com/firebasejs/12.18.0/firebase-auth.js";
+
+import {
+  doc,
+  getDoc,
+  setDoc,
+  serverTimestamp,
+} from "https://www.gstatic.com/firebasejs/12.18.0/firebase-firestore.js";
+
 /* ==========================================================
    MOONBOX LOGIN / ACCOUNT
-   UI ONLY
-
-   Firebase will be connected later.
+   FIREBASE CONNECTED
 ========================================================== */
 
 document.addEventListener("DOMContentLoaded", () => {
@@ -15,23 +30,29 @@ document.addEventListener("DOMContentLoaded", () => {
   const moonboxName = document.getElementById("moonboxName");
 
   if (!accountButton || !moonboxName) {
-    console.warn("MoonBox account elements not found.");
+    console.warn("MoonBox: account elements not found.");
+
     return;
   }
 
   /* ========================================================
-     LOCAL UI STATE
+     STATE
 
-     Temporary only.
-     Firebase will replace this later.
+     Firebase is the source of truth.
   ======================================================== */
 
   let isLoggedIn = false;
 
   let currentUser = null;
 
+  let currentProfile = null;
+
+  let accountMenu = null;
+
+  let signupMode = false;
+
   /* ========================================================
-     CREATE LOGIN UI
+     CREATE LOGIN OVERLAY
   ======================================================== */
 
   const overlay = document.createElement("div");
@@ -39,12 +60,15 @@ document.addEventListener("DOMContentLoaded", () => {
   overlay.className = "moonbox-account-overlay";
 
   overlay.innerHTML = `
+
     <div
       class="moonbox-account-window"
       role="dialog"
       aria-modal="true"
       aria-labelledby="moonboxAccountTitle"
     >
+
+      <!-- CLOSE -->
 
       <button
         type="button"
@@ -56,18 +80,24 @@ document.addEventListener("DOMContentLoaded", () => {
       </button>
 
 
+      <!-- HEADER -->
+
       <div class="moonbox-account-header">
 
         <div class="moonbox-account-logo">
+
           <img
             src="assets/moonboxlogo.png"
             alt="MoonBox"
           />
+
         </div>
+
 
         <h2 id="moonboxAccountTitle">
           Sign in to MoonBox
         </h2>
+
 
         <p id="moonboxAccountSubtitle">
           Sync your MoonBox across devices.
@@ -76,13 +106,19 @@ document.addEventListener("DOMContentLoaded", () => {
       </div>
 
 
+      <!-- FORM -->
+
       <form
         class="moonbox-login-form"
         id="moonboxLoginForm"
         novalidate
       >
 
-        <div class="moonbox-field moonbox-name-field">
+        <!-- NAME -->
+
+        <div
+          class="moonbox-field moonbox-name-field"
+        >
 
           <label for="moonboxDisplayName">
             Name
@@ -97,6 +133,8 @@ document.addEventListener("DOMContentLoaded", () => {
 
         </div>
 
+
+        <!-- EMAIL -->
 
         <div class="moonbox-field">
 
@@ -115,6 +153,8 @@ document.addEventListener("DOMContentLoaded", () => {
         </div>
 
 
+        <!-- PASSWORD -->
+
         <div class="moonbox-field">
 
           <label for="moonboxPassword">
@@ -132,6 +172,8 @@ document.addEventListener("DOMContentLoaded", () => {
         </div>
 
 
+        <!-- SUBMIT -->
+
         <button
           type="submit"
           class="moonbox-login-submit"
@@ -141,6 +183,8 @@ document.addEventListener("DOMContentLoaded", () => {
         </button>
 
 
+        <!-- MESSAGE -->
+
         <p
           class="moonbox-login-message"
           id="moonboxLoginMessage"
@@ -148,6 +192,8 @@ document.addEventListener("DOMContentLoaded", () => {
 
       </form>
 
+
+      <!-- SWITCH -->
 
       <div class="moonbox-account-switch">
 
@@ -165,15 +211,14 @@ document.addEventListener("DOMContentLoaded", () => {
       </div>
 
     </div>
+
   `;
 
   document.body.appendChild(overlay);
 
   /* ========================================================
-     ELEMENT REFERENCES
+     FORM ELEMENTS
   ======================================================== */
-
-  const windowElement = overlay.querySelector(".moonbox-account-window");
 
   const closeButton = document.getElementById("moonboxAccountClose");
 
@@ -198,21 +243,67 @@ document.addEventListener("DOMContentLoaded", () => {
   const passwordInput = document.getElementById("moonboxPassword");
 
   /* ========================================================
-     LUCIDE ICONS
+     LUCIDE
   ======================================================== */
 
-  if (typeof lucide !== "undefined") {
-    lucide.createIcons();
+  function refreshIcons() {
+    if (typeof lucide !== "undefined") {
+      lucide.createIcons();
+    }
+  }
+
+  refreshIcons();
+
+  /* ========================================================
+     FIRESTORE USER PROFILE
+  ======================================================== */
+
+  async function createUserProfile(user, displayName) {
+    const userRef = doc(db, "users", user.uid);
+
+    const profile = {
+      uid: user.uid,
+
+      email: user.email,
+
+      displayName: displayName,
+
+      moonboxName: `${displayName}'s MoonBox`,
+
+      createdAt: serverTimestamp(),
+
+      updatedAt: serverTimestamp(),
+    };
+
+    await setDoc(userRef, profile);
+
+    return profile;
   }
 
   /* ========================================================
-     LOGIN / SIGNUP MODE
+     LOAD USER PROFILE
   ======================================================== */
 
-  let signupMode = false;
+  async function loadUserProfile(user) {
+    const userRef = doc(db, "users", user.uid);
+
+    const snapshot = await getDoc(userRef);
+
+    if (!snapshot.exists()) {
+      return null;
+    }
+
+    return snapshot.data();
+  }
+
+  /* ========================================================
+     AUTH MODE
+  ======================================================== */
 
   function updateAuthMode() {
     form.classList.toggle("signup-mode", signupMode);
+
+    message.textContent = "";
 
     if (signupMode) {
       title.textContent = "Create your MoonBox";
@@ -224,8 +315,6 @@ document.addEventListener("DOMContentLoaded", () => {
       switchText.textContent = "Already have an account?";
 
       switchButton.textContent = "Sign in";
-
-      nameInput.focus();
     } else {
       title.textContent = "Sign in to MoonBox";
 
@@ -237,10 +326,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
       switchButton.textContent = "Create account";
     }
-
-    message.textContent = "";
-
-    passwordInput.value = "";
   }
 
   /* ========================================================
@@ -250,6 +335,7 @@ document.addEventListener("DOMContentLoaded", () => {
   function openLogin() {
     if (isLoggedIn) {
       openAccountMenu();
+
       return;
     }
 
@@ -281,23 +367,30 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   /* ========================================================
-     SWITCH LOGIN / SIGNUP
+     SWITCH SIGN IN / SIGN UP
   ======================================================== */
 
   switchButton.addEventListener("click", () => {
     signupMode = !signupMode;
 
     updateAuthMode();
+
+    if (signupMode) {
+      setTimeout(() => {
+        nameInput.focus();
+      }, 50);
+    } else {
+      setTimeout(() => {
+        emailInput.focus();
+      }, 50);
+    }
   });
 
   /* ========================================================
-     FORM SUBMIT
-     
-     TEMPORARY DEMO ONLY.
-     Firebase will replace this.
+     SIGN IN / SIGN UP
   ======================================================== */
 
-  form.addEventListener("submit", (event) => {
+  form.addEventListener("submit", async (event) => {
     event.preventDefault();
 
     const email = emailInput.value.trim();
@@ -305,6 +398,10 @@ document.addEventListener("DOMContentLoaded", () => {
     const password = passwordInput.value.trim();
 
     const displayName = nameInput.value.trim();
+
+    /* ----------------------------------------------------
+         VALIDATION
+      ---------------------------------------------------- */
 
     if (!email) {
       message.textContent = "Enter your email.";
@@ -330,32 +427,117 @@ document.addEventListener("DOMContentLoaded", () => {
       return;
     }
 
-    /* ------------------------------------------------------
-       TEMPORARY LOCAL LOGIN
+    /* ----------------------------------------------------
+         LOADING
+      ---------------------------------------------------- */
 
-       This is only so you can test the UI.
-       Firebase will replace this block.
-    ------------------------------------------------------ */
+    submitButton.disabled = true;
 
-    currentUser = {
-      email,
+    submitButton.textContent = signupMode ? "Creating..." : "Signing in...";
 
-      displayName: signupMode ? displayName : email.split("@")[0],
+    message.textContent = "";
 
-      moonboxName: signupMode
-        ? `${displayName}'s MoonBox`
-        : `${email.split("@")[0]}'s MoonBox`,
-    };
+    try {
+      /* ==================================================
+           SIGN UP
+        ================================================== */
 
-    isLoggedIn = true;
+      if (signupMode) {
+        const credential = await createUserWithEmailAndPassword(
+          auth,
+          email,
+          password,
+        );
 
-    /* Update header */
+        const user = credential.user;
 
-    moonboxName.textContent = currentUser.moonboxName;
+        /* ----------------------------------------------
+             Save display name in Firebase Auth
+          ---------------------------------------------- */
 
-    closeLogin();
+        await updateProfile(user, {
+          displayName: displayName,
+        });
 
-    console.log("Temporary MoonBox login:", currentUser);
+        /* ----------------------------------------------
+             Create Firestore user profile
+          ---------------------------------------------- */
+
+        await createUserProfile(user, displayName);
+
+        console.log("MoonBox account created:", user.uid);
+      } else {
+
+      /* ==================================================
+           SIGN IN
+        ================================================== */
+        const credential = await signInWithEmailAndPassword(
+          auth,
+          email,
+          password,
+        );
+
+        console.log("MoonBox user signed in:", credential.user.uid);
+      }
+
+      /*
+          Firebase's onAuthStateChanged()
+          will update the UI.
+        */
+
+      closeLogin();
+    } catch (error) {
+      console.error("MoonBox authentication error:", error);
+
+      switch (error.code) {
+        case "auth/email-already-in-use":
+          message.textContent = "An account already exists with this email.";
+
+          break;
+
+        case "auth/invalid-email":
+          message.textContent = "Please enter a valid email.";
+
+          break;
+
+        case "auth/weak-password":
+          message.textContent = "Password must be at least 6 characters.";
+
+          break;
+
+        case "auth/invalid-credential":
+          message.textContent = "Incorrect email or password.";
+
+          break;
+
+        case "auth/user-not-found":
+          message.textContent = "No account was found with this email.";
+
+          break;
+
+        case "auth/wrong-password":
+          message.textContent = "Incorrect email or password.";
+
+          break;
+
+        case "auth/too-many-requests":
+          message.textContent = "Too many attempts. Try again later.";
+
+          break;
+
+        case "auth/network-request-failed":
+          message.textContent = "Network error. Check your connection.";
+
+          break;
+
+        default:
+          message.textContent = "Something went wrong. Please try again.";
+      }
+
+      submitButton.textContent = signupMode ? "Create Account" : "Sign In";
+
+      submitButton.disabled = false;
+    }
   });
 
   /* ========================================================
@@ -365,7 +547,7 @@ document.addEventListener("DOMContentLoaded", () => {
   closeButton.addEventListener("click", closeLogin);
 
   /* ========================================================
-     CLICK OUTSIDE
+     CLICK OUTSIDE LOGIN
   ======================================================== */
 
   overlay.addEventListener("click", (event) => {
@@ -375,7 +557,7 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 
   /* ========================================================
-     ESCAPE KEY
+     ESCAPE
   ======================================================== */
 
   document.addEventListener("keydown", (event) => {
@@ -386,13 +568,13 @@ document.addEventListener("DOMContentLoaded", () => {
     if (overlay.classList.contains("show")) {
       closeLogin();
     }
+
+    closeAccountMenu();
   });
 
   /* ========================================================
      ACCOUNT MENU
   ======================================================== */
-
-  let accountMenu = null;
 
   function createAccountMenu() {
     if (accountMenu) {
@@ -405,11 +587,14 @@ document.addEventListener("DOMContentLoaded", () => {
 
     accountMenu.innerHTML = `
 
-      <div class="moonbox-account-menu-header">
+      <div
+        class="moonbox-account-menu-header"
+      >
 
         <strong id="moonboxMenuName">
           MoonBox
         </strong>
+
 
         <span id="moonboxMenuEmail">
         </span>
@@ -417,15 +602,22 @@ document.addEventListener("DOMContentLoaded", () => {
       </div>
 
 
-      <div class="moonbox-account-divider"></div>
+      <div
+        class="moonbox-account-divider"
+      ></div>
 
 
       <button
         type="button"
         id="moonboxCloudButton"
       >
+
         <i data-lucide="cloud"></i>
-        <span>Cloud Library</span>
+
+        <span>
+          Cloud Library
+        </span>
+
       </button>
 
 
@@ -433,65 +625,87 @@ document.addEventListener("DOMContentLoaded", () => {
         type="button"
         id="moonboxAccountSettings"
       >
+
         <i data-lucide="user-round"></i>
-        <span>Account</span>
+
+        <span>
+          Account
+        </span>
+
       </button>
 
 
-      <div class="moonbox-account-divider"></div>
+      <div
+        class="moonbox-account-divider"
+      ></div>
 
 
       <button
         type="button"
         id="moonboxLogoutButton"
       >
+
         <i data-lucide="log-out"></i>
-        <span>Log out</span>
+
+        <span>
+          Log out
+        </span>
+
       </button>
 
     `;
 
     /*
-      Put the menu around the logo area.
-      We make the logo container the positioning context.
+      Keep the account menu attached
+      to the MoonBox logo.
     */
 
     accountButton.style.position = "relative";
 
     accountButton.appendChild(accountMenu);
 
-    if (typeof lucide !== "undefined") {
-      lucide.createIcons();
-    }
+    refreshIcons();
 
-    /* Logout */
+    /* ======================================================
+       LOGOUT
+    ====================================================== */
 
     document
       .getElementById("moonboxLogoutButton")
-      .addEventListener("click", () => {
-        isLoggedIn = false;
+      .addEventListener("click", async () => {
+        try {
+          await signOut(auth);
 
-        currentUser = null;
-
-        moonboxName.textContent = "MoonBox";
-
-        closeAccountMenu();
+          closeAccountMenu();
+        } catch (error) {
+          console.error("MoonBox logout error:", error);
+        }
       });
 
-    /* Temporary buttons */
+    /* ======================================================
+       CLOUD LIBRARY
+    ====================================================== */
 
     document
       .getElementById("moonboxCloudButton")
       .addEventListener("click", () => {
-        console.log("Cloud Library will be connected later.");
+        console.log("MoonBox Cloud Library will be connected next.");
       });
+
+    /* ======================================================
+       ACCOUNT SETTINGS
+    ====================================================== */
 
     document
       .getElementById("moonboxAccountSettings")
       .addEventListener("click", () => {
-        console.log("Account settings will be connected later.");
+        console.log("MoonBox Account Settings will be connected next.");
       });
   }
+
+  /* ========================================================
+     OPEN ACCOUNT MENU
+  ======================================================== */
 
   function openAccountMenu() {
     createAccountMenu();
@@ -500,12 +714,17 @@ document.addEventListener("DOMContentLoaded", () => {
 
     const menuEmail = document.getElementById("moonboxMenuEmail");
 
-    menuName.textContent = currentUser?.moonboxName || "MoonBox";
+    menuName.textContent =
+      currentProfile?.moonboxName || currentUser?.displayName || "MoonBox";
 
     menuEmail.textContent = currentUser?.email || "";
 
     accountMenu.classList.add("show");
   }
+
+  /* ========================================================
+     CLOSE ACCOUNT MENU
+  ======================================================== */
 
   function closeAccountMenu() {
     if (!accountMenu) {
@@ -550,7 +769,77 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 
   /* ========================================================
-     INITIAL STATE
+     FIREBASE AUTH STATE
+  ======================================================== */
+
+  onAuthStateChanged(auth, async (user) => {
+    /* ====================================================
+         LOGGED OUT
+      ==================================================== */
+
+    if (!user) {
+      isLoggedIn = false;
+
+      currentUser = null;
+
+      currentProfile = null;
+
+      moonboxName.textContent = "MoonBox";
+
+      closeAccountMenu();
+
+      console.log("MoonBox: no user signed in.");
+
+      return;
+    }
+
+    /* ====================================================
+         LOGGED IN
+      ==================================================== */
+
+    isLoggedIn = true;
+
+    currentUser = user;
+
+    try {
+      currentProfile = await loadUserProfile(user);
+
+      /* --------------------------------------------------
+           Profile missing
+        -------------------------------------------------- */
+
+      if (!currentProfile) {
+        const displayName =
+          user.displayName || user.email?.split("@")[0] || "User";
+
+        currentProfile = await createUserProfile(user, displayName);
+      }
+
+      /* --------------------------------------------------
+           Update MoonBox title
+        -------------------------------------------------- */
+
+      moonboxName.textContent = currentProfile.moonboxName;
+
+      console.log("MoonBox: signed in", currentProfile);
+    } catch (error) {
+      console.error("MoonBox: profile loading failed", error);
+
+      /*
+          Still show a useful name if
+          Firestore temporarily fails.
+        */
+
+      const fallbackName =
+        user.displayName || user.email?.split("@")[0] || "MoonBox";
+
+      moonboxName.textContent =
+        fallbackName === "MoonBox" ? "MoonBox" : `${fallbackName}'s MoonBox`;
+    }
+  });
+
+  /* ========================================================
+     INITIAL UI
   ======================================================== */
 
   moonboxName.textContent = "MoonBox";
