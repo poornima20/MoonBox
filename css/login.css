@@ -6,7 +6,6 @@
   cursor: pointer;
 }
 
-
 /* ==========================================================
    ACCOUNT OVERLAY
 ========================================================== */
@@ -48,7 +47,6 @@
   pointer-events: auto;
 }
 
-
 /* ==========================================================
    LOGIN WINDOW
 ========================================================== */
@@ -63,30 +61,22 @@
 
   box-sizing: border-box;
 
-  background:
-    linear-gradient(
-      180deg,
-      #171717 0%,
-      #111111 100%
-    );
+  background: linear-gradient(180deg, #171717 0%, #111111 100%);
 
   border: 1px solid rgba(255, 255, 255, 0.09);
 
   border-radius: 22px;
 
-  box-shadow:
-    0 30px 80px rgba(0, 0, 0, 0.65);
+  box-shadow: 0 30px 80px rgba(0, 0, 0, 0.65);
 
   transform: translateY(10px) scale(0.98);
 
   transition: transform 0.2s ease;
 }
 
-.moonbox-account-overlay.show
-.moonbox-account-window {
+.moonbox-account-overlay.show .moonbox-account-window {
   transform: translateY(0) scale(1);
 }
-
 
 /* ==========================================================
    CLOSE
@@ -132,7 +122,6 @@
   width: 17px;
   height: 17px;
 }
-
 
 /* ==========================================================
    HEADER
@@ -183,7 +172,6 @@
 
   line-height: 1.5;
 }
-
 
 /* ==========================================================
    FORM
@@ -253,7 +241,6 @@
   background: #101010;
 }
 
-
 /* ==========================================================
    PRIMARY BUTTON
 ========================================================== */
@@ -296,7 +283,6 @@
   transform: translateY(0);
 }
 
-
 /* ==========================================================
    MESSAGE
 ========================================================== */
@@ -312,7 +298,6 @@
 
   text-align: center;
 }
-
 
 /* ==========================================================
    SWITCH LOGIN / SIGN UP
@@ -348,7 +333,6 @@
   color: #fff;
 }
 
-
 /* ==========================================================
    SIGN UP EXTRA FIELD
 ========================================================== */
@@ -357,11 +341,9 @@
   display: none;
 }
 
-.moonbox-login-form.signup-mode
-.moonbox-name-field {
+.moonbox-login-form.signup-mode .moonbox-name-field {
   display: flex;
 }
-
 
 /* ==========================================================
    ACCOUNT MENU
@@ -379,19 +361,13 @@
 
   box-sizing: border-box;
 
-  background:
-    linear-gradient(
-      180deg,
-      #171717,
-      #101010
-    );
+  background: linear-gradient(180deg, #171717, #101010);
 
   border: 1px solid rgba(255, 255, 255, 0.08);
 
   border-radius: 16px;
 
-  box-shadow:
-    0 22px 55px rgba(0, 0, 0, 0.55);
+  box-shadow: 0 22px 55px rgba(0, 0, 0, 0.55);
 
   opacity: 0;
 
@@ -418,7 +394,6 @@
 
   transform: translateY(0);
 }
-
 
 /* ==========================================================
    ACCOUNT MENU HEADER
@@ -454,7 +429,6 @@
   text-overflow: ellipsis;
 }
 
-
 /* ==========================================================
    MENU DIVIDER
 ========================================================== */
@@ -466,7 +440,6 @@
 
   background: rgba(255, 255, 255, 0.06);
 }
-
 
 /* ==========================================================
    MENU BUTTON
@@ -512,18 +485,118 @@
   color: #fff;
 }
 
+/* ICON */
+
 .moonbox-account-menu button svg {
   width: 16px;
   height: 16px;
+
+  flex: 0 0 16px;
+
+  color: currentColor;
 }
 
+/* LABEL */
+
+.moonbox-account-menu button span {
+  display: block;
+
+  flex: 1;
+
+  margin: 0;
+
+  padding: 0;
+
+  color: inherit;
+
+  font-family: var(--font-main);
+
+  font-size: 12px;
+
+  font-weight: 400;
+
+  line-height: 1;
+
+  white-space: nowrap;
+
+  overflow: visible;
+
+  opacity: 1;
+
+  visibility: visible;
+}
+
+/* ==========================================================
+   MOBILE
+========================================================== */
+
+@media (max-width: 1020px) {
+  .moonbox-account-overlay {
+    align-items: center;
+
+    padding: 12px;
+  }
+
+  .moonbox-account-window {
+    max-width: none;
+
+    padding: 24px 20px;
+
+    border-radius: 20px;
+
+    margin-bottom: env(safe-area-inset-bottom);
+  }
+
+  .moonbox-account-header {
+    margin-bottom: 22px;
+  }
+
+  .moonbox-account-header h2 {
+    font-size: 20px;
+  }
+
+  /* ----------------------------------------
+     CENTER ACCOUNT MENU AT TOP
+  ---------------------------------------- */
+
+  .moonbox-account-menu {
+    position: fixed;
+
+    top: 70px;
+
+    left: 50%;
+
+    right: auto;
+
+    width: min(260px, calc(100vw - 24px));
+
+    transform: translateX(-50%) translateY(-5px);
+  }
+
+  .moonbox-account-menu.show {
+    transform: translateX(-50%) translateY(0);
+  }
+
+  /* ----------------------------------------
+     MAKE SURE MOBILE LABELS ARE VISIBLE
+  ---------------------------------------- */
+
+  .moonbox-account-menu button span {
+    display: block;
+
+    color: #aaa;
+
+    opacity: 1;
+
+    visibility: visible;
+  }
+}
 
 /* ==========================================================
    MOBILE
 ========================================================== */
 
 @media (max-width: 600px) {
-
   .moonbox-account-overlay {
     align-items: center;
 
@@ -551,9 +624,17 @@
   .moonbox-account-menu {
     position: fixed;
 
-    top: 62px;
-    right: 12px;
+    top: 70px;
+    left: 50%;
+
+    right: auto;
 
     width: min(260px, calc(100vw - 24px));
+
+    transform: translateX(-50%) translateY(-5px);
   }
-}F
+
+  .moonbox-account-menu.show {
+    transform: translateX(-50%) translateY(0);
+  }
+}
