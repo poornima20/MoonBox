@@ -962,3 +962,94 @@ window.moonboxCloudTestGetCurrentSong = () => testSong;
 
 console.log("MoonBox Cloud: cloud.js ready.");
 moonboxCloudTestSaveOneSong();
+
+/* ==========================================================
+   CLOUD TEST
+========================================================== */
+
+async function testSaveOneSong() {
+  if (!cloudUser) {
+    console.warn("MoonBox Cloud: user is not signed in.");
+
+    return;
+  }
+
+  /* --------------------------------------------------------
+     TEMPORARY TEST SONG
+
+     This is NOT your real local song.
+
+     We are only testing whether cloud.js can successfully
+     write a song document to Firestore.
+  -------------------------------------------------------- */
+
+  const testSong = {
+    id: "moonbox-test-song-001",
+
+    name: "Akame ga Kill!, Akame theme.mp3",
+
+    title: "Akame ga Kill!, Akame theme",
+
+    originalTitle: "Akame ga Kill!, Akame theme",
+
+    artist: "Anime Songs",
+
+    folderId: "test-folder",
+
+    folderName: "Anime Songs",
+
+    duration: 168,
+
+    tags: ["anime"],
+
+    size: 0,
+
+    lastModified: Date.now(),
+
+    cover: null,
+
+    file: null,
+  };
+
+  try {
+    console.log("MoonBox Cloud: saving test song...");
+
+    const savedSong = await saveCloudSongWithHash(testSong);
+
+    console.log("MoonBox Cloud: TEST SUCCESS", savedSong);
+
+    return savedSong;
+  } catch (error) {
+    console.error("MoonBox Cloud: TEST FAILED", error);
+  }
+}
+
+/* ==========================================================
+   TEST READ SONGS
+========================================================== */
+
+async function testReadCloudSongs() {
+  try {
+    const songs = await getAllCloudSongs();
+
+    console.log("MoonBox Cloud: songs currently in Firestore:", songs);
+
+    return songs;
+  } catch (error) {
+    console.error("MoonBox Cloud: failed to read songs:", error);
+  }
+}
+
+/* ==========================================================
+   EXPOSE TEST FUNCTIONS
+========================================================== */
+
+window.moonboxCloudTestSaveOneSong = testSaveOneSong;
+
+window.moonboxCloudTestReadSongs = testReadCloudSongs;
+
+/* ==========================================================
+   CLOUD.JS READY
+========================================================== */
+
+console.log("MoonBox Cloud: cloud.js ready.");
