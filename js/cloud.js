@@ -961,3 +961,4 @@ window.moonboxCloudTestGetCurrentSong = () => testSong;
 ========================================================== */
 
 console.log("MoonBox Cloud: cloud.js ready.");
+moonboxCloudTestSaveOneSong();
