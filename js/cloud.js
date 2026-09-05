@@ -832,14 +832,7 @@ export {
 /* ==========================================================
    CLOUD TEST
    ----------------------------------------------------------
-   This section is ONLY for testing the first song upload.
-
-   IMPORTANT:
-   It does NOT automatically upload songs.
-
-   We wait for MoonBox to provide a song through its existing
-   events, then expose a manual test function in the browser
-   console.
+   Temporary browser-console testing helpers.
 ========================================================== */
 
 let testSong = null;
@@ -851,15 +844,9 @@ let testSong = null;
 document.addEventListener("moonbox:libraryQueueChanged", (event) => {
   const songs = event.detail?.songs || [];
 
-  if (songs.length === 0) {
+  if (!songs.length) {
     return;
   }
-
-  /*
-      Keep the first available song for testing.
-
-      Nothing is uploaded here.
-    */
 
   testSong = songs[0];
 
@@ -867,21 +854,16 @@ document.addEventListener("moonbox:libraryQueueChanged", (event) => {
 });
 
 /* ==========================================================
-   RECEIVE PLAYED SONG
+   RECEIVE SELECTED / PLAYED SONG
 ========================================================== */
 
 document.addEventListener("moonbox:playFromLibrary", (event) => {
   const songs = event.detail?.songs || [];
-
   const index = event.detail?.index ?? 0;
 
   if (!songs[index]) {
     return;
   }
-
-  /*
-      This is the exact song the user selected.
-    */
 
   testSong = songs[index];
 
@@ -889,146 +871,68 @@ document.addEventListener("moonbox:playFromLibrary", (event) => {
 });
 
 /* ==========================================================
-   TEST SAVE ONE SONG
+   TEST: GET CURRENT LOCAL SONG
+========================================================== */
+
+function testGetCurrentSong() {
+  if (!testSong) {
+    console.warn("MoonBox Cloud: no test song available.");
+
+    console.warn("Open Library and select/play a song first.");
+
+    return null;
+  }
+
+  console.log("MoonBox Cloud: CURRENT LOCAL SONG", testSong);
+
+  return testSong;
+}
+
+/* ==========================================================
+   TEST: SAVE REAL LOCAL SONG
 ========================================================== */
 
 async function testSaveOneSong() {
   if (!testSong) {
     console.warn("MoonBox Cloud: no test song available.");
 
-    console.warn("Open Library and click/play a song first.");
+    console.warn("Open Library and select/play a song first.");
 
-    return;
+    return null;
   }
 
   if (!cloudUser) {
     console.warn("MoonBox Cloud: user is not signed in.");
 
-    return;
+    return null;
   }
 
   try {
-    console.log("MoonBox Cloud: saving test song...", testSong);
+    console.log("MoonBox Cloud: saving REAL local song...", testSong);
 
     const savedSong = await saveCloudSongWithHash(testSong);
 
-    console.log("MoonBox Cloud: TEST SUCCESS", savedSong);
+    console.log("MoonBox Cloud: REAL SONG SAVE SUCCESS", savedSong);
 
     return savedSong;
   } catch (error) {
-    console.error("MoonBox Cloud: TEST FAILED", error);
+    console.error("MoonBox Cloud: REAL SONG SAVE FAILED", error);
 
     throw error;
   }
 }
 
 /* ==========================================================
-   TEST READ ALL SONGS
+   TEST: READ ALL CLOUD SONGS
 ========================================================== */
 
 async function testReadCloudSongs() {
-  try {
-    const songs = await getAllCloudSongs();
-
-    console.log("MoonBox Cloud: songs in Firestore", songs);
-
-    return songs;
-  } catch (error) {
-    console.error("MoonBox Cloud: failed to read songs", error);
-
-    throw error;
-  }
-}
-
-/* ==========================================================
-   EXPOSE TEST FUNCTIONS
-========================================================== */
-
-/*
-  These are temporary browser-console helpers.
-
-  We will remove this section later.
-*/
-
-window.moonboxCloudTestSaveOneSong = testSaveOneSong;
-
-window.moonboxCloudTestReadSongs = testReadCloudSongs;
-
-window.moonboxCloudTestGetCurrentSong = () => testSong;
-
-/* ==========================================================
-   CLOUD.JS READY
-========================================================== */
-
-console.log("MoonBox Cloud: cloud.js ready.");
-moonboxCloudTestSaveOneSong();
-
-/* ==========================================================
-   CLOUD TEST
-========================================================== */
-
-async function testSaveOneSong() {
   if (!cloudUser) {
     console.warn("MoonBox Cloud: user is not signed in.");
 
-    return;
+    return [];
   }
 
-  /* --------------------------------------------------------
-     TEMPORARY TEST SONG
-
-     This is NOT your real local song.
-
-     We are only testing whether cloud.js can successfully
-     write a song document to Firestore.
-  -------------------------------------------------------- */
-
-  const testSong = {
-    id: "moonbox-test-song-001",
-
-    name: "Akame ga Kill!, Akame theme.mp3",
-
-    title: "Akame ga Kill!, Akame theme",
-
-    originalTitle: "Akame ga Kill!, Akame theme",
-
-    artist: "Anime Songs",
-
-    folderId: "test-folder",
-
-    folderName: "Anime Songs",
-
-    duration: 168,
-
-    tags: ["anime"],
-
-    size: 0,
-
-    lastModified: Date.now(),
-
-    cover: null,
-
-    file: null,
-  };
-
-  try {
-    console.log("MoonBox Cloud: saving test song...");
-
-    const savedSong = await saveCloudSongWithHash(testSong);
-
-    console.log("MoonBox Cloud: TEST SUCCESS", savedSong);
-
-    return savedSong;
-  } catch (error) {
-    console.error("MoonBox Cloud: TEST FAILED", error);
-  }
-}
-
-/* ==========================================================
-   TEST READ SONGS
-========================================================== */
-
-async function testReadCloudSongs() {
   try {
     const songs = await getAllCloudSongs();
 
@@ -1037,12 +941,16 @@ async function testReadCloudSongs() {
     return songs;
   } catch (error) {
     console.error("MoonBox Cloud: failed to read songs:", error);
+
+    throw error;
   }
 }
 
 /* ==========================================================
    EXPOSE TEST FUNCTIONS
 ========================================================== */
+
+window.moonboxCloudTestGetCurrentSong = testGetCurrentSong;
 
 window.moonboxCloudTestSaveOneSong = testSaveOneSong;
 
