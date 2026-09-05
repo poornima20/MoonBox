@@ -2,11 +2,13 @@
    MOONBOX CLOUD
    Firebase / Firestore data layer
 
-   IMPORTANT:
-   This file does NOT automatically upload anything.
+   Automatic cloud synchronization.
 
-   Other MoonBox files will call these functions when we
-   are ready to sync local data with the cloud.
+   IMPORTANT:
+   - Audio files remain local.
+   - Firestore stores music metadata.
+   - Songs are stored per Firebase user.
+   - No changes are required in library.js or player.js.
 ========================================================== */
 
 /* ==========================================================
@@ -36,31 +38,66 @@ import {
 
 let cloudUser = null;
 
+let cloudReady = false;
+
 /*
-    Other MoonBox files can listen for:
+   Prevent duplicate sync operations.
 
-        moonbox:cloudReady
+   Key:
+       local song ID
 
-    or:
-
-        moonbox:cloudSignedOut
+   Value:
+       last known local state signature
 */
 
-onAuthStateChanged(auth, (user) => {
+const syncCache = new Map();
+
+/*
+   Prevent multiple simultaneous saves
+   for the same song.
+*/
+
+const syncInProgress = new Map();
+
+/* ==========================================================
+   FIREBASE AUTH STATE
+========================================================== */
+
+onAuthStateChanged(auth, async (user) => {
   cloudUser = user || null;
+
+  cloudReady = !!user;
 
   if (user) {
     console.log("MoonBox Cloud: signed in", user.uid);
 
+    /*
+       Tell the rest of MoonBox that cloud is ready.
+    */
+
     document.dispatchEvent(
       new CustomEvent("moonbox:cloudReady", {
         detail: {
-          user: user,
+          user,
         },
       }),
     );
+
+    /*
+       Give Library time to initialize,
+       then request a cloud synchronization.
+
+       library.js already broadcasts its current
+       queue whenever it renders.
+    */
+
+    setTimeout(() => {
+      document.dispatchEvent(new CustomEvent("moonbox:requestCloudSync"));
+    }, 500);
   } else {
     console.log("MoonBox Cloud: signed out");
+
+    syncCache.clear();
 
     document.dispatchEvent(new CustomEvent("moonbox:cloudSignedOut"));
   }
@@ -70,14 +107,6 @@ onAuthStateChanged(auth, (user) => {
    GET CURRENT CLOUD USER
 ========================================================== */
 
-/*
-    Returns the currently authenticated Firebase user.
-
-    Returns:
-        Firebase User
-        or null
-*/
-
 function getCloudUser() {
   return cloudUser;
 }
@@ -85,15 +114,6 @@ function getCloudUser() {
 /* ==========================================================
    REQUIRE LOGIN
 ========================================================== */
-
-/*
-    Used before performing cloud operations.
-
-    Example:
-
-        requireCloudUser();
-
-*/
 
 function requireCloudUser() {
   if (!cloudUser) {
@@ -107,15 +127,6 @@ function requireCloudUser() {
    USER PATH
 ========================================================== */
 
-/*
-    Every user's data lives inside their own UID.
-
-        users/{uid}
-
-    This prevents one user from seeing another user's
-    MoonBox data.
-*/
-
 function getUserRef() {
   const user = requireCloudUser();
 
@@ -125,12 +136,6 @@ function getUserRef() {
 /* ==========================================================
    SONG COLLECTION
 ========================================================== */
-
-/*
-    Path:
-
-        users/{uid}/songs
-*/
 
 function getSongsCollection() {
   const user = requireCloudUser();
@@ -142,12 +147,6 @@ function getSongsCollection() {
    TAG COLLECTION
 ========================================================== */
 
-/*
-    Path:
-
-        users/{uid}/tags
-*/
-
 function getTagsCollection() {
   const user = requireCloudUser();
 
@@ -155,28 +154,8 @@ function getTagsCollection() {
 }
 
 /* ==========================================================
-   CREATE CLOUD SONG ID
+   CLOUD SONG ID
 ========================================================== */
-
-/*
-    IMPORTANT:
-
-    This is NOT the final local-song identity system yet.
-
-    For now we use the existing local song ID.
-
-    Later we will add a permanent MoonBox songId so that:
-
-        same song
-        different device
-        replaced local file
-        changed SHA
-
-    can still resolve to the same cloud song.
-
-    We are deliberately keeping that integration out of
-    this first cloud.js stage.
-*/
 
 function getCloudSongId(song) {
   if (!song) {
@@ -191,20 +170,8 @@ function getCloudSongId(song) {
 }
 
 /* ==========================================================
-   CREATE CLOUD TAG ID
+   CLOUD TAG ID
 ========================================================== */
-
-/*
-    Your existing system already stores tags as IDs:
-
-        song.tags = ["all", "anime"]
-
-    We keep that structure.
-
-    The tag itself lives separately in:
-
-        users/{uid}/tags/{tagId}
-*/
 
 function getCloudTagId(tag) {
   if (!tag) {
@@ -238,20 +205,6 @@ function getCloudTagId(tag) {
    SONG → CLOUD DATA
 ========================================================== */
 
-/*
-    Converts your local song object into a Firestore-safe
-    object.
-
-    We NEVER put the actual File object into Firestore.
-
-    song.file stays local.
-
-    Later:
-        Firebase Storage
-            ↓
-        actual audio / artwork files
-*/
-
 function createCloudSongData(song) {
   if (!song) {
     throw new Error("MoonBox Cloud: song is required.");
@@ -260,17 +213,9 @@ function createCloudSongData(song) {
   const cloudSongId = getCloudSongId(song);
 
   return {
-    /* ----------------------------------------------
-       Identity
-    ---------------------------------------------- */
-
     songId: cloudSongId,
 
     localSongId: String(song.id || ""),
-
-    /* ----------------------------------------------
-       Song information
-    ---------------------------------------------- */
 
     title: song.title || "",
 
@@ -278,33 +223,25 @@ function createCloudSongData(song) {
 
     artist: song.artist || "",
 
-    /* ----------------------------------------------
-       Folder
-    ---------------------------------------------- */
+    album: song.album || "",
+
+    year: song.year || "",
+
+    genre: song.genre || "",
+
+    bitrate: song.bitrate || "",
+
+    format: song.format || "",
 
     folderId: song.folderId || null,
 
     folderName: song.folderName || "",
 
-    /* ----------------------------------------------
-       Duration
-    ---------------------------------------------- */
+    folderTagId: song.folderTagId || null,
 
     duration: Number(song.duration) || 0,
 
-    /* ----------------------------------------------
-       Tags
-    ---------------------------------------------- */
-
     tags: Array.isArray(song.tags) ? song.tags.map(String) : [],
-
-    /* ----------------------------------------------
-       Local file information
-
-       These are metadata only.
-
-       The actual audio file remains local.
-    ---------------------------------------------- */
 
     fileName: song.name || "",
 
@@ -312,55 +249,132 @@ function createCloudSongData(song) {
 
     lastModified: Number(song.lastModified) || 0,
 
-    /* ----------------------------------------------
-       Album artwork
-
-       Nothing uploaded yet.
-
-       Later this can contain a Firebase Storage
-       reference or URL.
-    ---------------------------------------------- */
-
     artwork: song.cover || null,
 
-    /* ----------------------------------------------
-       Cloud metadata
-    ---------------------------------------------- */
+    lyrics: typeof song.lyrics === "string" ? song.lyrics : "",
+
+    notes: typeof song.notes === "string" ? song.notes : "",
 
     updatedAt: serverTimestamp(),
   };
 }
 
 /* ==========================================================
-   SAVE SONG
+   CREATE LOCAL SONG SIGNATURE
 ========================================================== */
 
 /*
-    Creates or replaces:
+   Used only to prevent unnecessary Firestore writes.
 
-        users/{uid}/songs/{songId}
+   We are NOT using SHA yet.
 */
+
+function createSongSignature(song) {
+  if (!song) {
+    return "";
+  }
+
+  return JSON.stringify({
+    id: song.id || "",
+
+    title: song.title || "",
+
+    originalTitle: song.originalTitle || "",
+
+    artist: song.artist || "",
+
+    album: song.album || "",
+
+    year: song.year || "",
+
+    genre: song.genre || "",
+
+    bitrate: song.bitrate || "",
+
+    format: song.format || "",
+
+    folderId: song.folderId || null,
+
+    folderName: song.folderName || "",
+
+    folderTagId: song.folderTagId || null,
+
+    duration: Number(song.duration) || 0,
+
+    tags: Array.isArray(song.tags) ? [...song.tags].map(String).sort() : [],
+
+    fileName: song.name || "",
+
+    fileSize: Number(song.size) || 0,
+
+    lastModified: Number(song.lastModified) || 0,
+
+    cover: song.cover || null,
+
+    lyrics: typeof song.lyrics === "string" ? song.lyrics : "",
+
+    notes: typeof song.notes === "string" ? song.notes : "",
+  });
+}
+
+/* ==========================================================
+   SAVE SONG TO FIRESTORE
+========================================================== */
 
 async function saveCloudSong(song) {
   const user = requireCloudUser();
 
   const cloudSongId = getCloudSongId(song);
 
-  const songRef = doc(db, "users", user.uid, "songs", cloudSongId);
+  const signature = createSongSignature(song);
 
-  const data = createCloudSongData(song);
+  /*
+     Don't write the same unchanged song repeatedly.
+  */
 
-  await setDoc(songRef, data, {
-    merge: true,
-  });
+  if (syncCache.get(cloudSongId) === signature) {
+    return;
+  }
 
-  console.log("MoonBox Cloud: song saved", cloudSongId);
+  /*
+     If another save for this song is already running,
+     wait for it.
+  */
 
-  return {
-    id: cloudSongId,
+  if (syncInProgress.has(cloudSongId)) {
+    return syncInProgress.get(cloudSongId);
+  }
 
-    ...data,
-  };
+  const operation = (async () => {
+    try {
+      const songRef = doc(db, "users", user.uid, "songs", cloudSongId);
+
+      const data = createCloudSongData(song);
+
+      await setDoc(songRef, data, {
+        merge: true,
+      });
+
+      syncCache.set(cloudSongId, signature);
+
+      console.log("MoonBox Cloud: song synced", cloudSongId);
+
+      return {
+        id: cloudSongId,
+        ...data,
+      };
+    } catch (error) {
+      console.error("MoonBox Cloud: song sync failed", cloudSongId, error);
+
+      throw error;
+    } finally {
+      syncInProgress.delete(cloudSongId);
+    }
+  })();
+
+  syncInProgress.set(cloudSongId, operation);
+
+  return operation;
 }
 
 /* ==========================================================
@@ -380,7 +394,6 @@ async function getCloudSong(songId) {
 
   return {
     id: snapshot.id,
-
     ...snapshot.data(),
   };
 }
@@ -401,7 +414,6 @@ async function getAllCloudSongs() {
   snapshot.forEach((document) => {
     songs.push({
       id: document.id,
-
       ...document.data(),
     });
   });
@@ -412,19 +424,6 @@ async function getAllCloudSongs() {
 /* ==========================================================
    UPDATE SONG
 ========================================================== */
-
-/*
-    Used when the user changes:
-
-        title
-        artist
-        folder
-        tags
-        artwork
-        etc.
-
-    It does NOT replace the entire document.
-*/
 
 async function updateCloudSong(songId, changes) {
   const user = requireCloudUser();
@@ -437,9 +436,14 @@ async function updateCloudSong(songId, changes) {
 
   await updateDoc(songRef, {
     ...changes,
-
     updatedAt: serverTimestamp(),
   });
+
+  /*
+     Clear cache because metadata changed.
+  */
+
+  syncCache.delete(String(songId));
 
   console.log("MoonBox Cloud: song updated", songId);
 }
@@ -455,6 +459,8 @@ async function deleteCloudSong(songId) {
 
   await deleteDoc(songRef);
 
+  syncCache.delete(String(songId));
+
   console.log("MoonBox Cloud: song deleted", songId);
 }
 
@@ -466,7 +472,7 @@ function createCloudTagData(tag) {
   const tagId = getCloudTagId(tag);
 
   return {
-    tagId: tagId,
+    tagId,
 
     name: typeof tag === "string" ? tag : tag.name || "",
 
@@ -499,7 +505,6 @@ async function saveCloudTag(tag) {
 
   return {
     id: tagId,
-
     ...data,
   };
 }
@@ -521,7 +526,6 @@ async function getCloudTag(tagId) {
 
   return {
     id: snapshot.id,
-
     ...snapshot.data(),
   };
 }
@@ -540,7 +544,6 @@ async function getAllCloudTags() {
   snapshot.forEach((document) => {
     tags.push({
       id: document.id,
-
       ...document.data(),
     });
   });
@@ -559,7 +562,6 @@ async function updateCloudTag(tagId, changes) {
 
   await updateDoc(tagRef, {
     ...changes,
-
     updatedAt: serverTimestamp(),
   });
 
@@ -581,16 +583,8 @@ async function deleteCloudTag(tagId) {
 }
 
 /* ==========================================================
-   SAVE USER CLOUD PROFILE
+   USER PROFILE
 ========================================================== */
-
-/*
-    This is separate from login.js.
-
-    login.js creates the initial user profile.
-
-    cloud.js can later update cloud-related account data.
-*/
 
 async function getCloudUserProfile() {
   const user = requireCloudUser();
@@ -605,7 +599,6 @@ async function getCloudUserProfile() {
 
   return {
     id: snapshot.id,
-
     ...snapshot.data(),
   };
 }
@@ -621,7 +614,6 @@ async function updateCloudUserProfile(changes) {
 
   await updateDoc(userRef, {
     ...changes,
-
     updatedAt: serverTimestamp(),
   });
 
@@ -629,38 +621,8 @@ async function updateCloudUserProfile(changes) {
 }
 
 /* ==========================================================
-   CALCULATE FILE SHA-256
+   SHA-256
 ========================================================== */
-
-/*
-    IMPORTANT:
-
-    This DOES NOT upload the file.
-
-    It only calculates a fingerprint of the local file.
-
-    This will become important later for:
-
-        Device A
-             ↓
-        local song
-             ↓
-        SHA-256
-             ↓
-        cloud song
-
-        Device B
-             ↓
-        different local file object
-             ↓
-        SHA-256
-             ↓
-        identify matching song
-
-
-    We are storing the SHA separately from the main
-    metadata for now.
-*/
 
 async function calculateFileHash(file) {
   if (!file) {
@@ -681,14 +643,8 @@ async function calculateFileHash(file) {
 }
 
 /* ==========================================================
-   ADD FILE HASH TO SONG
+   CREATE CLOUD SONG WITH HASH
 ========================================================== */
-
-/*
-    This creates a cloud-ready copy of the song.
-
-    It does NOT modify the original local song object.
-*/
 
 async function createCloudSongWithHash(song) {
   const data = createCloudSongData(song);
@@ -711,43 +667,49 @@ async function saveCloudSongWithHash(song) {
 
   const cloudSongId = getCloudSongId(song);
 
-  const songRef = doc(db, "users", user.uid, "songs", cloudSongId);
+  const signature = createSongSignature(song);
 
-  const data = await createCloudSongWithHash(song);
+  if (syncCache.get(cloudSongId) === signature) {
+    return;
+  }
 
-  data.updatedAt = serverTimestamp();
+  if (syncInProgress.has(cloudSongId)) {
+    return syncInProgress.get(cloudSongId);
+  }
 
-  await setDoc(songRef, data, {
-    merge: true,
-  });
+  const operation = (async () => {
+    try {
+      const songRef = doc(db, "users", user.uid, "songs", cloudSongId);
 
-  console.log("MoonBox Cloud: song + SHA saved", cloudSongId);
+      const data = await createCloudSongWithHash(song);
 
-  return {
-    id: cloudSongId,
+      data.updatedAt = serverTimestamp();
 
-    ...data,
-  };
+      await setDoc(songRef, data, {
+        merge: true,
+      });
+
+      syncCache.set(cloudSongId, signature);
+
+      console.log("MoonBox Cloud: song + hash synced", cloudSongId);
+
+      return {
+        id: cloudSongId,
+        ...data,
+      };
+    } finally {
+      syncInProgress.delete(cloudSongId);
+    }
+  })();
+
+  syncInProgress.set(cloudSongId, operation);
+
+  return operation;
 }
 
 /* ==========================================================
-   FIND CLOUD SONG BY FILE HASH
+   FIND CLOUD SONG BY HASH
 ========================================================== */
-
-/*
-    Later this lets another device say:
-
-        "I found this local file."
-
-    and ask:
-
-        "Does MoonBox know this file?"
-
-    Example:
-
-        findCloudSongByHash("abc123...")
-
-*/
 
 async function findCloudSongByHash(fileHash) {
   if (!fileHash) {
@@ -756,32 +718,12 @@ async function findCloudSongByHash(fileHash) {
 
   const songs = await getAllCloudSongs();
 
-  const match = songs.find((song) => song.fileHash === fileHash);
-
-  return match || null;
+  return songs.find((song) => song.fileHash === fileHash) || null;
 }
 
 /* ==========================================================
-   FIND CLOUD SONG BY ORIGINAL FILENAME
+   FIND CLOUD SONGS BY FILENAME
 ========================================================== */
-
-/*
-    SHA is the strongest match.
-
-    Filename is useful as a secondary fallback.
-
-    This is especially useful when:
-
-        same song
-        same filename
-        new file
-        different SHA
-
-    We can then detect:
-
-        "This may be a replacement file."
-
-*/
 
 async function findCloudSongsByFilename(fileName) {
   if (!fileName) {
@@ -792,6 +734,360 @@ async function findCloudSongsByFilename(fileName) {
 
   return songs.filter((song) => song.fileName === fileName);
 }
+
+/* ==========================================================
+   AUTOMATIC SONG SYNC
+========================================================== */
+
+/*
+   Library.js already emits:
+
+       moonbox:libraryQueueChanged
+
+   whenever its library queue changes.
+
+   We use that event to automatically
+   synchronize songs with Firestore.
+*/
+
+async function syncLibrarySongs(songs) {
+  if (!cloudReady) {
+    return;
+  }
+
+  if (!Array.isArray(songs)) {
+    return;
+  }
+
+  if (!songs.length) {
+    return;
+  }
+
+  console.log("MoonBox Cloud: checking library", songs.length, "songs");
+
+  /*
+     Sync in small sequential batches.
+
+     This avoids firing hundreds of Firestore
+     writes simultaneously.
+  */
+
+  for (const song of songs) {
+    try {
+      await saveCloudSong(song);
+    } catch (error) {
+      console.error("MoonBox Cloud: failed to sync song", song?.id, error);
+    }
+  }
+
+  console.log("MoonBox Cloud: library sync complete");
+}
+
+/* ==========================================================
+   LIBRARY QUEUE EVENT
+========================================================== */
+
+document.addEventListener("moonbox:libraryQueueChanged", (event) => {
+  const songs = event.detail?.songs || [];
+
+  syncLibrarySongs(songs);
+});
+
+/* ==========================================================
+   TITLE CHANGED
+========================================================== */
+
+document.addEventListener("moonbox:songTitleChanged", async (event) => {
+  if (!cloudReady) {
+    return;
+  }
+
+  const songId = event.detail?.songId;
+
+  if (!songId) {
+    return;
+  }
+
+  try {
+    await updateCloudSong(songId, {
+      title: event.detail?.title || "",
+
+      originalTitle: event.detail?.originalTitle || "",
+    });
+
+    console.log("MoonBox Cloud: title synced", songId);
+  } catch (error) {
+    console.error("MoonBox Cloud: title sync failed", error);
+  }
+});
+
+/* ==========================================================
+   TAGS CHANGED
+========================================================== */
+
+document.addEventListener("moonbox:songTagsChanged", async (event) => {
+  if (!cloudReady) {
+    return;
+  }
+
+  const songId = event.detail?.songId;
+
+  if (!songId) {
+    return;
+  }
+
+  const tags = Array.isArray(event.detail?.tags)
+    ? event.detail.tags.map(String)
+    : [];
+
+  try {
+    await updateCloudSong(songId, {
+      tags,
+    });
+
+    console.log("MoonBox Cloud: tags synced", songId);
+  } catch (error) {
+    console.error("MoonBox Cloud: tags sync failed", error);
+  }
+});
+
+/* ==========================================================
+   FULL METADATA CHANGED
+========================================================== */
+
+document.addEventListener("moonbox:songMetadataChanged", async (event) => {
+  if (!cloudReady) {
+    return;
+  }
+
+  const songId = event.detail?.songId;
+
+  const song = event.detail?.song;
+
+  if (!songId || !song) {
+    return;
+  }
+
+  try {
+    await saveCloudSong(song);
+
+    console.log("MoonBox Cloud: metadata synced", songId);
+  } catch (error) {
+    console.error("MoonBox Cloud: metadata sync failed", error);
+  }
+});
+
+/* ==========================================================
+   COVER CHANGED
+========================================================== */
+
+document.addEventListener("moonbox:coverChanged", async (event) => {
+  if (!cloudReady) {
+    return;
+  }
+
+  const songId = event.detail?.songId;
+
+  if (!songId) {
+    return;
+  }
+
+  try {
+    await updateCloudSong(songId, {
+      artwork: event.detail?.cover || null,
+    });
+
+    console.log("MoonBox Cloud: artwork synced", songId);
+  } catch (error) {
+    console.error("MoonBox Cloud: artwork sync failed", error);
+  }
+});
+
+/* ==========================================================
+   AUTOMATIC CLOUD LOOKUP
+========================================================== */
+
+/*
+   When Library sends a song, check whether
+   Firestore already has metadata for that ID.
+
+   If it exists, update the local object with
+   the cloud metadata.
+
+   IMPORTANT:
+
+   This is deliberately conservative.
+
+   Cloud metadata is only applied when a cloud
+   document exists.
+
+   We do NOT create a new local song here.
+*/
+
+async function applyCloudMetadataToSong(song) {
+  if (!cloudReady || !song?.id) {
+    return song;
+  }
+
+  try {
+    
+    let cloudSong = await getCloudSong(song.id);
+
+    if (!cloudSong && song.name) {
+      const matches = await findCloudSongsByFilename(song.name);
+
+      if (matches.length === 1) {
+        cloudSong = matches[0];
+
+        console.log("MoonBox Cloud: matched song by filename", song.name);
+      }
+    }
+
+    /*
+       Apply cloud metadata to the
+       existing local song object.
+
+       DO NOT replace:
+           file
+           name
+           size
+           lastModified
+
+       Those belong to the local file.
+    */
+
+    if (cloudSong.title !== undefined) {
+      song.title = cloudSong.title;
+    }
+
+    if (cloudSong.originalTitle !== undefined) {
+      song.originalTitle = cloudSong.originalTitle;
+    }
+
+    if (cloudSong.artist !== undefined) {
+      song.artist = cloudSong.artist;
+    }
+
+    if (cloudSong.album !== undefined) {
+      song.album = cloudSong.album;
+    }
+
+    if (cloudSong.year !== undefined) {
+      song.year = cloudSong.year;
+    }
+
+    if (cloudSong.genre !== undefined) {
+      song.genre = cloudSong.genre;
+    }
+
+    if (cloudSong.bitrate !== undefined) {
+      song.bitrate = cloudSong.bitrate;
+    }
+
+    if (cloudSong.format !== undefined) {
+      song.format = cloudSong.format;
+    }
+
+    if (cloudSong.folderId !== undefined) {
+      song.folderId = cloudSong.folderId;
+    }
+
+    if (cloudSong.folderName !== undefined) {
+      song.folderName = cloudSong.folderName;
+    }
+
+    if (cloudSong.folderTagId !== undefined) {
+      song.folderTagId = cloudSong.folderTagId;
+    }
+
+    if (Array.isArray(cloudSong.tags)) {
+      song.tags = [...cloudSong.tags];
+    }
+
+    if (cloudSong.duration !== undefined) {
+      song.duration = Number(cloudSong.duration) || song.duration || 0;
+    }
+
+    if (cloudSong.artwork !== undefined) {
+      song.cover = cloudSong.artwork;
+    }
+
+    if (cloudSong.lyrics !== undefined) {
+      song.lyrics = cloudSong.lyrics;
+    }
+
+    if (cloudSong.notes !== undefined) {
+      song.notes = cloudSong.notes;
+    }
+
+    /*
+       Cache the resulting state.
+    */
+
+    syncCache.set(String(song.id), createSongSignature(song));
+
+    console.log("MoonBox Cloud: metadata loaded from Firestore", song.id);
+
+    return song;
+  } catch (error) {
+    console.error(
+      "MoonBox Cloud: cloud metadata lookup failed",
+      song?.id,
+      error,
+    );
+
+    return song;
+  }
+}
+
+/* ==========================================================
+   CLOUD SYNC REQUEST
+========================================================== */
+
+/*
+   Other MoonBox components can dispatch:
+
+       moonbox:requestCloudSync
+
+   The next libraryQueueChanged event will
+   perform normal synchronization.
+
+   This event is intentionally lightweight.
+*/
+
+document.addEventListener("moonbox:requestCloudSync", () => {
+  console.log("MoonBox Cloud: cloud sync requested");
+});
+
+/* ==========================================================
+   PLAYER SONG SELECTION
+========================================================== */
+
+/*
+   When a song is selected in Player:
+
+       1. Check Firestore
+       2. If found, apply metadata
+       3. If not found, save local metadata
+*/
+
+document.addEventListener("moonbox:playFromLibrary", async (event) => {
+  if (!cloudReady) {
+    return;
+  }
+
+  const songs = event.detail?.songs || [];
+
+  const index = event.detail?.index ?? 0;
+
+  const song = songs[index];
+
+  if (!song) {
+    return;
+  }
+
+  await applyCloudMetadataToSong(song);
+});
 
 /* ==========================================================
    EXPORT API
@@ -830,134 +1126,7 @@ export {
 };
 
 /* ==========================================================
-   CLOUD TEST
-   ----------------------------------------------------------
-   Temporary browser-console testing helpers.
-========================================================== */
-
-let testSong = null;
-
-/* ==========================================================
-   RECEIVE SONG FROM LIBRARY
-========================================================== */
-
-document.addEventListener("moonbox:libraryQueueChanged", (event) => {
-  const songs = event.detail?.songs || [];
-
-  if (!songs.length) {
-    return;
-  }
-
-  testSong = songs[0];
-
-  console.log("MoonBox Cloud: test song ready", testSong);
-});
-
-/* ==========================================================
-   RECEIVE SELECTED / PLAYED SONG
-========================================================== */
-
-document.addEventListener("moonbox:playFromLibrary", (event) => {
-  const songs = event.detail?.songs || [];
-  const index = event.detail?.index ?? 0;
-
-  if (!songs[index]) {
-    return;
-  }
-
-  testSong = songs[index];
-
-  console.log("MoonBox Cloud: selected test song", testSong);
-});
-
-/* ==========================================================
-   TEST: GET CURRENT LOCAL SONG
-========================================================== */
-
-function testGetCurrentSong() {
-  if (!testSong) {
-    console.warn("MoonBox Cloud: no test song available.");
-
-    console.warn("Open Library and select/play a song first.");
-
-    return null;
-  }
-
-  console.log("MoonBox Cloud: CURRENT LOCAL SONG", testSong);
-
-  return testSong;
-}
-
-/* ==========================================================
-   TEST: SAVE REAL LOCAL SONG
-========================================================== */
-
-async function testSaveOneSong() {
-  if (!testSong) {
-    console.warn("MoonBox Cloud: no test song available.");
-
-    console.warn("Open Library and select/play a song first.");
-
-    return null;
-  }
-
-  if (!cloudUser) {
-    console.warn("MoonBox Cloud: user is not signed in.");
-
-    return null;
-  }
-
-  try {
-    console.log("MoonBox Cloud: saving REAL local song...", testSong);
-
-    const savedSong = await saveCloudSongWithHash(testSong);
-
-    console.log("MoonBox Cloud: REAL SONG SAVE SUCCESS", savedSong);
-
-    return savedSong;
-  } catch (error) {
-    console.error("MoonBox Cloud: REAL SONG SAVE FAILED", error);
-
-    throw error;
-  }
-}
-
-/* ==========================================================
-   TEST: READ ALL CLOUD SONGS
-========================================================== */
-
-async function testReadCloudSongs() {
-  if (!cloudUser) {
-    console.warn("MoonBox Cloud: user is not signed in.");
-
-    return [];
-  }
-
-  try {
-    const songs = await getAllCloudSongs();
-
-    console.log("MoonBox Cloud: songs currently in Firestore:", songs);
-
-    return songs;
-  } catch (error) {
-    console.error("MoonBox Cloud: failed to read songs:", error);
-
-    throw error;
-  }
-}
-
-/* ==========================================================
-   EXPOSE TEST FUNCTIONS
-========================================================== */
-
-window.moonboxCloudTestGetCurrentSong = testGetCurrentSong;
-
-window.moonboxCloudTestSaveOneSong = testSaveOneSong;
-
-window.moonboxCloudTestReadSongs = testReadCloudSongs;
-
-/* ==========================================================
-   CLOUD.JS READY
+   READY
 ========================================================== */
 
 console.log("MoonBox Cloud: cloud.js ready.");
