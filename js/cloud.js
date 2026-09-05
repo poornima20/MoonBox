@@ -751,7 +751,105 @@ async function findCloudSongsByFilename(fileName) {
 */
 
 /* ==========================================================
-   AUTOMATIC SONG SYNC
+   APPLY CLOUD SONG DATA TO LOCAL SONG
+========================================================== */
+
+function applyCloudSongDataToLocalSong(song, cloudSong) {
+  if (!song || !cloudSong) {
+    return song;
+  }
+
+  /*
+     IMPORTANT:
+     Never replace local file information.
+
+     Keep:
+       file
+       name
+       size
+       lastModified
+       id
+  */
+
+  if (cloudSong.title !== undefined) {
+    song.title = cloudSong.title;
+  }
+
+  if (cloudSong.originalTitle !== undefined) {
+    song.originalTitle = cloudSong.originalTitle;
+  }
+
+  if (cloudSong.artist !== undefined) {
+    song.artist = cloudSong.artist;
+  }
+
+  if (cloudSong.album !== undefined) {
+    song.album = cloudSong.album;
+  }
+
+  if (cloudSong.year !== undefined) {
+    song.year = cloudSong.year;
+  }
+
+  if (cloudSong.genre !== undefined) {
+    song.genre = cloudSong.genre;
+  }
+
+  if (cloudSong.bitrate !== undefined) {
+    song.bitrate = cloudSong.bitrate;
+  }
+
+  if (cloudSong.format !== undefined) {
+    song.format = cloudSong.format;
+  }
+
+  if (cloudSong.folderId !== undefined) {
+    song.folderId = cloudSong.folderId;
+  }
+
+  if (cloudSong.folderName !== undefined) {
+    song.folderName = cloudSong.folderName;
+  }
+
+  if (cloudSong.folderTagId !== undefined) {
+    song.folderTagId = cloudSong.folderTagId;
+  }
+
+  if (Array.isArray(cloudSong.tags)) {
+    song.tags = [...cloudSong.tags];
+  }
+
+  if (cloudSong.duration !== undefined) {
+    song.duration = Number(cloudSong.duration) || song.duration || 0;
+  }
+
+  /*
+     THIS IS THE IMPORTANT PART.
+
+     Firestore:
+         artwork
+
+     Local song:
+         cover
+  */
+
+  if (cloudSong.artwork !== undefined) {
+    song.cover = cloudSong.artwork;
+  }
+
+  if (cloudSong.lyrics !== undefined) {
+    song.lyrics = cloudSong.lyrics;
+  }
+
+  if (cloudSong.notes !== undefined) {
+    song.notes = cloudSong.notes;
+  }
+
+  return song;
+}
+
+/* ==========================================================
+   AUTOMATIC SONG SYNC + CLOUD METADATA HYDRATION
 ========================================================== */
 
 async function syncLibrarySongs(songs) {
@@ -765,6 +863,8 @@ async function syncLibrarySongs(songs) {
 
   console.log("MoonBox Cloud: checking library", songs.length, "songs");
 
+  let metadataChanged = false;
+
   for (const song of songs) {
     try {
       if (!song?.id) {
@@ -773,76 +873,33 @@ async function syncLibrarySongs(songs) {
 
       /*
          STEP 1
-         Check by local ID first.
+         Check exact local ID.
       */
 
-      const existingById = await getCloudSong(song.id);
-
-      if (existingById) {
-        /*
-           This exact local ID already exists.
-           Sync normally.
-        */
-
-        await saveCloudSong(song);
-
-        continue;
-      }
+      let cloudSong = await getCloudSong(song.id);
 
       /*
          STEP 2
-         Local ID doesn't exist.
+         If ID doesn't exist, check filename.
 
-         Check filename before creating
-         a new Firestore document.
+         This handles cross-device songs.
       */
 
-      if (song.name) {
+      if (!cloudSong && song.name) {
         const matches = await findCloudSongsByFilename(song.name);
 
-        /*
-           Exactly one song with this filename.
-           This is our cross-device match.
-        */
-
         if (matches.length === 1) {
-          const cloudSong = matches[0];
+          cloudSong = matches[0];
 
           console.log(
-            "MoonBox Cloud: existing song found by filename",
+            "MoonBox Cloud: cross-device match",
             song.name,
             "→",
             cloudSong.id,
           );
-
-          /*
-             IMPORTANT:
-
-             Do NOT call saveCloudSong(song) here.
-
-             That would create a duplicate using
-             the new browser's local ID.
-
-             Instead, use the existing cloud
-             metadata.
-          */
-
-          await applyCloudMetadataToSong(song);
-
-          continue;
-        }
-
-        /*
-           More than one matching filename means
-           we cannot safely know which cloud song
-           this is.
-
-           DO NOT create another document.
-        */
-
-        if (matches.length > 1) {
+        } else if (matches.length > 1) {
           console.warn(
-            "MoonBox Cloud: multiple cloud songs have the same filename. Skipping new song to prevent duplicate:",
+            "MoonBox Cloud: multiple songs have filename:",
             song.name,
           );
 
@@ -852,8 +909,39 @@ async function syncLibrarySongs(songs) {
 
       /*
          STEP 3
-         No matching ID.
-         No matching filename.
+         Existing cloud song found.
+
+         IMPORTANT:
+         Do NOT create a new document.
+
+         Instead, load the cloud metadata
+         into the local song.
+      */
+
+      if (cloudSong) {
+        const oldSignature = createSongSignature(song);
+
+        await applyCloudSongDataToLocalSong(song, cloudSong);
+
+        const newSignature = createSongSignature(song);
+
+        if (oldSignature !== newSignature) {
+          metadataChanged = true;
+        }
+
+        /*
+           Remember that this local ID has already
+           been matched to cloud metadata.
+        */
+
+        syncCache.set(String(song.id), newSignature);
+
+        continue;
+      }
+
+      /*
+         STEP 4
+         No cloud song exists.
 
          This is genuinely a new song.
       */
@@ -864,6 +952,26 @@ async function syncLibrarySongs(songs) {
     }
   }
 
+  /*
+     Tell Player again after cloud metadata
+     has been loaded.
+
+     This is important because the original
+     library event happened before the async
+     Firestore reads completed.
+  */
+
+  if (metadataChanged) {
+    document.dispatchEvent(
+      new CustomEvent("moonbox:libraryQueueChanged", {
+        detail: {
+          songs,
+          cloudHydrated: true,
+        },
+      }),
+    );
+  }
+
   console.log("MoonBox Cloud: library sync complete");
 }
 
@@ -872,6 +980,15 @@ async function syncLibrarySongs(songs) {
 ========================================================== */
 
 document.addEventListener("moonbox:libraryQueueChanged", (event) => {
+  /*
+       If this event was already hydrated by cloud.js,
+       don't start another sync cycle.
+    */
+
+  if (event.detail?.cloudHydrated) {
+    return;
+  }
+
   const songs = event.detail?.songs || [];
 
   syncLibrarySongs(songs);
@@ -1011,28 +1128,13 @@ document.addEventListener("moonbox:coverChanged", async (event) => {
 /* ==========================================================
    AUTOMATIC CLOUD LOOKUP
 ========================================================== */
-
 async function applyCloudMetadataToSong(song) {
   if (!cloudReady || !song?.id) {
     return song;
   }
 
   try {
-    /*
-       STEP 1
-       Try exact local ID.
-    */
-
     let cloudSong = await getCloudSong(song.id);
-
-    /*
-       STEP 2
-       If local ID does not exist,
-       try exact filename.
-
-       Filename is being used as the
-       temporary cross-device identity.
-    */
 
     if (!cloudSong && song.name) {
       const matches = await findCloudSongsByFilename(song.name);
@@ -1056,106 +1158,11 @@ async function applyCloudMetadataToSong(song) {
       }
     }
 
-    /*
-       Nothing exists in Firestore yet.
-
-       Leave the local song alone.
-    */
-
     if (!cloudSong) {
-      console.log(
-        "MoonBox Cloud: no cloud metadata found",
-        song.name || song.id,
-      );
-
       return song;
     }
 
-    /*
-       Apply cloud metadata to the existing
-       local song object.
-
-       DO NOT replace:
-         file
-         name
-         size
-         lastModified
-
-       Those belong to the local file.
-    */
-
-    if (cloudSong.title !== undefined) {
-      song.title = cloudSong.title;
-    }
-
-    if (cloudSong.originalTitle !== undefined) {
-      song.originalTitle = cloudSong.originalTitle;
-    }
-
-    if (cloudSong.artist !== undefined) {
-      song.artist = cloudSong.artist;
-    }
-
-    if (cloudSong.album !== undefined) {
-      song.album = cloudSong.album;
-    }
-
-    if (cloudSong.year !== undefined) {
-      song.year = cloudSong.year;
-    }
-
-    if (cloudSong.genre !== undefined) {
-      song.genre = cloudSong.genre;
-    }
-
-    if (cloudSong.bitrate !== undefined) {
-      song.bitrate = cloudSong.bitrate;
-    }
-
-    if (cloudSong.format !== undefined) {
-      song.format = cloudSong.format;
-    }
-
-    if (cloudSong.folderId !== undefined) {
-      song.folderId = cloudSong.folderId;
-    }
-
-    if (cloudSong.folderName !== undefined) {
-      song.folderName = cloudSong.folderName;
-    }
-
-    if (cloudSong.folderTagId !== undefined) {
-      song.folderTagId = cloudSong.folderTagId;
-    }
-
-    if (Array.isArray(cloudSong.tags)) {
-      song.tags = [...cloudSong.tags];
-    }
-
-    if (cloudSong.duration !== undefined) {
-      song.duration = Number(cloudSong.duration) || song.duration || 0;
-    }
-
-    if (cloudSong.artwork !== undefined) {
-      song.cover = cloudSong.artwork;
-    }
-
-    if (cloudSong.lyrics !== undefined) {
-      song.lyrics = cloudSong.lyrics;
-    }
-
-    if (cloudSong.notes !== undefined) {
-      song.notes = cloudSong.notes;
-    }
-
-    /*
-       Cache using the LOCAL ID.
-
-       The local ID can be different on another
-       device, but the filename matching above
-       has already connected it to the same
-       Firestore document.
-    */
+    applyCloudSongDataToLocalSong(song, cloudSong);
 
     syncCache.set(String(song.id), createSongSignature(song));
 
