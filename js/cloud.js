@@ -750,30 +750,114 @@ async function findCloudSongsByFilename(fileName) {
    synchronize songs with Firestore.
 */
 
+/* ==========================================================
+   AUTOMATIC SONG SYNC
+========================================================== */
+
 async function syncLibrarySongs(songs) {
   if (!cloudReady) {
     return;
   }
 
-  if (!Array.isArray(songs)) {
-    return;
-  }
-
-  if (!songs.length) {
+  if (!Array.isArray(songs) || !songs.length) {
     return;
   }
 
   console.log("MoonBox Cloud: checking library", songs.length, "songs");
 
-  /*
-     Sync in small sequential batches.
-
-     This avoids firing hundreds of Firestore
-     writes simultaneously.
-  */
-
   for (const song of songs) {
     try {
+      if (!song?.id) {
+        continue;
+      }
+
+      /*
+         STEP 1
+         Check by local ID first.
+      */
+
+      const existingById = await getCloudSong(song.id);
+
+      if (existingById) {
+        /*
+           This exact local ID already exists.
+           Sync normally.
+        */
+
+        await saveCloudSong(song);
+
+        continue;
+      }
+
+      /*
+         STEP 2
+         Local ID doesn't exist.
+
+         Check filename before creating
+         a new Firestore document.
+      */
+
+      if (song.name) {
+        const matches = await findCloudSongsByFilename(song.name);
+
+        /*
+           Exactly one song with this filename.
+           This is our cross-device match.
+        */
+
+        if (matches.length === 1) {
+          const cloudSong = matches[0];
+
+          console.log(
+            "MoonBox Cloud: existing song found by filename",
+            song.name,
+            "→",
+            cloudSong.id,
+          );
+
+          /*
+             IMPORTANT:
+
+             Do NOT call saveCloudSong(song) here.
+
+             That would create a duplicate using
+             the new browser's local ID.
+
+             Instead, use the existing cloud
+             metadata.
+          */
+
+          await applyCloudMetadataToSong(song);
+
+          continue;
+        }
+
+        /*
+           More than one matching filename means
+           we cannot safely know which cloud song
+           this is.
+
+           DO NOT create another document.
+        */
+
+        if (matches.length > 1) {
+          console.warn(
+            "MoonBox Cloud: multiple cloud songs have the same filename. Skipping new song to prevent duplicate:",
+            song.name,
+          );
+
+          continue;
+        }
+      }
+
+      /*
+         STEP 3
+         No matching ID.
+         No matching filename.
+
+         This is genuinely a new song.
+      */
+
       await saveCloudSong(song);
     } catch (error) {
       console.error("MoonBox Cloud: failed to sync song", song?.id, error);
@@ -924,14 +1008,31 @@ document.addEventListener("moonbox:coverChanged", async (event) => {
    We do NOT create a new local song here.
 */
 
+/* ==========================================================
+   AUTOMATIC CLOUD LOOKUP
+========================================================== */
+
 async function applyCloudMetadataToSong(song) {
   if (!cloudReady || !song?.id) {
     return song;
   }
 
   try {
-    
+    /*
+       STEP 1
+       Try exact local ID.
+    */
+
     let cloudSong = await getCloudSong(song.id);
+
+    /*
+       STEP 2
+       If local ID does not exist,
+       try exact filename.
+
+       Filename is being used as the
+       temporary cross-device identity.
+    */
 
     if (!cloudSong && song.name) {
       const matches = await findCloudSongsByFilename(song.name);
@@ -939,19 +1040,46 @@ async function applyCloudMetadataToSong(song) {
       if (matches.length === 1) {
         cloudSong = matches[0];
 
-        console.log("MoonBox Cloud: matched song by filename", song.name);
+        console.log(
+          "MoonBox Cloud: matched song by filename",
+          song.name,
+          "→",
+          cloudSong.id,
+        );
+      } else if (matches.length > 1) {
+        console.warn(
+          "MoonBox Cloud: multiple songs found with filename:",
+          song.name,
+        );
+
+        return song;
       }
     }
 
     /*
-       Apply cloud metadata to the
-       existing local song object.
+       Nothing exists in Firestore yet.
+
+       Leave the local song alone.
+    */
+
+    if (!cloudSong) {
+      console.log(
+        "MoonBox Cloud: no cloud metadata found",
+        song.name || song.id,
+      );
+
+      return song;
+    }
+
+    /*
+       Apply cloud metadata to the existing
+       local song object.
 
        DO NOT replace:
-           file
-           name
-           size
-           lastModified
+         file
+         name
+         size
+         lastModified
 
        Those belong to the local file.
     */
@@ -1021,12 +1149,22 @@ async function applyCloudMetadataToSong(song) {
     }
 
     /*
-       Cache the resulting state.
+       Cache using the LOCAL ID.
+
+       The local ID can be different on another
+       device, but the filename matching above
+       has already connected it to the same
+       Firestore document.
     */
 
     syncCache.set(String(song.id), createSongSignature(song));
 
-    console.log("MoonBox Cloud: metadata loaded from Firestore", song.id);
+    console.log(
+      "MoonBox Cloud: metadata loaded from Firestore",
+      song.name,
+      "→",
+      cloudSong.id,
+    );
 
     return song;
   } catch (error) {
