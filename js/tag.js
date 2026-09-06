@@ -1772,9 +1772,18 @@ document.addEventListener("moonbox:cloudTagsReady", (event) => {
   }
 
   /*
-     Cloud is the account-wide source of truth.
+     IMPORTANT:
 
-     Keep ALL locally because it is a system tag.
+     We must MERGE cloud tags with local folder tags.
+
+     Cloud tags:
+       User-created tags
+
+     Local folder tags:
+       Automatically created from folders
+
+     ALL:
+       Always local/system
   */
 
   const allTag = tags.find((tag) => tag.id === "all") || {
@@ -1784,30 +1793,69 @@ document.addEventListener("moonbox:cloudTagsReady", (event) => {
     system: true,
   };
 
-  tags = [
-    allTag,
-    ...cloudTags
-      .filter((tag) => tag && tag.id && tag.id !== "all")
-      .map((tag) => ({
-        id: String(tag.id),
-        name: tag.name || "",
-        icon: tag.icon || "moon",
-        system: false,
-        ...(tag.folderTag ? { folderTag: true } : {}),
-      })),
-  ];
+  /* --------------------------------------------------------
+     Keep all existing folder-generated tags
+  -------------------------------------------------------- */
 
+  const localFolderTags = tags.filter(
+    (tag) => tag && tag.folderTag === true && tag.id !== "all",
+  );
+
+  /* --------------------------------------------------------
+     Convert Firestore tags into normal MoonBox tags
+  -------------------------------------------------------- */
+
+  const normalizedCloudTags = cloudTags
+    .filter((tag) => tag && tag.id && tag.id !== "all")
+    .map((tag) => ({
+      id: String(tag.id),
+
+      name: tag.name || "",
+
+      icon: tag.icon || "moon",
+
+      system: false,
+
+      ...(tag.folderTag ? { folderTag: true } : {}),
+    }));
+
+  /* --------------------------------------------------------
+     Merge everything by ID
+
+     Cloud tag wins if the same ID exists.
+     Folder tags are preserved if they only exist locally.
+  -------------------------------------------------------- */
+
+  const mergedTags = new Map();
+
+  /* ALL first */
+  mergedTags.set(allTag.id, allTag);
+
+  /* Local folder tags */
+  localFolderTags.forEach((tag) => {
+    mergedTags.set(String(tag.id), tag);
+  });
+
+  /* Cloud tags */
+  normalizedCloudTags.forEach((tag) => {
+    mergedTags.set(String(tag.id), tag);
+  });
+
+  /* --------------------------------------------------------
+     Update local tag state
+  -------------------------------------------------------- */
+
+  tags = [...mergedTags.values()];
+
+  /* Save merged result to localStorage */
   saveTags();
 
+  /* Refresh Tag page */
   renderTags();
 
   updateSelectionFooter();
 
-  /*
-     Tell Player / Library that the available
-     tag definitions have changed.
-  */
-
+  /* Tell Player / Library that tag definitions changed */
   document.dispatchEvent(
     new CustomEvent("moonbox:tagsChanged", {
       detail: {
@@ -1816,9 +1864,8 @@ document.addEventListener("moonbox:cloudTagsReady", (event) => {
     }),
   );
 
-  console.log("MoonBox: cloud tags loaded into localStorage", tags);
+  console.log("MoonBox: cloud + folder tags merged", tags);
 });
-s;
 
 /* ==========================================================
    INITIALIZE
