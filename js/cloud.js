@@ -71,6 +71,8 @@ onAuthStateChanged(auth, async (user) => {
   if (user) {
     console.log("MoonBox Cloud: signed in", user.uid);
 
+    await syncCloudTagsToLocal();
+
     /*
        Tell the rest of MoonBox that cloud is ready.
     */
@@ -551,6 +553,35 @@ async function getAllCloudTags() {
   return tags;
 }
 
+/* ==========================================================
+   SYNC CLOUD TAGS → LOCAL TAGS
+========================================================== */
+
+async function syncCloudTagsToLocal() {
+  if (!cloudReady || !cloudUser) {
+    return;
+  }
+
+  try {
+    const cloudTags = await getAllCloudTags();
+
+    console.log(
+      "MoonBox Cloud: loaded",
+      cloudTags.length,
+      "tags from Firestore",
+    );
+
+    document.dispatchEvent(
+      new CustomEvent("moonbox:cloudTagsReady", {
+        detail: {
+          tags: cloudTags,
+        },
+      }),
+    );
+  } catch (error) {
+    console.error("MoonBox Cloud: failed to load tags", error);
+  }
+}
 /* ==========================================================
    UPDATE TAG
 ========================================================== */
@@ -1232,6 +1263,51 @@ document.addEventListener("moonbox:playFromLibrary", async (event) => {
   }
 
   await applyCloudMetadataToSong(song);
+});
+
+/* ==========================================================
+   Tag Creation / Update / Deletion
+========================================================== */
+document.addEventListener("moonbox:tagCreated", async (event) => {
+  if (!cloudUser || !cloudReady) return;
+
+  const tag = event.detail?.tag;
+  if (!tag?.id) return;
+
+  try {
+    await saveCloudTag(tag);
+    console.log("MoonBox Cloud: tag created", tag.id);
+  } catch (error) {
+    console.error("MoonBox Cloud: failed to save tag", error);
+  }
+});
+
+document.addEventListener("moonbox:tagUpdated", async (event) => {
+  if (!cloudUser || !cloudReady) return;
+
+  const tag = event.detail?.tag;
+  if (!tag?.id) return;
+
+  try {
+    await updateCloudTag(tag.id, tag);
+    console.log("MoonBox Cloud: tag updated", tag.id);
+  } catch (error) {
+    console.error("MoonBox Cloud: failed to update tag", error);
+  }
+});
+
+document.addEventListener("moonbox:tagDeleted", async (event) => {
+  if (!cloudUser || !cloudReady) return;
+
+  const tagId = event.detail?.tagId;
+  if (!tagId) return;
+
+  try {
+    await deleteCloudTag(tagId);
+    console.log("MoonBox Cloud: tag deleted", tagId);
+  } catch (error) {
+    console.error("MoonBox Cloud: failed to delete tag", error);
+  }
 });
 
 /* ==========================================================

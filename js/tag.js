@@ -1114,6 +1114,14 @@ function openAddTagModal() {
 
     saveTags();
 
+    document.dispatchEvent(
+      new CustomEvent("moonbox:tagCreated", {
+        detail: {
+          tag: { ...newTag },
+        },
+      }),
+    );
+
     setCustomOrder();
 
     closeModal();
@@ -1392,6 +1400,14 @@ function openEditTagModal(tagId) {
     tag.icon = newIcon;
 
     saveTags();
+
+    document.dispatchEvent(
+      new CustomEvent("moonbox:tagUpdated", {
+        detail: {
+          tag: { ...tag },
+        },
+      }),
+    );
 
     renderTags();
 
@@ -1743,6 +1759,66 @@ document.addEventListener("moonbox:foldersReady", (event) => {
     }),
   );
 });
+
+/* ==========================================================
+   CLOUD TAGS → LOCAL STORAGE
+========================================================== */
+
+document.addEventListener("moonbox:cloudTagsReady", (event) => {
+  const cloudTags = event.detail?.tags;
+
+  if (!Array.isArray(cloudTags)) {
+    return;
+  }
+
+  /*
+     Cloud is the account-wide source of truth.
+
+     Keep ALL locally because it is a system tag.
+  */
+
+  const allTag = tags.find((tag) => tag.id === "all") || {
+    id: "all",
+    name: "ALL",
+    icon: "layers-3",
+    system: true,
+  };
+
+  tags = [
+    allTag,
+    ...cloudTags
+      .filter((tag) => tag && tag.id && tag.id !== "all")
+      .map((tag) => ({
+        id: String(tag.id),
+        name: tag.name || "",
+        icon: tag.icon || "moon",
+        system: false,
+        ...(tag.folderTag ? { folderTag: true } : {}),
+      })),
+  ];
+
+  saveTags();
+
+  renderTags();
+
+  updateSelectionFooter();
+
+  /*
+     Tell Player / Library that the available
+     tag definitions have changed.
+  */
+
+  document.dispatchEvent(
+    new CustomEvent("moonbox:tagsChanged", {
+      detail: {
+        selectedTagIds: [...selectedTagIds],
+      },
+    }),
+  );
+
+  console.log("MoonBox: cloud tags loaded into localStorage", tags);
+});
+s;
 
 /* ==========================================================
    INITIALIZE
