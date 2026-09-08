@@ -84,18 +84,6 @@ onAuthStateChanged(auth, async (user) => {
         },
       }),
     );
-
-    /*
-       Give Library time to initialize,
-       then request a cloud synchronization.
-
-       library.js already broadcasts its current
-       queue whenever it renders.
-    */
-
-    setTimeout(() => {
-      document.dispatchEvent(new CustomEvent("moonbox:requestCloudSync"));
-    }, 500);
   } else {
     console.log("MoonBox Cloud: signed out");
 
@@ -767,21 +755,6 @@ async function findCloudSongsByFilename(fileName) {
 }
 
 /* ==========================================================
-   AUTOMATIC SONG SYNC
-========================================================== */
-
-/*
-   Library.js already emits:
-
-       moonbox:libraryQueueChanged
-
-   whenever its library queue changes.
-
-   We use that event to automatically
-   synchronize songs with Firestore.
-*/
-
-/* ==========================================================
    APPLY CLOUD SONG DATA TO LOCAL SONG
 ========================================================== */
 
@@ -878,152 +851,6 @@ function applyCloudSongDataToLocalSong(song, cloudSong) {
 
   return song;
 }
-
-/* ==========================================================
-   AUTOMATIC SONG SYNC + CLOUD METADATA HYDRATION
-========================================================== */
-
-async function syncLibrarySongs(songs) {
-  if (!cloudReady) {
-    return;
-  }
-
-  if (!Array.isArray(songs) || !songs.length) {
-    return;
-  }
-
-  console.log("MoonBox Cloud: checking library", songs.length, "songs");
-
-  let metadataChanged = false;
-
-  for (const song of songs) {
-    try {
-      if (!song?.id) {
-        continue;
-      }
-
-      /*
-         STEP 1
-         Check exact local ID.
-      */
-
-      let cloudSong = await getCloudSong(song.id);
-
-      /*
-         STEP 2
-         If ID doesn't exist, check filename.
-
-         This handles cross-device songs.
-      */
-
-      if (!cloudSong && song.name) {
-        const matches = await findCloudSongsByFilename(song.name);
-
-        if (matches.length === 1) {
-          cloudSong = matches[0];
-
-          console.log(
-            "MoonBox Cloud: cross-device match",
-            song.name,
-            "→",
-            cloudSong.id,
-          );
-        } else if (matches.length > 1) {
-          console.warn(
-            "MoonBox Cloud: multiple songs have filename:",
-            song.name,
-          );
-
-          continue;
-        }
-      }
-
-      /*
-         STEP 3
-         Existing cloud song found.
-
-         IMPORTANT:
-         Do NOT create a new document.
-
-         Instead, load the cloud metadata
-         into the local song.
-      */
-
-      if (cloudSong) {
-        const oldSignature = createSongSignature(song);
-
-        await applyCloudSongDataToLocalSong(song, cloudSong);
-
-        const newSignature = createSongSignature(song);
-
-        if (oldSignature !== newSignature) {
-          metadataChanged = true;
-        }
-
-        /*
-           Remember that this local ID has already
-           been matched to cloud metadata.
-        */
-
-        syncCache.set(String(song.id), newSignature);
-
-        continue;
-      }
-
-      /*
-         STEP 4
-         No cloud song exists.
-
-         This is genuinely a new song.
-      */
-
-      await saveCloudSong(song);
-    } catch (error) {
-      console.error("MoonBox Cloud: failed to sync song", song?.id, error);
-    }
-  }
-
-  /*
-     Tell Player again after cloud metadata
-     has been loaded.
-
-     This is important because the original
-     library event happened before the async
-     Firestore reads completed.
-  */
-
-  if (metadataChanged) {
-    document.dispatchEvent(
-      new CustomEvent("moonbox:libraryQueueChanged", {
-        detail: {
-          songs,
-          cloudHydrated: true,
-        },
-      }),
-    );
-  }
-
-  console.log("MoonBox Cloud: library sync complete");
-}
-
-/* ==========================================================
-   LIBRARY QUEUE EVENT
-========================================================== */
-
-document.addEventListener("moonbox:libraryQueueChanged", (event) => {
-  /*
-       If this event was already hydrated by cloud.js,
-       don't start another sync cycle.
-    */
-
-  if (event.detail?.cloudHydrated) {
-    return;
-  }
-
-  const songs = event.detail?.songs || [];
-
-  syncLibrarySongs(songs);
-});
 
 /* ==========================================================
    TITLE CHANGED
@@ -1217,35 +1044,8 @@ async function applyCloudMetadataToSong(song) {
 }
 
 /* ==========================================================
-   CLOUD SYNC REQUEST
-========================================================== */
-
-/*
-   Other MoonBox components can dispatch:
-
-       moonbox:requestCloudSync
-
-   The next libraryQueueChanged event will
-   perform normal synchronization.
-
-   This event is intentionally lightweight.
-*/
-
-document.addEventListener("moonbox:requestCloudSync", () => {
-  console.log("MoonBox Cloud: cloud sync requested");
-});
-
-/* ==========================================================
    PLAYER SONG SELECTION
 ========================================================== */
-
-/*
-   When a song is selected in Player:
-
-       1. Check Firestore
-       2. If found, apply metadata
-       3. If not found, save local metadata
-*/
 
 document.addEventListener("moonbox:playFromLibrary", async (event) => {
   if (!cloudReady) {
