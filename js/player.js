@@ -297,10 +297,9 @@ document.addEventListener("DOMContentLoaded", () => {
 
     /* Tell Library / Cloud layer */
     document.dispatchEvent(
-      new CustomEvent("moonbox:songTagsChanged", {
+      new CustomEvent("moonbox:songMetadataChanged", {
         detail: {
-          songId: song.id,
-          tags: [...song.tags],
+          songId: song.id || null,
           song: song,
         },
       }),
@@ -365,12 +364,10 @@ document.addEventListener("DOMContentLoaded", () => {
     titleEditor.classList.remove("editing");
 
     document.dispatchEvent(
-      new CustomEvent("moonbox:songTitleChanged", {
+      new CustomEvent("moonbox:songMetadataChanged", {
         detail: {
           songId: song.id || null,
-          title: originalTitle,
-          originalTitle,
-          restored: true,
+          song: song,
         },
       }),
     );
@@ -454,9 +451,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
     /* ========================================================
      FOLDER TAG IS MANDATORY
-     
-     The folder tag is stored on the song as folderTagId.
-     It can be selected, but never removed.
   ======================================================== */
 
     if (tagId === song.folderTagId) {
@@ -472,19 +466,35 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     /* ========================================================
-     TOGGLE NORMAL TAG
+     TOGGLE TAG
   ======================================================== */
 
     const index = song.tags.indexOf(tagId);
 
+    let added;
+
     if (index === -1) {
+      /*
+       Tag was not present.
+       Add it.
+    */
+
       song.tags.push(tagId);
+
+      added = true;
     } else {
+      /*
+       Tag was already present.
+       Remove it.
+    */
+
       song.tags.splice(index, 1);
+
+      added = false;
     }
 
     /* ========================================================
-     UPDATE UI
+     UPDATE PLAYER UI
   ======================================================== */
 
     renderPlayerTagPicker();
@@ -492,13 +502,20 @@ document.addEventListener("DOMContentLoaded", () => {
     renderPlayerTags();
 
     /* ========================================================
-     TELL LIBRARY
+     TELL CLOUD
   ======================================================== */
 
     document.dispatchEvent(
       new CustomEvent("moonbox:songTagsChanged", {
         detail: {
-          songId: song.id,
+          songId: song.id || null,
+
+          song: song,
+
+          tagId: tagId,
+
+          added: added,
+
           tags: [...song.tags],
         },
       }),
@@ -1033,10 +1050,10 @@ document.addEventListener("DOMContentLoaded", () => {
 
       /* Tell the rest of MoonBox */
       document.dispatchEvent(
-        new CustomEvent("moonbox:coverChanged", {
+        new CustomEvent("moonbox:songMetadataChanged", {
           detail: {
             songId: song.id || null,
-            cover: url,
+            song: song,
           },
         }),
       );
@@ -1263,6 +1280,15 @@ document.addEventListener("DOMContentLoaded", () => {
     lyricsEditor.classList.remove("active");
 
     lyricsView.classList.remove("hide");
+
+    document.dispatchEvent(
+      new CustomEvent("moonbox:songMetadataChanged", {
+        detail: {
+          songId: song.id || null,
+          song: song,
+        },
+      }),
+    );
   });
 
   lyricsFile?.addEventListener("change", async (event) => {
@@ -1278,6 +1304,15 @@ document.addEventListener("DOMContentLoaded", () => {
       const text = await file.text();
 
       song.lyrics = text;
+
+      document.dispatchEvent(
+        new CustomEvent("moonbox:songMetadataChanged", {
+          detail: {
+            songId: song.id || null,
+            song: song,
+          },
+        }),
+      );
 
       lyricsView.textContent = text;
 

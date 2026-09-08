@@ -28,6 +28,8 @@ import {
   updateDoc,
   deleteDoc,
   serverTimestamp,
+  arrayUnion,
+  arrayRemove,
   query,
   orderBy,
 } from "https://www.gstatic.com/firebasejs/12.18.0/firebase-firestore.js";
@@ -279,7 +281,7 @@ function createSongSignature(song) {
   }
 
   return JSON.stringify({
-    id: song.id || "",
+    songId: getCloudSongId(song),
 
     title: song.title || "",
 
@@ -405,72 +407,6 @@ async function getCloudSong(song) {
 }
 
 /* ==========================================================
-   GET ALL CLOUD SONGS
-========================================================== */
-
-async function getAllCloudSongs() {
-  const songsRef = getSongsCollection();
-
-  const songsQuery = query(songsRef, orderBy("title"));
-
-  const snapshot = await getDocs(songsQuery);
-
-  const songs = [];
-
-  snapshot.forEach((document) => {
-    songs.push({
-      id: document.id,
-      ...document.data(),
-    });
-  });
-
-  return songs;
-}
-
-/* ==========================================================
-   UPDATE SONG
-========================================================== */
-
-async function updateCloudSong(songId, changes) {
-  const user = requireCloudUser();
-
-  if (!songId) {
-    throw new Error("MoonBox Cloud: song ID is required.");
-  }
-
-  const songRef = doc(db, "users", user.uid, "songs", String(songId));
-
-  await updateDoc(songRef, {
-    ...changes,
-    updatedAt: serverTimestamp(),
-  });
-
-  /*
-     Clear cache because metadata changed.
-  */
-
-  syncCache.delete(String(songId));
-
-  console.log("MoonBox Cloud: song updated", songId);
-}
-
-/* ==========================================================
-   DELETE SONG
-========================================================== */
-
-async function deleteCloudSong(songId) {
-  const user = requireCloudUser();
-
-  const songRef = doc(db, "users", user.uid, "songs", String(songId));
-
-  await deleteDoc(songRef);
-
-  syncCache.delete(String(songId));
-
-  console.log("MoonBox Cloud: song deleted", songId);
-}
-
-/* ==========================================================
    TAG → CLOUD DATA
 ========================================================== */
 
@@ -513,6 +449,48 @@ async function saveCloudTag(tag) {
     id: tagId,
     ...data,
   };
+}
+
+async function addSongToCloudTag(tagId, song) {
+  const user = requireCloudUser();
+
+  const cloudSongId = getCloudSongId(song);
+
+  const tagRef = doc(db, "users", user.uid, "tags", String(tagId));
+
+  await setDoc(
+    tagRef,
+    {
+      songIds: arrayUnion(cloudSongId),
+      updatedAt: serverTimestamp(),
+    },
+    {
+      merge: true,
+    },
+  );
+
+  console.log("MoonBox Cloud: song added to tag", cloudSongId, tagId);
+}
+
+async function removeSongFromCloudTag(tagId, song) {
+  const user = requireCloudUser();
+
+  const cloudSongId = getCloudSongId(song);
+
+  const tagRef = doc(db, "users", user.uid, "tags", String(tagId));
+
+  await setDoc(
+    tagRef,
+    {
+      songIds: arrayRemove(cloudSongId),
+      updatedAt: serverTimestamp(),
+    },
+    {
+      merge: true,
+    },
+  );
+
+  console.log("MoonBox Cloud: song removed from tag", cloudSongId, tagId);
 }
 
 /* ==========================================================
@@ -855,34 +833,6 @@ function applyCloudSongDataToLocalSong(song, cloudSong) {
 }
 
 /* ==========================================================
-   TITLE CHANGED
-========================================================== */
-
-document.addEventListener("moonbox:songTitleChanged", async (event) => {
-  if (!cloudReady) {
-    return;
-  }
-
-  const songId = event.detail?.songId;
-
-  if (!songId) {
-    return;
-  }
-
-  try {
-    await updateCloudSong(songId, {
-      title: event.detail?.title || "",
-
-      originalTitle: event.detail?.originalTitle || "",
-    });
-
-    console.log("MoonBox Cloud: title synced", songId);
-  } catch (error) {
-    console.error("MoonBox Cloud: title sync failed", error);
-  }
-});
-
-/* ==========================================================
    TAGS CHANGED
 ========================================================== */
 
@@ -891,35 +841,38 @@ document.addEventListener("moonbox:songTagsChanged", async (event) => {
     return;
   }
 
-  const songId = event.detail?.songId;
   const song = event.detail?.song;
 
-  if (!songId || !song) {
+  const tagId = event.detail?.tagId;
+
+  const added = event.detail?.added;
+
+  if (!song || !tagId) {
     return;
   }
 
-  const tags = Array.isArray(event.detail?.tags)
-    ? event.detail.tags.map(String)
-    : [];
-
   try {
-    const existingCloudSong = await getCloudSong(songId);
+    /*
+     * Save the complete song metadata.
+     */
+    await saveCloudSong(song);
 
-    if (existingCloudSong) {
-      await updateCloudSong(songId, {
-        tags,
-      });
-
-      console.log("MoonBox Cloud: song tags updated", songId);
+    /*
+     * Update tag → songIds index.
+     */
+    if (added) {
+      await addSongToCloudTag(tagId, song);
     } else {
-      song.tags = tags;
-
-      await saveCloudSong(song);
-
-      console.log("MoonBox Cloud: song created from tag action", songId);
+      await removeSongFromCloudTag(tagId, song);
     }
+
+    console.log(
+      "MoonBox Cloud: tag membership synced",
+      tagId,
+      getCloudSongId(song),
+    );
   } catch (error) {
-    console.error("MoonBox Cloud: tags sync failed", error);
+    console.error("MoonBox Cloud: tag membership sync failed", error);
   }
 });
 
@@ -946,32 +899,6 @@ document.addEventListener("moonbox:songMetadataChanged", async (event) => {
     console.log("MoonBox Cloud: metadata synced", songId);
   } catch (error) {
     console.error("MoonBox Cloud: metadata sync failed", error);
-  }
-});
-
-/* ==========================================================
-   COVER CHANGED
-========================================================== */
-
-document.addEventListener("moonbox:coverChanged", async (event) => {
-  if (!cloudReady) {
-    return;
-  }
-
-  const songId = event.detail?.songId;
-
-  if (!songId) {
-    return;
-  }
-
-  try {
-    await updateCloudSong(songId, {
-      artwork: event.detail?.cover || null,
-    });
-
-    console.log("MoonBox Cloud: artwork synced", songId);
-  } catch (error) {
-    console.error("MoonBox Cloud: artwork sync failed", error);
   }
 });
 
@@ -1117,9 +1044,6 @@ export {
   saveCloudSong,
   saveCloudSongWithHash,
   getCloudSong,
-  getAllCloudSongs,
-  updateCloudSong,
-  deleteCloudSong,
 
   /* Tags */
   saveCloudTag,
@@ -1132,7 +1056,6 @@ export {
   calculateFileHash,
   createCloudSongWithHash,
   findCloudSongByHash,
-  findCloudSongsByFilename,
 };
 
 /* ==========================================================
