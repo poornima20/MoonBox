@@ -1711,6 +1711,59 @@ document.addEventListener("moonbox:removeTag", (event) => {
 });
 
 /* ==========================================================
+   PLAYER → TAG PAGE SONG TAG CHANGES
+   Keep tag counts synchronized immediately.
+========================================================== */
+
+document.addEventListener("moonbox:songTagsChanged", (event) => {
+  const song = event.detail?.song;
+
+  if (!song) {
+    return;
+  }
+
+  /* --------------------------------------------------------
+     Update the matching local song inside currentFolders
+  -------------------------------------------------------- */
+
+  currentFolders.forEach((folder) => {
+    if (!Array.isArray(folder.songs)) {
+      return;
+    }
+
+    const localSong = folder.songs.find(
+      (item) => String(item.id) === String(song.id),
+    );
+
+    if (!localSong) {
+      return;
+    }
+
+    /* Keep local tag membership synchronized */
+    localSong.tags = Array.isArray(song.tags) ? [...song.tags] : [];
+
+    /* Keep metadata reference values synchronized if needed */
+    if (song.title !== undefined) {
+      localSong.title = song.title;
+    }
+
+    if (song.artist !== undefined) {
+      localSong.artist = song.artist;
+    }
+  });
+
+  /* --------------------------------------------------------
+     Refresh tag counts immediately
+  -------------------------------------------------------- */
+
+  renderTags();
+
+  updateSelectionFooter();
+
+  refreshIcons();
+});
+
+/* ==========================================================
    FOLDER → TAG CONNECTION
 ========================================================== */
 

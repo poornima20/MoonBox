@@ -112,6 +112,32 @@ document.addEventListener("DOMContentLoaded", () => {
   );
 
   /* ==========================================================
+   REFRESH PLAYER TAG UI WHEN SONG TAGS CHANGE
+========================================================== */
+
+  document.addEventListener("moonbox:songTagsChanged", (event) => {
+    const changedSong = event.detail?.song;
+
+    const current = songs[currentSong];
+
+    if (!changedSong || !current) {
+      return;
+    }
+
+    if (String(changedSong.id) !== String(current.id)) {
+      return;
+    }
+
+    current.tags = Array.isArray(changedSong.tags) ? [...changedSong.tags] : [];
+
+    requestPlayerTags();
+
+    renderPlayerTagPicker();
+
+    renderPlayerTags();
+  });
+
+  /* ==========================================================
    GET MASTER TAG LIST FROM TAG.JS
 ========================================================== */
 
