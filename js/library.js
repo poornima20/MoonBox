@@ -327,12 +327,21 @@ RENDER SONGS
 
   function renderSongs() {
     songList.innerHTML = "";
-
     const allSongs = getAllSongs();
 
     /* ====================================================
-     SEARCH + TAG FILTER
-  ==================================================== */
+ TAG DEFINITIONS
+
+ Includes cloud tag songIds already loaded by tag.js.
+==================================================== */
+
+    const availableTags = getAvailableTags();
+
+    const tagMap = new Map(availableTags.map((tag) => [String(tag.id), tag]));
+
+    /* ====================================================
+ SEARCH + TAG FILTER
+==================================================== */
 
     const filtered = allSongs.filter((song) => {
       /* -----------------------------------------------
@@ -380,7 +389,8 @@ RENDER SONGS
         }
 
         return (
-          matchesSearch && actualTags.some((tagId) => song.tags.includes(tagId))
+          matchesSearch &&
+          actualTags.some((tagId) => songHasTag(song, tagId, tagMap))
         );
       }
 
@@ -392,7 +402,7 @@ RENDER SONGS
       if (filterMode === "intersection") {
         return (
           matchesSearch &&
-          actualTags.every((tagId) => song.tags.includes(tagId))
+          actualTags.every((tagId) => songHasTag(song, tagId, tagMap))
         );
       }
 
@@ -632,7 +642,7 @@ RENDER SONGS
       new CustomEvent("moonbox:requestTags", {
         detail: {
           setTags(tags) {
-            availableTags = tags;
+            availableTags = Array.isArray(tags) ? tags : [];
           },
         },
       }),
@@ -641,5 +651,50 @@ RENDER SONGS
     return availableTags;
   }
 
+  /* ======================================================
+   CHECK SONG MEMBERSHIP IN A TAG
+
+   Local/folder tags:
+      song.tags
+
+   Cloud/user tags:
+      tag.songIds
+
+   No Firebase read happens here.
+====================================================== */
+
+  function songHasTag(song, tagId, tagMap) {
+    if (!song) {
+      return false;
+    }
+
+    const tag = tagMap.get(tagId);
+
+    /* ----------------------------------------------------
+     Cloud tag
+  ---------------------------------------------------- */
+
+    if (tag && Array.isArray(tag.songIds)) {
+      const cloudSongId = String(
+        String(song.name || "")
+          .normalize("NFKC")
+          .trim()
+          .toLowerCase()
+          .replace(/\.[^/.]+$/, "")
+          .replace(/[^a-z0-9]+/g, "-")
+          .replace(/^-+|-+$/g, ""),
+      );
+
+      return tag.songIds.map(String).includes(cloudSongId);
+    }
+
+    /* ----------------------------------------------------
+     Local/folder tag
+  ---------------------------------------------------- */
+
+    const songTags = Array.isArray(song.tags) ? song.tags : [];
+
+    return songTags.includes(tagId);
+  }
   lucide.createIcons();
 });
