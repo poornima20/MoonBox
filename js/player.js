@@ -297,11 +297,11 @@ document.addEventListener("DOMContentLoaded", () => {
 
     /* Tell Library / Cloud layer */
     document.dispatchEvent(
-      new CustomEvent("moonbox:songTitleChanged", {
+      new CustomEvent("moonbox:songTagsChanged", {
         detail: {
-          songId: song.id || null,
-          title: value,
-          originalTitle: song.originalTitle,
+          songId: song.id,
+          tags: [...song.tags],
+          song: song,
         },
       }),
     );

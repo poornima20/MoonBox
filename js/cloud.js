@@ -147,16 +147,30 @@ function getTagsCollection() {
    CLOUD SONG ID
 ========================================================== */
 
+function normalizeSongFilename(fileName) {
+  if (!fileName) {
+    throw new Error("MoonBox Cloud: song filename is required.");
+  }
+
+  return String(fileName)
+    .normalize("NFKC")
+    .trim()
+    .toLowerCase()
+    .replace(/\.[^/.]+$/, "")
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "");
+}
+
 function getCloudSongId(song) {
   if (!song) {
     throw new Error("MoonBox Cloud: song is required.");
   }
 
-  if (!song.id) {
-    throw new Error("MoonBox Cloud: song has no local ID.");
+  if (!song.name) {
+    throw new Error("MoonBox Cloud: song has no filename.");
   }
 
-  return String(song.id);
+  return normalizeSongFilename(song.name);
 }
 
 /* ==========================================================
@@ -371,10 +385,12 @@ async function saveCloudSong(song) {
    GET ONE SONG
 ========================================================== */
 
-async function getCloudSong(songId) {
+async function getCloudSong(song) {
   const user = requireCloudUser();
 
-  const songRef = doc(db, "users", user.uid, "songs", String(songId));
+  const cloudSongId = getCloudSongId(song);
+
+  const songRef = doc(db, "users", user.uid, "songs", cloudSongId);
 
   const snapshot = await getDoc(songRef);
 
@@ -741,20 +757,6 @@ async function findCloudSongByHash(fileHash) {
 }
 
 /* ==========================================================
-   FIND CLOUD SONGS BY FILENAME
-========================================================== */
-
-async function findCloudSongsByFilename(fileName) {
-  if (!fileName) {
-    return [];
-  }
-
-  const songs = await getAllCloudSongs();
-
-  return songs.filter((song) => song.fileName === fileName);
-}
-
-/* ==========================================================
    APPLY CLOUD SONG DATA TO LOCAL SONG
 ========================================================== */
 
@@ -890,8 +892,9 @@ document.addEventListener("moonbox:songTagsChanged", async (event) => {
   }
 
   const songId = event.detail?.songId;
+  const song = event.detail?.song;
 
-  if (!songId) {
+  if (!songId || !song) {
     return;
   }
 
@@ -900,11 +903,21 @@ document.addEventListener("moonbox:songTagsChanged", async (event) => {
     : [];
 
   try {
-    await updateCloudSong(songId, {
-      tags,
-    });
+    const existingCloudSong = await getCloudSong(songId);
 
-    console.log("MoonBox Cloud: tags synced", songId);
+    if (existingCloudSong) {
+      await updateCloudSong(songId, {
+        tags,
+      });
+
+      console.log("MoonBox Cloud: song tags updated", songId);
+    } else {
+      song.tags = tags;
+
+      await saveCloudSong(song);
+
+      console.log("MoonBox Cloud: song created from tag action", songId);
+    }
   } catch (error) {
     console.error("MoonBox Cloud: tags sync failed", error);
   }
@@ -987,42 +1000,18 @@ document.addEventListener("moonbox:coverChanged", async (event) => {
    AUTOMATIC CLOUD LOOKUP
 ========================================================== */
 async function applyCloudMetadataToSong(song) {
-  if (!cloudReady || !song?.id) {
+  if (!cloudReady || !song?.name) {
     return song;
   }
 
   try {
-    let cloudSong = await getCloudSong(song.id);
-
-    if (!cloudSong && song.name) {
-      const matches = await findCloudSongsByFilename(song.name);
-
-      if (matches.length === 1) {
-        cloudSong = matches[0];
-
-        console.log(
-          "MoonBox Cloud: matched song by filename",
-          song.name,
-          "→",
-          cloudSong.id,
-        );
-      } else if (matches.length > 1) {
-        console.warn(
-          "MoonBox Cloud: multiple songs found with filename:",
-          song.name,
-        );
-
-        return song;
-      }
-    }
+    const cloudSong = await getCloudSong(song);
 
     if (!cloudSong) {
       return song;
     }
 
     applyCloudSongDataToLocalSong(song, cloudSong);
-
-    syncCache.set(String(song.id), createSongSignature(song));
 
     console.log(
       "MoonBox Cloud: metadata loaded from Firestore",
@@ -1035,7 +1024,7 @@ async function applyCloudMetadataToSong(song) {
   } catch (error) {
     console.error(
       "MoonBox Cloud: cloud metadata lookup failed",
-      song?.id,
+      song?.name,
       error,
     );
 
