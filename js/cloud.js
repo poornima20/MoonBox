@@ -979,6 +979,52 @@ document.addEventListener("moonbox:playFromLibrary", async (event) => {
   }
 
   await applyCloudMetadataToSong(song);
+
+  document.dispatchEvent(
+    new CustomEvent("moonbox:songTagsChanged", {
+      detail: {
+        songId: song.id || null,
+        song: song,
+        tags: Array.isArray(song.tags) ? [...song.tags] : [],
+      },
+    }),
+  );
+});
+
+/* ==========================================================
+   CLOUD → PLAYER TAG SYNC
+========================================================== */
+
+document.addEventListener("moonbox:songTagsChanged", (event) => {
+  const changedSong = event.detail?.song;
+
+  if (!changedSong) {
+    return;
+  }
+
+  const currentSongObject = songs[currentSong];
+
+  if (!currentSongObject) {
+    return;
+  }
+
+  if (String(changedSong.id) !== String(currentSongObject.id)) {
+    return;
+  }
+
+  /* Keep the current player song synchronized */
+  currentSongObject.tags = Array.isArray(changedSong.tags)
+    ? [...changedSong.tags]
+    : [];
+
+  /* Refresh tag definitions */
+  requestPlayerTags();
+
+  /* Refresh visible selected tags */
+  renderPlayerTags();
+
+  /* Refresh picker if it is open */
+  renderPlayerTagPicker();
 });
 
 /* ==========================================================

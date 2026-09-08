@@ -91,6 +91,17 @@ let editingTagId = null;
 
 let draggedTagId = null;
 
+/*
+   Cloud tag membership
+
+   Key:
+      tagId
+
+   Value:
+      Set of cloud song IDs belonging to that tag
+*/
+let cloudTagSongIds = new Map();
+
 /* ==========================================================
    ELEMENTS
 ========================================================== */
@@ -448,13 +459,54 @@ function getAllMoonBoxSongs() {
   return Array.isArray(allFilesFolder.songs) ? allFilesFolder.songs : [];
 }
 
+/* ==========================================================
+   CLOUD SONG ID
+   Must match cloud.js
+========================================================== */
+
+function getLocalCloudSongId(song) {
+  if (!song?.name) {
+    return null;
+  }
+
+  return String(song.name)
+    .normalize("NFKC")
+    .trim()
+    .toLowerCase()
+    .replace(/\.[^/.]+$/, "")
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "");
+}
+
 function getTagSongCount(tagId) {
   const allSongs = getAllMoonBoxSongs();
 
-  // ALL shows the total number of songs
+  /* -----------------------------------------------
+     ALL is always local
+  ------------------------------------------------ */
+
   if (tagId === "all") {
     return allSongs.length;
   }
+
+  /* -----------------------------------------------
+     Cloud tag
+
+     Use Firebase tag.songIds.
+
+     This means the count works even when the
+     local song.tags array has not been updated yet.
+  ------------------------------------------------ */
+
+  if (cloudTagSongIds.has(tagId)) {
+    return cloudTagSongIds.get(tagId).size;
+  }
+
+  /* -----------------------------------------------
+     Folder/local tag
+
+     Folder tags remain completely local.
+  ------------------------------------------------ */
 
   return allSongs.filter((song) => {
     const songTags = Array.isArray(song.tags) ? song.tags : [];
@@ -476,37 +528,38 @@ function getSelectedSongCount() {
   }
 
   /* -----------------------------------------------
-       ALL = every song
-    ------------------------------------------------ */
+     ALL = every local song
+  ------------------------------------------------ */
 
   if (selectedTagIds.has("all")) {
-    /*
-            For now, selecting ALL means
-            show every song.
-
-            This remains true even if other
-            tags are also selected.
-        */
-
     return allSongs.length;
   }
-
-  /* -----------------------------------------------
-       Real selected tags
-    ------------------------------------------------ */
 
   const selected = [...selectedTagIds];
 
   /* -----------------------------------------------
-       UNION
-
-       Song needs ANY selected tag.
-    ------------------------------------------------ */
+     UNION
+     
+     Song needs ANY selected tag.
+     
+     Cloud tags are matched using the same
+     cloud song ID used by cloud.js.
+  ------------------------------------------------ */
 
   const matchingSongs = allSongs.filter((song) => {
-    const songTags = Array.isArray(song.tags) ? song.tags : [];
+    const localTags = Array.isArray(song.tags) ? song.tags : [];
 
-    return selected.some((tagId) => songTags.includes(tagId));
+    const cloudSongId = getLocalCloudSongId(song);
+
+    return selected.some((tagId) => {
+      /* Cloud tag */
+      if (cloudTagSongIds.has(tagId)) {
+        return cloudSongId && cloudTagSongIds.get(tagId).has(cloudSongId);
+      }
+
+      /* Local/folder tag */
+      return localTags.includes(tagId);
+    });
   });
 
   return matchingSongs.length;
@@ -1723,6 +1776,30 @@ document.addEventListener("moonbox:songTagsChanged", (event) => {
   }
 
   /* --------------------------------------------------------
+   Synchronize cloud tag membership in memory.
+
+   This keeps the Tag page immediately updated when
+   a tag is added/removed from the Player.
+-------------------------------------------------------- */
+
+  const cloudSongId = getLocalCloudSongId(song);
+
+  if (cloudSongId) {
+    const changedTagId = event.detail?.tagId;
+    const added = event.detail?.added;
+
+    if (changedTagId && cloudTagSongIds.has(changedTagId)) {
+      const songIds = cloudTagSongIds.get(changedTagId);
+
+      if (added) {
+        songIds.add(cloudSongId);
+      } else {
+        songIds.delete(cloudSongId);
+      }
+    }
+  }
+
+  /* --------------------------------------------------------
      Update the matching local song inside currentFolders
   -------------------------------------------------------- */
 
@@ -1869,8 +1946,30 @@ document.addEventListener("moonbox:cloudTagsReady", (event) => {
 
       system: false,
 
+      /*
+       Keep Firebase song membership in memory.
+       Do NOT put this into localStorage.
+    */
+      songIds: Array.isArray(tag.songIds) ? tag.songIds.map(String) : [],
+
       ...(tag.folderTag ? { folderTag: true } : {}),
     }));
+
+  /* --------------------------------------------------------
+   Store cloud tag → song IDs in memory
+
+   This does NOT perform another Firebase read.
+   The songIds already came with cloudTagsReady.
+-------------------------------------------------------- */
+
+  cloudTagSongIds.clear();
+
+  normalizedCloudTags.forEach((tag) => {
+    cloudTagSongIds.set(
+      String(tag.id),
+      new Set(Array.isArray(tag.songIds) ? tag.songIds.map(String) : []),
+    );
+  });
 
   /* --------------------------------------------------------
      Merge everything by ID
