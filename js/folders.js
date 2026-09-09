@@ -132,6 +132,55 @@ function getAllSongs() {
 }
 
 /* ==========================================================
+   MOONBOX IMPORT LOADER
+========================================================== */
+
+const moonboxImportLoader = document.getElementById("moonboxImportLoader");
+
+const moonboxImportCount = document.getElementById("moonboxImportCount");
+
+const moonboxImportProgress = document.getElementById("moonboxImportProgress");
+
+/* ----------------------------------------------------------
+   SHOW
+---------------------------------------------------------- */
+
+function showMoonBoxImportLoader(total) {
+  moonboxImportLoader.classList.add("active");
+
+  updateMoonBoxImportLoader(0, total);
+}
+
+/* ----------------------------------------------------------
+   UPDATE
+---------------------------------------------------------- */
+
+function updateMoonBoxImportLoader(completed, total) {
+  const safeTotal = Math.max(Number(total) || 0, 0);
+
+  const safeCompleted = Math.min(
+    Math.max(Number(completed) || 0, 0),
+    safeTotal,
+  );
+
+  moonboxImportCount.textContent = `Loading ${safeCompleted} / ${safeTotal} songs`;
+
+  const percentage = safeTotal > 0 ? (safeCompleted / safeTotal) * 100 : 0;
+
+  moonboxImportProgress.style.width = `${percentage}%`;
+}
+
+/* ----------------------------------------------------------
+   HIDE
+---------------------------------------------------------- */
+
+function hideMoonBoxImportLoader() {
+  moonboxImportLoader.classList.remove("active");
+
+  moonboxImportProgress.style.width = "0%";
+}
+
+/* ==========================================================
    MASTER DATA
    Each song exists ONLY ONCE
 ========================================================== */
@@ -402,6 +451,13 @@ async function importDirectory(directoryHandle) {
     handle: folder.handle,
   });
 
+  /* ========================================================
+     FIRST PASS
+     Find all audio files
+  ======================================================== */
+
+  const audioFiles = [];
+
   for await (const [name, entry] of directoryHandle.entries()) {
     if (entry.kind !== "file") {
       continue;
@@ -413,12 +469,57 @@ async function importDirectory(directoryHandle) {
       continue;
     }
 
-    await importSong(file, folder);
+    /*
+       Don't count files that are already in MoonBox.
+    */
+
+    if (isDuplicateFile(file, folder)) {
+      continue;
+    }
+
+    audioFiles.push(file);
+  }
+
+  /* ========================================================
+     SHOW LOADER
+  ======================================================== */
+
+  showMoonBoxImportLoader(audioFiles.length);
+
+  /* ========================================================
+     SECOND PASS
+     Import songs
+  ======================================================== */
+
+  let completed = 0;
+
+  try {
+    for (const file of audioFiles) {
+      await importSong(file, folder);
+
+      completed++;
+
+      updateMoonBoxImportLoader(completed, audioFiles.length);
+    }
+  } finally {
+    /*
+       Give the user a tiny moment to see
+       564 / 564 before closing.
+    */
+
+    updateMoonBoxImportLoader(audioFiles.length, audioFiles.length);
+
+    await new Promise((resolve) => {
+      setTimeout(resolve, 350);
+    });
+
+    hideMoonBoxImportLoader();
   }
 
   currentFolder = folders.indexOf(folder);
 
   renderFolders();
+
   notifyFolderDataChanged();
 }
 
@@ -706,8 +807,36 @@ filePicker.addEventListener("change", async () => {
     handle: null,
   });
 
-  for (const file of files) {
-    await importSong(file, folder);
+  const audioFiles = files.filter(isAudioFile);
+
+  if (!audioFiles.length) {
+    return;
+  }
+
+  /* ========================================================
+     SHOW LOADER
+  ======================================================== */
+
+  showMoonBoxImportLoader(audioFiles.length);
+
+  let completed = 0;
+
+  try {
+    for (const file of audioFiles) {
+      await importSong(file, folder);
+
+      completed++;
+
+      updateMoonBoxImportLoader(completed, audioFiles.length);
+    }
+  } finally {
+    updateMoonBoxImportLoader(audioFiles.length, audioFiles.length);
+
+    await new Promise((resolve) => {
+      setTimeout(resolve, 350);
+    });
+
+    hideMoonBoxImportLoader();
   }
 
   currentFolder = folders.indexOf(folder);
