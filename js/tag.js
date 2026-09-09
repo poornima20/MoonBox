@@ -85,11 +85,36 @@ let tags = loadTags();
 
 let selectedTagIds = new Set();
 
-let tagOrderMode = "custom";
+let tagOrderMode = "tags";
 
 let editingTagId = null;
 
 let draggedTagId = null;
+
+/* ==========================================================
+   TAG GROUPS
+========================================================== */
+
+/*
+   Groups are only an organizational layer for tags.
+
+   Tags remain the main data structure.
+
+   Each tag can contain:
+      groupId
+      groupName
+      groupOrder
+      order
+*/
+
+const DEFAULT_GROUP = {
+  id: "default",
+  name: "Default",
+  order: 0,
+  system: true,
+};
+
+let tagGroups = loadTagGroups();
 
 /*
    Cloud tag membership
@@ -183,6 +208,127 @@ function saveTags() {
   } catch (error) {
     console.warn("MoonBox: Could not save tags.", error);
   }
+}
+
+/* ==========================================================
+   LOAD TAG GROUPS
+========================================================== */
+
+function loadTagGroups() {
+  try {
+    const saved = localStorage.getItem("moonboxTagGroups");
+
+    let groups = [];
+
+    if (saved) {
+      const parsed = JSON.parse(saved);
+
+      if (Array.isArray(parsed)) {
+        groups = parsed;
+      }
+    }
+
+    /*
+       Always make sure Default exists.
+    */
+
+    const defaultExists = groups.some((group) => group.id === DEFAULT_GROUP.id);
+
+    if (!defaultExists) {
+      groups.unshift({ ...DEFAULT_GROUP });
+    }
+
+    return groups.sort((a, b) => {
+      return (a.order ?? 0) - (b.order ?? 0);
+    });
+  } catch (error) {
+    console.warn("MoonBox: Could not load tag groups.", error);
+
+    return [{ ...DEFAULT_GROUP }];
+  }
+}
+
+/* ==========================================================
+   SAVE TAG GROUPS
+========================================================== */
+
+function saveTagGroups() {
+  try {
+    localStorage.setItem("moonboxTagGroups", JSON.stringify(tagGroups));
+  } catch (error) {
+    console.warn("MoonBox: Could not save tag groups.", error);
+  }
+}
+
+/* ==========================================================
+   CREATE GROUP ID
+========================================================== */
+
+function createGroupId(name) {
+  const base =
+    name
+      .toLowerCase()
+      .trim()
+      .replace(/[^a-z0-9]+/g, "-")
+      .replace(/^-+|-+$/g, "") || "group";
+
+  let id = base;
+
+  let number = 2;
+
+  while (tagGroups.some((group) => group.id === id)) {
+    id = `${base}-${number}`;
+
+    number++;
+  }
+
+  return id;
+}
+
+/* ==========================================================
+   NORMALIZE TAG GROUP DATA
+========================================================== */
+
+function normalizeTagGroups() {
+  if (!Array.isArray(tagGroups)) {
+    tagGroups = [];
+  }
+
+  ensureDefaultGroup();
+
+  /*
+     Every tag without a group
+     automatically belongs to Default.
+  */
+
+  tags.forEach((tag, index) => {
+    if (!tag.groupId) {
+      tag.groupId = "default";
+    }
+
+    const group = getTagGroup(tag);
+
+    if (!group) {
+      tag.groupId = "default";
+    }
+
+    if (!tag.groupName) {
+      tag.groupName = getTagGroup(tag).name;
+    }
+
+    if (typeof tag.order !== "number") {
+      tag.order = index;
+    }
+  });
+
+  /*
+     Rebuild group ordering safely.
+  */
+
+  tagGroups.sort((a, b) => (a.order ?? 0) - (b.order ?? 0));
+
+  saveTagGroups();
+  saveTags();
 }
 
 /* ==========================================================
@@ -773,14 +919,44 @@ function renderTags() {
 
   grid.innerHTML = "";
 
-  let tagsToRender = [...tags];
+  /* ========================================================
+     TAGS — NORMAL
+     
+     No alphabetical headings.
+     No group headings.
+     Simply render the tags normally.
+  ======================================================== */
 
-  /* --------------------------------------------------------
-       ALPHABETICAL
-    -------------------------------------------------------- */
+  if (tagOrderMode === "tags") {
+    const allTag = tags.find((tag) => tag.id === "all");
 
-  if (tagOrderMode === "alphabetical") {
-    tagsToRender.sort((a, b) =>
+    const folderTags = tags.filter(
+      (tag) => tag.folderTag === true && tag.id !== "all",
+    );
+
+    const normalTags = tags.filter(
+      (tag) => tag.id !== "all" && tag.folderTag !== true,
+    );
+
+    /* ALL first */
+    if (allTag) {
+      grid.appendChild(createTagElement(allTag));
+    }
+
+    /* Folders second */
+    folderTags.forEach((tag) => {
+      grid.appendChild(createTagElement(tag));
+    });
+
+    /* User-created / normal tags last */
+    normalTags.forEach((tag) => {
+      grid.appendChild(createTagElement(tag));
+    });
+  } else if (tagOrderMode === "alphabetical") {
+    /* ========================================================
+     ALPHABETICAL
+  ======================================================== */
+    const tagsToRender = [...tags].sort((a, b) =>
       a.name.localeCompare(b.name, undefined, {
         sensitivity: "base",
       }),
@@ -805,12 +981,48 @@ function renderTags() {
 
       grid.appendChild(createTagElement(tag));
     });
-  } else {
-    /* --------------------------------------------------------
-       CUSTOM ORDER
-    -------------------------------------------------------- */
-    tagsToRender.forEach((tag) => {
-      grid.appendChild(createTagElement(tag));
+  } else if (tagOrderMode === "custom") {
+    /* ========================================================
+     CUSTOM ORDER
+     
+     Group order:
+       tagGroups.order
+
+     Tag order:
+       tag.order
+  ======================================================== */
+    normalizeTagGroups();
+
+    const orderedGroups = [...tagGroups].sort(
+      (a, b) => (a.order ?? 0) - (b.order ?? 0),
+    );
+
+    orderedGroups.forEach((group) => {
+      const groupTags = getTagsForGroup(group.id);
+
+      /* Don't show empty groups */
+
+      if (groupTags.length === 0) {
+        return;
+      }
+
+      /* Group heading */
+
+      const heading = document.createElement("div");
+
+      heading.className = "tag-group-heading";
+
+      heading.dataset.groupId = group.id;
+
+      heading.textContent = group.name;
+
+      grid.appendChild(heading);
+
+      /* Tags inside group */
+
+      groupTags.forEach((tag) => {
+        grid.appendChild(createTagElement(tag));
+      });
     });
   }
 
@@ -832,14 +1044,14 @@ function applySearchFilter() {
 
   tagElements.forEach((tagElement) => {
     const name =
-      tagElement.querySelector("span")?.textContent.toLowerCase() || "";
+      tagElement.querySelector(".tag-name")?.textContent.toLowerCase() || "";
 
     tagElement.style.display = name.includes(value) ? "" : "none";
   });
 
-  /* --------------------------------------------------------
-       Hide empty alphabetical headings
-    -------------------------------------------------------- */
+  /* ========================================================
+     ALPHABETICAL HEADINGS
+  ======================================================== */
 
   if (tagOrderMode === "alphabetical") {
     const letters = grid.querySelectorAll(".tag-letter");
@@ -852,7 +1064,6 @@ function applySearchFilter() {
       while (next && !next.classList.contains("tag-letter")) {
         if (next.classList.contains("tag") && next.style.display !== "none") {
           hasVisibleTag = true;
-
           break;
         }
 
@@ -860,6 +1071,31 @@ function applySearchFilter() {
       }
 
       letter.style.display = hasVisibleTag ? "" : "none";
+    });
+  }
+
+  /* ========================================================
+     CUSTOM GROUP HEADINGS
+  ======================================================== */
+
+  if (tagOrderMode === "custom") {
+    const groups = grid.querySelectorAll(".tag-group-heading");
+
+    groups.forEach((heading) => {
+      let next = heading.nextElementSibling;
+
+      let hasVisibleTag = false;
+
+      while (next && !next.classList.contains("tag-group-heading")) {
+        if (next.classList.contains("tag") && next.style.display !== "none") {
+          hasVisibleTag = true;
+          break;
+        }
+
+        next = next.nextElementSibling;
+      }
+
+      heading.style.display = hasVisibleTag ? "" : "none";
     });
   }
 }
@@ -896,6 +1132,10 @@ if (viewLibraryButton) {
    MANAGE MENU
 ========================================================== */
 
+/* ==========================================================
+   MANAGE MENU
+========================================================== */
+
 function setupManageMenu() {
   if (!manageButton || !menu) return;
 
@@ -908,13 +1148,16 @@ function setupManageMenu() {
   const buttons = menu.querySelectorAll("button");
 
   /*
-       Current HTML order:
+     Current HTML order:
 
-       0 = Add Tag
-       1 = Custom Order
-       2 = Alphabetical
-       3 = Edit Tags
-    */
+     0 = Add Tag
+     1 = Tags
+     2 = Custom Order
+     3 = Alphabetical
+     4 = Edit Tags
+  */
+
+  /* ---------- Add Tag ---------- */
 
   if (buttons[0]) {
     buttons[0].addEventListener("click", (event) => {
@@ -926,8 +1169,22 @@ function setupManageMenu() {
     });
   }
 
+  /* ---------- Tags ---------- */
+
   if (buttons[1]) {
     buttons[1].addEventListener("click", (event) => {
+      event.stopPropagation();
+
+      closeManageMenu();
+
+      setTagsMode();
+    });
+  }
+
+  /* ---------- Custom Order ---------- */
+
+  if (buttons[2]) {
+    buttons[2].addEventListener("click", (event) => {
       event.stopPropagation();
 
       closeManageMenu();
@@ -936,8 +1193,10 @@ function setupManageMenu() {
     });
   }
 
-  if (buttons[2]) {
-    buttons[2].addEventListener("click", (event) => {
+  /* ---------- Alphabetical ---------- */
+
+  if (buttons[3]) {
+    buttons[3].addEventListener("click", (event) => {
       event.stopPropagation();
 
       closeManageMenu();
@@ -946,8 +1205,10 @@ function setupManageMenu() {
     });
   }
 
-  if (buttons[3]) {
-    buttons[3].addEventListener("click", (event) => {
+  /* ---------- Edit Tags ---------- */
+
+  if (buttons[4]) {
+    buttons[4].addEventListener("click", (event) => {
       event.stopPropagation();
 
       closeManageMenu();
@@ -968,6 +1229,16 @@ document.addEventListener("click", (event) => {
     closeManageMenu();
   }
 });
+
+/* ==========================================================
+   TAGS — NORMAL ORDER
+========================================================== */
+
+function setTagsMode() {
+  tagOrderMode = "tags";
+
+  renderTags();
+}
 
 /* ==========================================================
    ALPHABETICAL ORDER
@@ -1157,10 +1428,15 @@ function openAddTagModal() {
 
     const newTag = {
       id: createTagId(name),
-
-      name,
-
+      name: name,
       icon: selectedIcon,
+
+      groupId: "default",
+      groupName: "Default",
+      groupOrder: 0,
+      order: tags.length,
+
+      system: false,
     };
 
     tags.push(newTag);
@@ -1175,7 +1451,7 @@ function openAddTagModal() {
       }),
     );
 
-    setCustomOrder();
+    setTagsMode();
 
     closeModal();
 
@@ -1513,42 +1789,57 @@ function deleteTag(tagId) {
 ========================================================== */
 
 function openCustomOrderModal() {
+  normalizeTagGroups();
+
   const modal = createModal({
     title: "Custom Order",
-    subtitle: "Drag tags to arrange your preferred order.",
+    subtitle: "Drag groups and tags to arrange your preferred order.",
     className: "custom-order-modal",
   });
 
   modal.body.innerHTML = `
 
-        <div
-            class="tag-order-list"
-            id="tagOrderList"
-        ></div>
+    <div class="tag-group-toolbar">
 
+      <button
+        type="button"
+        class="tag-add-group-button"
+        id="addTagGroup"
+      >
+        <i data-lucide="plus"></i>
+        <span>Add Group</span>
+      </button>
 
+    </div>
 
-    `;
+    <div
+      class="tag-order-groups"
+      id="tagOrderGroups"
+    ></div>
+
+  `;
 
   modal.footer.innerHTML = `
     <button
-        type="button"
-        class="tag-secondary-button"
-        id="cancelTagOrder"
+      type="button"
+      class="tag-secondary-button"
+      id="cancelTagOrder"
     >
-        Cancel
+      Cancel
     </button>
 
     <button
-        type="button"
-        class="tag-primary-button"
-        id="saveTagOrder"
+      type="button"
+      class="tag-primary-button"
+      id="saveTagOrder"
     >
-        Save Order
+      Save Order
     </button>
-`;
+  `;
 
-  renderOrderList();
+  renderOrderGroups();
+
+  document.getElementById("addTagGroup").addEventListener("click", addTagGroup);
 
   document
     .getElementById("cancelTagOrder")
@@ -1560,75 +1851,433 @@ function openCustomOrderModal() {
 }
 
 /* ==========================================================
-   RENDER ORDER LIST
+   GET GROUP
+========================================================== */
+function getTagGroup(tag) {
+  return (
+    tagGroups.find((group) => group.id === (tag.groupId || "default")) ||
+    DEFAULT_GROUP
+  );
+}
+
+function getTagsForGroup(groupId) {
+  return tags
+    .filter((tag) => (tag.groupId || "default") === groupId)
+    .sort((a, b) => (a.order ?? 0) - (b.order ?? 0));
+}
+
+function ensureDefaultGroup() {
+  let defaultGroup = tagGroups.find((group) => group.id === "default");
+
+  if (!defaultGroup) {
+    defaultGroup = {
+      ...DEFAULT_GROUP,
+    };
+
+    tagGroups.unshift(defaultGroup);
+  }
+
+  defaultGroup.name = "Default";
+  defaultGroup.system = true;
+  defaultGroup.order = 0;
+
+  return defaultGroup;
+}
+
+/* ==========================================================
+   ADD GROUP
 ========================================================== */
 
-function renderOrderList() {
-  const list = document.getElementById("tagOrderList");
+function addTagGroup() {
+  const name = window.prompt("Enter group name:");
 
-  if (!list) return;
+  if (!name) {
+    return;
+  }
 
-  list.innerHTML = "";
+  const trimmedName = name.trim();
 
-  tags.forEach((tag) => {
-    const row = document.createElement("div");
+  if (!trimmedName) {
+    return;
+  }
 
-    row.className = "tag-order-row";
+  const duplicate = tagGroups.some(
+    (group) => group.name.toLowerCase() === trimmedName.toLowerCase(),
+  );
 
-    row.dataset.tagId = tag.id;
+  if (duplicate) {
+    alert("A group with this name already exists.");
+    return;
+  }
 
-    row.innerHTML = `
+  const nextOrder =
+    tagGroups.length > 0
+      ? Math.max(...tagGroups.map((group) => group.order ?? 0)) + 1
+      : 0;
 
-            <button
-                type="button"
-                class="tag-drag-handle"
-                aria-label="Drag ${escapeHTML(tag.name)}"
-            >
-                <i data-lucide="grip-vertical"></i>
-            </button>
+  const newGroup = {
+    id: createGroupId(trimmedName),
+    name: trimmedName,
+    order: nextOrder,
+    system: false,
+  };
 
-            <div class="tag-order-icon">
-                <i data-lucide="${escapeHTML(tag.icon)}"></i>
-            </div>
+  tagGroups.push(newGroup);
 
-            <span class="tag-order-name">
-                ${escapeHTML(tag.name)}
-            </span>
-        `;
+  renderOrderGroups();
+}
 
-    list.appendChild(row);
+/* ==========================================================
+   RENDER GROUPS
+========================================================== */
+
+function renderOrderGroups() {
+  const container = document.getElementById("tagOrderGroups");
+
+  if (!container) {
+    return;
+  }
+
+  container.innerHTML = "";
+
+  /*
+     Sort groups by their current order.
+  */
+
+  const orderedGroups = [...tagGroups].sort(
+    (a, b) => (a.order ?? 0) - (b.order ?? 0),
+  );
+
+  orderedGroups.forEach((group) => {
+    const groupElement = createOrderGroup(group);
+
+    container.appendChild(groupElement);
   });
 
   refreshIcons();
 
-  setupPointerDragging();
+  setupGroupDragging();
+  setupTagDragging();
 }
 
 /* ==========================================================
-   POINTER DRAGGING
-   Works better on touch devices than native draggable.
+   CREATE GROUP
+========================================================== */
+function createOrderGroup(group) {
+  const groupElement = document.createElement("div");
+
+  groupElement.className = "tag-order-group";
+
+  groupElement.dataset.groupId = group.id;
+
+  const groupTags = getTagsForGroup(group.id);
+
+  const editButton = group.system
+    ? ""
+    : `
+      <button
+        type="button"
+        class="tag-group-edit-button"
+        data-group-edit="${escapeHTML(group.id)}"
+        aria-label="Edit ${escapeHTML(group.name)}"
+      >
+        <i data-lucide="pencil"></i>
+      </button>
+    `;
+
+  groupElement.innerHTML = `
+
+    <div class="tag-order-group-header">
+
+      <button
+        type="button"
+        class="tag-group-drag-handle"
+        aria-label="Drag group"
+      >
+        <i data-lucide="grip-vertical"></i>
+      </button>
+
+      <div class="tag-group-title">
+        ${escapeHTML(group.name)}
+      </div>
+
+      <span class="tag-group-count">
+        ${groupTags.length}
+        ${groupTags.length === 1 ? "tag" : "tags"}
+      </span>
+
+      <div class="tag-group-actions">
+        ${editButton}
+      </div>
+
+    </div>
+
+    <div
+      class="tag-order-group-tags"
+      data-group-id="${escapeHTML(group.id)}"
+    ></div>
+
+  `;
+
+  const tagContainer = groupElement.querySelector(".tag-order-group-tags");
+
+  groupTags.forEach((tag) => {
+    tagContainer.appendChild(createOrderTag(tag));
+  });
+
+  const edit = groupElement.querySelector("[data-group-edit]");
+
+  if (edit) {
+    edit.addEventListener("click", () => {
+      editTagGroup(group.id);
+    });
+  }
+
+  return groupElement;
+}
+
+function editTagGroup(groupId) {
+  const group = tagGroups.find((item) => item.id === groupId);
+
+  if (!group) return;
+
+  /* Default can never be edited */
+  if (group.system) {
+    return;
+  }
+
+  const groupElement = document.querySelector(
+    `.tag-order-group[data-group-id="${CSS.escape(groupId)}"]`,
+  );
+
+  if (!groupElement) return;
+
+  const title = groupElement.querySelector(".tag-group-title");
+  const count = groupElement.querySelector(".tag-group-count");
+  const actions = groupElement.querySelector(".tag-group-actions");
+
+  if (!title || !count || !actions) {
+    return;
+  }
+
+  /*
+     Replace title with input
+  */
+
+  title.innerHTML = `
+    <input
+      type="text"
+      class="tag-group-name-input"
+      value="${escapeHTML(group.name)}"
+      maxlength="40"
+      autocomplete="off"
+    />
+  `;
+
+  /*
+     Hide count while editing
+  */
+
+  count.style.visibility = "hidden";
+
+  /*
+     Put both buttons inside the same
+     action container.
+  */
+
+  actions.innerHTML = `
+    <button
+      type="button"
+      class="tag-group-confirm-button"
+      aria-label="Save group name"
+      title="Save"
+    >
+      <i data-lucide="check"></i>
+    </button>
+
+    <button
+      type="button"
+      class="tag-group-delete-button"
+      aria-label="Delete group"
+      title="Delete group"
+    >
+      <i data-lucide="trash-2"></i>
+    </button>
+  `;
+
+  refreshIcons();
+
+  const input = groupElement.querySelector(".tag-group-name-input");
+
+  const confirmButton = groupElement.querySelector(".tag-group-confirm-button");
+
+  const deleteButton = groupElement.querySelector(".tag-group-delete-button");
+
+  input.focus();
+  input.select();
+
+  /*
+     Confirm rename
+  */
+
+  confirmButton.addEventListener("click", () => {
+    const newName = input.value.trim();
+
+    if (!newName) {
+      input.focus();
+      return;
+    }
+
+    const duplicate = tagGroups.some(
+      (item) =>
+        item.id !== group.id &&
+        item.name.toLowerCase() === newName.toLowerCase(),
+    );
+
+    if (duplicate) {
+      alert("A group with this name already exists.");
+
+      input.focus();
+
+      return;
+    }
+
+    group.name = newName;
+
+    /*
+       Update group name inside
+       every tag belonging to it.
+    */
+
+    tags.forEach((tag) => {
+      if (tag.groupId === group.id) {
+        tag.groupName = newName;
+      }
+    });
+
+    saveTagGroups();
+    saveTags();
+
+    renderOrderGroups();
+  });
+
+  /*
+     Delete group
+  */
+
+  deleteButton.addEventListener("click", () => {
+    deleteTagGroup(group.id);
+  });
+}
+
+/* ==========================================================
+   CREATE TAG ROW
 ========================================================== */
 
-function setupPointerDragging() {
-  const list = document.getElementById("tagOrderList");
+function createOrderTag(tag) {
+  const row = document.createElement("div");
 
-  if (!list) return;
+  row.className = "tag-order-row";
 
-  const rows = [...list.querySelectorAll(".tag-order-row")];
+  row.dataset.tagId = tag.id;
 
-  let activeRow = null;
+  row.innerHTML = `
 
-  let startY = 0;
+    <button
+      type="button"
+      class="tag-drag-handle"
+      aria-label="Drag ${escapeHTML(tag.name)}"
+    >
+      <i data-lucide="grip-vertical"></i>
+    </button>
 
-  let dragging = false;
+    <div class="tag-order-icon">
+      <i data-lucide="${escapeHTML(tag.icon)}"></i>
+    </div>
 
-  rows.forEach((row) => {
-    const handle = row.querySelector(".tag-drag-handle");
+    <span class="tag-order-name">
+      ${escapeHTML(tag.name)}
+    </span>
+
+  `;
+
+  return row;
+}
+
+function deleteTagGroup(groupId) {
+  const group = tagGroups.find((item) => item.id === groupId);
+
+  if (!group) return;
+
+  /*
+     Default can never be deleted.
+  */
+
+  if (group.system) {
+    return;
+  }
+
+  const confirmed = window.confirm(
+    `Delete "${group.name}"?\n\nThe tags inside it will be moved to Default.`,
+  );
+
+  if (!confirmed) {
+    return;
+  }
+
+  /*
+     Move all tags to Default.
+  */
+
+  tags.forEach((tag) => {
+    if (tag.groupId === group.id) {
+      tag.groupId = "default";
+      tag.groupName = "Default";
+      tag.groupOrder = 0;
+    }
+  });
+
+  /*
+     Remove group.
+  */
+
+  tagGroups = tagGroups.filter((item) => item.id !== group.id);
+
+  ensureDefaultGroup();
+
+  saveTagGroups();
+  saveTags();
+
+  renderOrderGroups();
+}
+/* ==========================================================
+   GROUP DRAGGING
+========================================================== */
+
+function setupGroupDragging() {
+  const container = document.getElementById("tagOrderGroups");
+
+  if (!container) {
+    return;
+  }
+
+  const groups = [...container.querySelectorAll(".tag-order-group")];
+
+  groups.forEach((group) => {
+    const handle = group.querySelector(".tag-group-drag-handle");
+
+    if (!handle) {
+      return;
+    }
+
+    let activeGroup = null;
+    let startY = 0;
+    let dragging = false;
 
     handle.addEventListener("pointerdown", (event) => {
       event.preventDefault();
 
-      activeRow = row;
+      activeGroup = group;
 
       startY = event.clientY;
 
@@ -1638,7 +2287,9 @@ function setupPointerDragging() {
     });
 
     handle.addEventListener("pointermove", (event) => {
-      if (!activeRow) return;
+      if (!activeGroup) {
+        return;
+      }
 
       const distance = Math.abs(event.clientY - startY);
 
@@ -1648,48 +2299,239 @@ function setupPointerDragging() {
 
       dragging = true;
 
-      activeRow.classList.add("dragging");
+      activeGroup.classList.add("dragging");
 
       const siblings = [
-        ...list.querySelectorAll(".tag-order-row:not(.dragging)"),
+        ...container.querySelectorAll(".tag-order-group:not(.dragging)"),
       ];
 
-      const nextRow = siblings.find((sibling) => {
+      const nextGroup = siblings.find((sibling) => {
         const rect = sibling.getBoundingClientRect();
 
         return event.clientY < rect.top + rect.height / 2;
       });
 
-      if (nextRow) {
-        list.insertBefore(activeRow, nextRow);
+      if (nextGroup) {
+        container.insertBefore(activeGroup, nextGroup);
       } else {
-        list.appendChild(activeRow);
+        container.appendChild(activeGroup);
       }
     });
 
     handle.addEventListener("pointerup", (event) => {
-      if (!activeRow) return;
+      if (!activeGroup) {
+        return;
+      }
 
-      activeRow.classList.remove("dragging");
+      activeGroup.classList.remove("dragging");
 
       if (handle.hasPointerCapture(event.pointerId)) {
         handle.releasePointerCapture(event.pointerId);
       }
 
-      activeRow = null;
+      activeGroup = null;
 
       dragging = false;
     });
 
     handle.addEventListener("pointercancel", () => {
-      if (!activeRow) return;
+      if (!activeGroup) {
+        return;
+      }
 
-      activeRow.classList.remove("dragging");
+      activeGroup.classList.remove("dragging");
 
-      activeRow = null;
+      activeGroup = null;
 
       dragging = false;
     });
+  });
+}
+
+/* ==========================================================
+   TAG DRAGGING
+   Supports:
+      - Reordering inside group
+      - Moving tag between groups
+========================================================== */
+function setupTagDragging() {
+  const container = document.getElementById("tagOrderGroups");
+
+  if (!container) return;
+
+  const rows = [...container.querySelectorAll(".tag-order-row")];
+
+  rows.forEach((row) => {
+    const handle = row.querySelector(".tag-drag-handle");
+
+    if (!handle) return;
+
+    let dragging = false;
+    let pointerId = null;
+    let startX = 0;
+    let startY = 0;
+
+    function getTargetGroup(event) {
+      /*
+         Temporarily hide the dragged row so
+         elementFromPoint can see underneath it.
+      */
+
+      const previousPointerEvents = row.style.pointerEvents;
+
+      row.style.pointerEvents = "none";
+
+      const element = document.elementFromPoint(event.clientX, event.clientY);
+
+      row.style.pointerEvents = previousPointerEvents;
+
+      if (!element) {
+        return null;
+      }
+
+      return element.closest(".tag-order-group");
+    }
+
+    function moveRow(event) {
+      if (!dragging || event.pointerId !== pointerId) {
+        return;
+      }
+
+      const targetGroup = getTargetGroup(event);
+
+      if (!targetGroup) {
+        return;
+      }
+
+      const targetTags = targetGroup.querySelector(".tag-order-group-tags");
+
+      if (!targetTags) {
+        return;
+      }
+
+      /*
+         Remove previous target highlight.
+      */
+
+      document
+        .querySelectorAll(".tag-order-group.drop-target")
+        .forEach((group) => {
+          group.classList.remove("drop-target");
+        });
+
+      targetGroup.classList.add("drop-target");
+
+      /*
+         Find rows in the target group,
+         excluding the row currently being dragged.
+      */
+
+      const targetRows = [
+        ...targetTags.querySelectorAll(".tag-order-row:not(.dragging)"),
+      ];
+
+      let inserted = false;
+
+      for (const targetRow of targetRows) {
+        const rect = targetRow.getBoundingClientRect();
+
+        const midpoint = rect.top + rect.height / 2;
+
+        if (event.clientY < midpoint) {
+          targetTags.insertBefore(row, targetRow);
+
+          inserted = true;
+
+          break;
+        }
+      }
+
+      /*
+         If pointer is below all rows,
+         put it at the end.
+      */
+
+      if (!inserted) {
+        targetTags.appendChild(row);
+      }
+    }
+
+    function stopDrag(event) {
+      if (event.pointerId !== pointerId) {
+        return;
+      }
+
+      document.removeEventListener("pointermove", moveRow);
+
+      document.removeEventListener("pointerup", stopDrag);
+
+      document.removeEventListener("pointercancel", stopDrag);
+
+      row.classList.remove("dragging");
+
+      document
+        .querySelectorAll(".tag-order-group.drop-target")
+        .forEach((group) => {
+          group.classList.remove("drop-target");
+        });
+
+      row.style.pointerEvents = "";
+
+      dragging = false;
+      pointerId = null;
+    }
+
+    function startDrag(event) {
+      event.preventDefault();
+
+      pointerId = event.pointerId;
+
+      startX = event.clientX;
+      startY = event.clientY;
+
+      dragging = false;
+
+      /*
+         Start listening globally.
+
+         This is what allows the row to travel
+         from one group to another reliably.
+      */
+
+      document.addEventListener("pointermove", moveRow);
+
+      document.addEventListener("pointerup", stopDrag);
+
+      document.addEventListener("pointercancel", stopDrag);
+
+      /*
+         Small movement threshold prevents
+         accidental dragging.
+      */
+
+      const checkDrag = (moveEvent) => {
+        if (moveEvent.pointerId !== pointerId) {
+          return;
+        }
+
+        const distance = Math.hypot(
+          moveEvent.clientX - startX,
+          moveEvent.clientY - startY,
+        );
+
+        if (distance >= 5) {
+          dragging = true;
+
+          row.classList.add("dragging");
+
+          document.removeEventListener("pointermove", checkDrag);
+        }
+      };
+
+      document.addEventListener("pointermove", checkDrag);
+    }
+
+    handle.addEventListener("pointerdown", startDrag);
   });
 }
 
@@ -1698,19 +2540,102 @@ function setupPointerDragging() {
 ========================================================== */
 
 function saveCustomOrder() {
-  const list = document.getElementById("tagOrderList");
+  const container = document.getElementById("tagOrderGroups");
 
-  if (!list) return;
+  if (!container) {
+    return;
+  }
 
-  const orderedIds = [...list.querySelectorAll(".tag-order-row")].map(
-    (row) => row.dataset.tagId,
-  );
+  /*
+     Read group order from the actual DOM.
+  */
 
-  const tagMap = new Map(tags.map((tag) => [tag.id, tag]));
+  const groupElements = [...container.querySelectorAll(".tag-order-group")];
 
-  tags = orderedIds.map((id) => tagMap.get(id)).filter(Boolean);
+  groupElements.forEach((groupElement, groupIndex) => {
+    const groupId = groupElement.dataset.groupId;
+
+    const group = tagGroups.find((item) => item.id === groupId);
+
+    if (group) {
+      group.order = groupIndex;
+    }
+
+    /*
+         Read tag order inside this group.
+      */
+
+    const tagRows = [...groupElement.querySelectorAll(".tag-order-row")];
+
+    tagRows.forEach((row, tagIndex) => {
+      const tagId = row.dataset.tagId;
+
+      const tag = tags.find((item) => item.id === tagId);
+
+      if (!tag) {
+        return;
+      }
+
+      tag.groupId = groupId;
+
+      tag.groupName = group?.name || "Default";
+
+      tag.groupOrder = groupIndex;
+
+      tag.order = tagIndex;
+    });
+  });
+
+  /*
+     Save groups.
+  */
+
+  tagGroups = groupElements.map((groupElement, index) => {
+    const group = tagGroups.find(
+      (item) => item.id === groupElement.dataset.groupId,
+    );
+
+    return {
+      ...group,
+      order: index,
+    };
+  });
+
+  saveTagGroups();
 
   saveTags();
+
+  /*
+     Keep normal Tag page custom order
+     synchronized with the grouped order.
+  */
+
+  tags.sort((a, b) => {
+    const groupA = tagGroups.find((group) => group.id === a.groupId);
+
+    const groupB = tagGroups.find((group) => group.id === b.groupId);
+
+    const groupOrderA = groupA?.order ?? 0;
+
+    const groupOrderB = groupB?.order ?? 0;
+
+    if (groupOrderA !== groupOrderB) {
+      return groupOrderA - groupOrderB;
+    }
+
+    return (a.order ?? 0) - (b.order ?? 0);
+  });
+
+  saveTags();
+
+  document.dispatchEvent(
+    new CustomEvent("moonbox:tagGroupsChanged", {
+      detail: {
+        groups: tagGroups.map((group) => ({ ...group })),
+        tags: tags.map((tag) => ({ ...tag })),
+      },
+    }),
+  );
 
   setCustomOrder();
 
@@ -2022,6 +2947,8 @@ document.addEventListener("moonbox:cloudTagsReady", (event) => {
 /* ==========================================================
    INITIALIZE
 ========================================================== */
+
+normalizeTagGroups();
 
 setupManageMenu();
 

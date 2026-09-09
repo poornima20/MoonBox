@@ -1222,21 +1222,365 @@
 }
 
 /* ==========================================================
-   25. CUSTOM ORDER
-   ========================================================== */
+   25. CUSTOM ORDER — GROUPED
+========================================================== */
 
-.tag-order-list {
+.tag-group-toolbar {
+  margin-bottom: 14px;
+}
+
+.tag-add-group-button {
+  width: 100%;
+  height: 46px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  gap: 9px;
+
+  padding: 0 16px;
+
+  box-sizing: border-box;
+
+  border: 1px dashed rgba(255, 255, 255, 0.13);
+  border-radius: 12px;
+
+  background: rgba(255, 255, 255, 0.018);
+
+  color: #cfcfcf;
+
+  font-family: var(--font-main, sans-serif);
+  font-size: 13px;
+  font-weight: 600;
+
+  cursor: pointer;
+
+  transition:
+    background 0.18s ease,
+    border-color 0.18s ease,
+    color 0.18s ease;
+}
+
+.tag-add-group-button:hover {
+  background: rgba(255, 255, 255, 0.05);
+
+  border-color: rgba(255, 255, 255, 0.22);
+
+  color: #fff;
+}
+
+.tag-add-group-button svg {
+  width: 17px;
+  height: 17px;
+}
+
+.tag-order-group.drop-target {
+  border-color: rgba(255, 255, 255, 0.22);
+
+  background: rgba(255, 255, 255, 0.045);
+
+  box-shadow:
+    inset 0 0 0 1px rgba(255, 255, 255, 0.025),
+    0 0 0 2px rgba(255, 255, 255, 0.025);
+}
+
+.tag-order-row.dragging {
+  position: relative;
+
+  opacity: 0.55;
+
+  background: rgba(255, 255, 255, 0.08);
+
+  border-color: rgba(255, 255, 255, 0.14);
+
+  transform: scale(1.015);
+
+  z-index: 100;
+}
+
+/* ==========================================================
+   GROUP LIST
+========================================================== */
+
+.tag-order-groups {
   display: flex;
   flex-direction: column;
 
-  gap: 6px;
+  gap: 14px;
 
   user-select: none;
   -webkit-user-select: none;
 }
 
+/* ==========================================================
+   GROUP
+========================================================== */
+
+.tag-order-group {
+  width: 100%;
+
+  box-sizing: border-box;
+
+  border: 1px solid rgba(255, 255, 255, 0.055);
+  border-radius: 16px;
+
+  background: rgba(255, 255, 255, 0.018);
+
+  overflow: hidden;
+
+  transition:
+    background 0.15s ease,
+    border-color 0.15s ease,
+    transform 0.15s ease,
+    opacity 0.15s ease;
+}
+
+.tag-order-group:hover {
+  border-color: rgba(255, 255, 255, 0.09);
+
+  background: rgba(255, 255, 255, 0.025);
+}
+
+.tag-order-group.dragging {
+  opacity: 0.55;
+
+  border-color: rgba(255, 255, 255, 0.16);
+
+  transform: scale(1.015);
+}
+
+/* ==========================================================
+   GROUP HEADER
+========================================================== */
+.tag-order-group-header {
+  min-height: 56px;
+
+  display: grid;
+
+  grid-template-columns:
+    34px
+    minmax(0, 1fr)
+    auto
+    auto;
+
+  align-items: center;
+
+  gap: 8px;
+
+  padding: 7px 10px;
+
+  box-sizing: border-box;
+
+  background: rgba(255, 255, 255, 0.025);
+
+  border-bottom: 1px solid rgba(255, 255, 255, 0.045);
+}
+
+.tag-group-actions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+
+  gap: 4px;
+
+  min-width: 32px;
+
+  flex-shrink: 0;
+}
+
+.tag-group-edit-button,
+.tag-group-confirm-button,
+.tag-group-delete-button {
+  width: 30px;
+  height: 30px;
+}
+
+.tag-group-name-input {
+  height: 32px;
+
+  font-size: 13px;
+}
+
+/* ==========================================================
+   GROUP DRAG HANDLE
+========================================================== */
+
+.tag-group-drag-handle {
+  width: 34px;
+  height: 40px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  padding: 0;
+
+  border: none;
+
+  background: transparent;
+
+  color: #666;
+
+  cursor: grab;
+
+  touch-action: none;
+
+  -webkit-tap-highlight-color: transparent;
+}
+
+.tag-group-drag-handle:active {
+  cursor: grabbing;
+
+  color: #fff;
+}
+
+.tag-group-drag-handle svg {
+  width: 18px;
+  height: 18px;
+}
+
+/* ==========================================================
+   GROUP TITLE
+========================================================== */
+
+.tag-group-title {
+  min-width: 0;
+
+  overflow: hidden;
+
+  color: #e8e8e8;
+
+  font-size: 15px;
+  font-weight: 600;
+
+  white-space: nowrap;
+
+  text-overflow: ellipsis;
+}
+
+/* ==========================================================
+   GROUP COUNT
+========================================================== */
+
+.tag-group-count {
+  color: #777;
+
+  font-size: 11px;
+  font-weight: 500;
+
+  white-space: nowrap;
+}
+
+/* ==========================================================
+   GROUP EDIT CONTROLS
+========================================================== */
+
+.tag-group-edit-button,
+.tag-group-confirm-button,
+.tag-group-delete-button {
+  width: 32px;
+  height: 32px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  padding: 0;
+
+  border: 1px solid transparent;
+  border-radius: 9px;
+
+  background: transparent;
+
+  color: #777;
+
+  cursor: pointer;
+
+  transition:
+    background 0.18s ease,
+    color 0.18s ease,
+    border-color 0.18s ease;
+}
+
+.tag-group-edit-button:hover,
+.tag-group-confirm-button:hover {
+  background: rgba(255, 255, 255, 0.07);
+
+  border-color: rgba(255, 255, 255, 0.08);
+
+  color: #fff;
+}
+
+.tag-group-delete-button:hover {
+  background: rgba(255, 70, 70, 0.09);
+
+  border-color: rgba(255, 70, 70, 0.13);
+
+  color: #ff7777;
+}
+
+.tag-group-edit-button svg,
+.tag-group-confirm-button svg,
+.tag-group-delete-button svg {
+  width: 15px;
+  height: 15px;
+}
+
+/* ==========================================================
+   GROUP NAME INPUT
+========================================================== */
+
+.tag-group-name-input {
+  width: 100%;
+
+  min-width: 0;
+
+  height: 34px;
+
+  padding: 0 10px;
+
+  box-sizing: border-box;
+
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  border-radius: 9px;
+
+  outline: none;
+
+  background: rgba(255, 255, 255, 0.055);
+
+  color: #fff;
+
+  font-family: var(--font-main, sans-serif);
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.tag-group-name-input:focus {
+  border-color: rgba(255, 255, 255, 0.28);
+
+  background: rgba(255, 255, 255, 0.07);
+}
+
+/* ==========================================================
+   TAGS INSIDE GROUP
+========================================================== */
+
+.tag-order-group-tags {
+  display: flex;
+  flex-direction: column;
+
+  gap: 5px;
+
+  padding: 7px;
+}
+
+/* ==========================================================
+   TAG ROW
+========================================================== */
+
 .tag-order-row {
-  min-height: 58px;
+  min-height: 56px;
 
   display: grid;
 
@@ -1251,9 +1595,9 @@
   box-sizing: border-box;
 
   border: 1px solid rgba(255, 255, 255, 0.045);
-  border-radius: 13px;
+  border-radius: 12px;
 
-  background: rgba(255, 255, 255, 0.025);
+  background: rgba(255, 255, 255, 0.018);
 
   transition:
     background 0.15s ease,
@@ -1279,6 +1623,10 @@
 
   z-index: 10;
 }
+
+/* ==========================================================
+   TAG DRAG HANDLE
+========================================================== */
 
 .tag-drag-handle {
   width: 34px;
@@ -1314,6 +1662,10 @@
   height: 18px;
 }
 
+/* ==========================================================
+   TAG ICON
+========================================================== */
+
 .tag-order-icon {
   width: 40px;
   height: 40px;
@@ -1335,6 +1687,10 @@
   width: 18px;
   height: 18px;
 }
+
+/* ==========================================================
+   TAG NAME
+========================================================== */
 
 .tag-order-name {
   min-width: 0;
@@ -1380,6 +1736,50 @@
 }
 
 .tag-letter::after {
+  content: "";
+
+  display: block;
+
+  height: 1px;
+
+  margin-top: 7px;
+
+  background: rgba(255, 255, 255, 0.06);
+}
+
+/* ==========================================================
+   CUSTOM GROUP HEADINGS
+========================================================== */
+
+.tag-group-heading {
+  grid-column: 1 / -1;
+
+  width: 100%;
+
+  margin: 12px 0 -6px;
+  padding: 0 4px;
+
+  box-sizing: border-box;
+
+  color: #858585;
+
+  font-size: 11px;
+  font-weight: 700;
+
+  letter-spacing: 1.4px;
+
+  line-height: 1.5;
+
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.tag-group-heading:first-child {
+  margin-top: 0;
+}
+
+.tag-group-heading::after {
   content: "";
 
   display: block;
@@ -1765,6 +2165,13 @@
     font-size: 8px;
   }
 
+  .tag-group-heading {
+    margin-top: 10px;
+
+    font-size: 10px;
+
+    letter-spacing: 1.2px;
+  }
   /* ========================================================
      MOBILE SELECTION FOOTER
 
@@ -2074,23 +2481,76 @@
     height: 32px;
   }
 
-  /* ---------- Order Rows ---------- */
+  /* ---------- Grouped Custom Order ---------- */
+
+  .tag-add-group-button {
+    height: 44px;
+
+    font-size: 12px;
+
+    border-radius: 11px;
+  }
+
+  .tag-order-groups {
+    gap: 10px;
+  }
+
+  .tag-order-group {
+    border-radius: 13px;
+  }
+
+  .tag-order-group-header {
+    min-height: 52px;
+
+    grid-template-columns:
+      32px
+      minmax(0, 1fr)
+      auto
+      auto;
+
+    gap: 8px;
+
+    padding: 6px 8px;
+  }
+
+  .tag-group-actions {
+    gap: 3px;
+  }
+
+  .tag-group-drag-handle {
+    width: 32px;
+    height: 40px;
+  }
+
+  .tag-group-title {
+    font-size: 13px;
+  }
+
+  .tag-group-count {
+    font-size: 10px;
+  }
+
+  .tag-order-group-tags {
+    gap: 5px;
+
+    padding: 6px;
+  }
 
   .tag-order-row {
-    min-height: 56px;
+    min-height: 52px;
 
-    grid-template-columns: 34px 38px minmax(0, 1fr);
+    grid-template-columns: 32px 38px minmax(0, 1fr);
 
     gap: 8px;
 
     padding: 6px 8px;
 
-    border-radius: 12px;
+    border-radius: 11px;
   }
 
   .tag-drag-handle {
-    width: 34px;
-    height: 42px;
+    width: 32px;
+    height: 40px;
   }
 
   .tag-order-icon {
@@ -2352,6 +2812,11 @@
   }
 
   .tag-drag-handle {
+    min-width: 34px;
+    min-height: 42px;
+  }
+
+  .tag-group-drag-handle {
     min-width: 34px;
     min-height: 42px;
   }

@@ -146,6 +146,80 @@ function getTagsCollection() {
 }
 
 /* ==========================================================
+   TAG GROUP STATE DOCUMENT
+========================================================== */
+
+function getTagGroupsRef() {
+  const user = requireCloudUser();
+
+  return doc(db, "users", user.uid, "tags", "_groups");
+}
+
+/* ==========================================================
+   SAVE TAG GROUP STATE
+========================================================== */
+
+async function saveCloudTagGroups(groups, tags = []) {
+  const user = requireCloudUser();
+
+  const groupsRef = getTagGroupsRef();
+
+  const tagStates = {};
+
+  tags.forEach((tag) => {
+    if (!tag?.id) return;
+
+    tagStates[String(tag.id)] = {
+      groupId: tag.groupId || "default",
+      groupName: tag.groupName || "Default",
+      groupOrder: Number(tag.groupOrder ?? 0),
+      order: Number(tag.order ?? 0),
+    };
+  });
+
+  await setDoc(
+    groupsRef,
+    {
+      groups: groups.map((group) => ({
+        id: String(group.id),
+        name: group.name || "Default",
+        order: Number(group.order ?? 0),
+        system: !!group.system,
+      })),
+
+      tagStates,
+
+      updatedAt: serverTimestamp(),
+    },
+    {
+      merge: true,
+    },
+  );
+
+  console.log("MoonBox Cloud: tag group state saved");
+
+  return true;
+}
+
+/* ==========================================================
+   LOAD TAG GROUP STATE
+========================================================== */
+
+async function getCloudTagGroups() {
+  const groupsRef = getTagGroupsRef();
+
+  const snapshot = await getDoc(groupsRef);
+
+  if (!snapshot.exists()) {
+    return null;
+  }
+
+  return {
+    ...snapshot.data(),
+  };
+}
+
+/* ==========================================================
    CLOUD SONG ID
 ========================================================== */
 
@@ -526,6 +600,11 @@ async function getAllCloudTags() {
   const tags = [];
 
   snapshot.forEach((document) => {
+    /* _groups is metadata, not a tag */
+    if (document.id === "_groups") {
+      return;
+    }
+
     tags.push({
       id: document.id,
       ...document.data(),
@@ -1073,32 +1152,49 @@ document.addEventListener("moonbox:tagDeleted", async (event) => {
 });
 
 /* ==========================================================
+   TAG GROUP STATE CHANGED
+========================================================== */
+
+document.addEventListener("moonbox:tagGroupsChanged", async (event) => {
+  if (!cloudUser || !cloudReady) {
+    return;
+  }
+
+  const groups = event.detail?.groups;
+  const tags = event.detail?.tags;
+
+  if (!Array.isArray(groups)) {
+    return;
+  }
+
+  try {
+    await saveCloudTagGroups(groups, Array.isArray(tags) ? tags : []);
+
+    console.log("MoonBox Cloud: tag group state synced");
+  } catch (error) {
+    console.error("MoonBox Cloud: failed to save tag group state", error);
+  }
+});
+
+/* ==========================================================
    EXPORT API
 ========================================================== */
 
 export {
-  /* Authentication */
-
   getCloudUser,
   requireCloudUser,
-
-  /* User */
   getCloudUserProfile,
   updateCloudUserProfile,
-
-  /* Songs */
   saveCloudSong,
   saveCloudSongWithHash,
   getCloudSong,
-
-  /* Tags */
   saveCloudTag,
   getCloudTag,
   getAllCloudTags,
   updateCloudTag,
   deleteCloudTag,
-
-  /* File identity */
+  saveCloudTagGroups,
+  getCloudTagGroups,
   calculateFileHash,
   createCloudSongWithHash,
   findCloudSongByHash,
