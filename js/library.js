@@ -284,7 +284,7 @@ SONG TEMPLATE
         </h3>
 
         <span>
-          Unknown Artist
+            ${escapeHtml(song.folderName || "Unknown Artist")}
         </span>
 
       </div>
