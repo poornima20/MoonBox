@@ -574,6 +574,94 @@ function toggleTagSelection(tagId) {
 }
 
 /* ==========================================================
+   CLOUD GROUP STATE → LOCAL
+========================================================== */
+
+document.addEventListener("moonbox:cloudTagGroupsReady", (event) => {
+  const cloudGroups = event.detail?.groups;
+  const tagStates = event.detail?.tagStates;
+
+  if (!Array.isArray(cloudGroups)) {
+    return;
+  }
+
+  /*
+       Always keep Default.
+    */
+
+  const defaultGroup = {
+    ...DEFAULT_GROUP,
+  };
+
+  /*
+       Load cloud groups.
+    */
+
+  tagGroups = cloudGroups.map((group) => ({
+    id: String(group.id),
+    name: group.name || "Default",
+    order: Number(group.order ?? 0),
+    system: !!group.system,
+  }));
+
+  /*
+       Make sure Default exists.
+    */
+
+  if (!tagGroups.some((group) => group.id === "default")) {
+    tagGroups.unshift(defaultGroup);
+  }
+
+  ensureDefaultGroup();
+
+  /*
+       Apply saved group membership/order
+       to local tags.
+    */
+
+  tags.forEach((tag) => {
+    const state = tagStates?.[String(tag.id)];
+
+    if (!state) {
+      return;
+    }
+
+    tag.groupId = state.groupId || "default";
+
+    tag.groupName =
+      state.groupName ||
+      tagGroups.find((group) => group.id === tag.groupId)?.name ||
+      "Default";
+
+    tag.groupOrder = Number(state.groupOrder ?? 0);
+
+    tag.order = Number(state.order ?? 0);
+  });
+
+  /*
+       Normalize anything missing.
+    */
+
+  normalizeTagGroups();
+
+  /*
+       Save the restored state locally.
+    */
+
+  saveTagGroups();
+  saveTags();
+
+  /*
+       Refresh the UI.
+    */
+
+  renderTags();
+  updateSelectionFooter();
+
+  console.log("MoonBox: cloud group state restored", tagGroups, tags);
+});
+
+/* ==========================================================
    TAG SELECTION FOOTER
 ========================================================== */
 

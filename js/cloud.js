@@ -624,13 +624,29 @@ async function syncCloudTagsToLocal() {
   }
 
   try {
-    const cloudTags = await getAllCloudTags();
+    /*
+       Load both:
+
+       1. Cloud tag definitions
+       2. Cloud group state
+    */
+
+    const [cloudTags, cloudGroupState] = await Promise.all([
+      getAllCloudTags(),
+      getCloudTagGroups(),
+    ]);
 
     console.log(
       "MoonBox Cloud: loaded",
       cloudTags.length,
       "tags from Firestore",
     );
+
+    console.log("MoonBox Cloud: group state loaded", cloudGroupState);
+
+    /*
+       Send tag definitions
+    */
 
     document.dispatchEvent(
       new CustomEvent("moonbox:cloudTagsReady", {
@@ -639,10 +655,24 @@ async function syncCloudTagsToLocal() {
         },
       }),
     );
+
+    /*
+       Send group state
+    */
+
+    document.dispatchEvent(
+      new CustomEvent("moonbox:cloudTagGroupsReady", {
+        detail: {
+          groups: cloudGroupState?.groups || [],
+          tagStates: cloudGroupState?.tagStates || {},
+        },
+      }),
+    );
   } catch (error) {
-    console.error("MoonBox Cloud: failed to load tags", error);
+    console.error("MoonBox Cloud: failed to load tags and groups", error);
   }
 }
+
 /* ==========================================================
    UPDATE TAG
 ========================================================== */
