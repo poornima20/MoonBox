@@ -287,7 +287,6 @@
   box-sizing: border-box;
 
   padding-bottom: 50px;
-
 }
 
 /* ==========================================================
@@ -1988,10 +1987,7 @@
 
     box-sizing: border-box;
 
-   
-     touch-action: pan-y;
-
-
+    touch-action: pan-y;
   }
 
   /* ---------- Header ---------- */
@@ -2127,8 +2123,8 @@
 
     -webkit-overflow-scrolling: touch;
 
-      touch-action: pan-y;
-  overscroll-behavior-y: contain;
+    touch-action: pan-y;
+    overscroll-behavior-y: contain;
   }
 
   /* ---------- Tags ---------- */
@@ -2851,4 +2847,12 @@
 
 body:has(#tagModalRoot .tag-modal-overlay) .tag-selection-footer {
   display: none !important;
+}
+
+@media (max-width: 768px) {
+  .tag-grid {
+    height: 300px !important;
+    overflow-y: scroll !important;
+    touch-action: pan-y !important;
+  }
 }
