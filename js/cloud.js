@@ -1077,63 +1077,103 @@ document.addEventListener("moonbox:playFromLibrary", async (event) => {
     return;
   }
 
-  const songs = event.detail?.songs || [];
+  const queue = event.detail?.songs;
 
   const index = event.detail?.index ?? 0;
 
-  const song = songs[index];
+  if (!Array.isArray(queue)) {
+    return;
+  }
+
+  const song = queue[index];
 
   if (!song) {
     return;
   }
 
+  /*
+     Load existing Firebase metadata.
+
+     IMPORTANT:
+     This modifies the SAME song object that was sent
+     from Library to Player.
+  */
+
   await applyCloudMetadataToSong(song);
 
+  /*
+     Tell Player that Firebase metadata has arrived.
+
+     Player can now refresh the UI.
+  */
+
   document.dispatchEvent(
-    new CustomEvent("moonbox:songTagsChanged", {
+    new CustomEvent("moonbox:cloudSongMetadataReady", {
       detail: {
         songId: song.id || null,
         song: song,
-        tags: Array.isArray(song.tags) ? [...song.tags] : [],
       },
     }),
   );
 });
 
 /* ==========================================================
-   CLOUD → PLAYER TAG SYNC
+   CLOUD METADATA RESTORED
 ========================================================== */
 
-document.addEventListener("moonbox:songTagsChanged", (event) => {
-  const changedSong = event.detail?.song;
+document.addEventListener("moonbox:cloudSongMetadataReady", (event) => {
+  const cloudSong = event.detail?.song;
 
-  if (!changedSong) {
+  if (!cloudSong) {
     return;
   }
 
-  const currentSongObject = songs[currentSong];
+  const current = songs[currentSong];
 
-  if (!currentSongObject) {
+  if (!current) {
     return;
   }
 
-  if (String(changedSong.id) !== String(currentSongObject.id)) {
+  /*
+       Make sure this is the song currently displayed.
+    */
+
+  if (String(cloudSong.id) !== String(current.id)) {
     return;
   }
 
-  /* Keep the current player song synchronized */
-  currentSongObject.tags = Array.isArray(changedSong.tags)
-    ? [...changedSong.tags]
-    : [];
+  /*
+       The cloud layer has already merged the metadata
+       into the same song object.
 
-  /* Refresh tag definitions */
+       Refresh everything that can have changed.
+    */
+
+  updateTitleEditor(current);
+
+  artist.textContent = current.artist || "MoonBox";
+
+  applySongCover(current);
+
+  loadSongDetails(current);
+
+  loadLyrics(current);
+
+  loadNotes(current);
+
   requestPlayerTags();
 
-  /* Refresh visible selected tags */
   renderPlayerTags();
 
-  /* Refresh picker if it is open */
   renderPlayerTagPicker();
+
+  lucide.createIcons();
+
+  console.log("MoonBox Player: Firebase metadata restored", {
+    song: current.name,
+    cover: current.cover,
+    tags: current.tags,
+  });
 });
 
 /* ==========================================================
