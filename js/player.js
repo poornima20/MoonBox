@@ -112,6 +112,61 @@ document.addEventListener("DOMContentLoaded", () => {
   );
 
   /* ==========================================================
+   ALBUM ART HELPERS
+========================================================== */
+
+  function getSongCover(song) {
+    if (!song) {
+      return "assets/moon.png";
+    }
+
+    /*
+    Support the possible artwork field names.
+
+    MoonBox's preferred field is:
+        song.cover
+  */
+
+    return (
+      song.cover ||
+      song.albumArt ||
+      song.albumArtUrl ||
+      song.coverUrl ||
+      "assets/moon.png"
+    );
+  }
+
+  function applySongCover(song) {
+    const songCover = getSongCover(song);
+
+    if (cover) {
+      cover.src = songCover;
+    }
+
+    if (vinylCover) {
+      vinylCover.src = songCover;
+    }
+
+    /*
+    If the image cannot be loaded, fall back safely.
+  */
+
+    if (cover) {
+      cover.onerror = () => {
+        cover.onerror = null;
+        cover.src = "assets/moon.png";
+      };
+    }
+
+    if (vinylCover) {
+      vinylCover.onerror = () => {
+        vinylCover.onerror = null;
+        vinylCover.src = "assets/moon.png";
+      };
+    }
+  }
+
+  /* ==========================================================
    REFRESH PLAYER TAG UI WHEN SONG TAGS CHANGE
 ========================================================== */
 
@@ -606,42 +661,57 @@ document.addEventListener("DOMContentLoaded", () => {
   /* ==========================================================
    RECEIVE LIBRARY QUEUE
 ========================================================== */
-
   document.addEventListener("moonbox:libraryQueueChanged", (event) => {
-    songs = event.detail.songs || [];
+    songs = Array.isArray(event.detail.songs) ? event.detail.songs : [];
 
     /*
-      Keep current song if it still exists.
-      Otherwise reset safely.
-    */
+    Normalize artwork fields so Player always knows
+    where the album art is.
+  */
+
+    songs.forEach((song) => {
+      if (!song) return;
+
+      if (!song.cover) {
+        song.cover = song.albumArt || song.albumArtUrl || song.coverUrl || "";
+      }
+    });
+
+    /*
+    Keep current song if it still exists.
+  */
 
     if (currentSong >= songs.length) {
       currentSong = 0;
     }
   });
-
   /* ==========================================================
    PLAY SONG FROM LIBRARY
 ========================================================== */
 
   document.addEventListener("moonbox:playFromLibrary", (event) => {
-    const queue = event.detail.songs || [];
+    const queue = Array.isArray(event.detail.songs) ? event.detail.songs : [];
+
     const index = event.detail.index ?? 0;
 
     if (queue.length === 0) {
       return;
     }
 
-    /* Replace Player queue */
     songs = queue;
 
-    /* Select the clicked Library song */
+    songs.forEach((song) => {
+      if (!song) return;
+
+      if (!song.cover) {
+        song.cover = song.albumArt || song.albumArtUrl || song.coverUrl || "";
+      }
+    });
+
     currentSong = index;
 
-    /* Load it */
     loadSong(currentSong);
 
-    /* Start playback */
     playSong();
   });
 
@@ -759,14 +829,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     artist.textContent = song.artist || "MoonBox";
 
-    /* 6. Artwork */
-    const songCover = song.cover || "assets/moon.png";
-
-    cover.src = songCover;
-
-    if (vinylCover) {
-      vinylCover.src = songCover;
-    }
+    applySongCover(song);
 
     /* 7. Duration */
     const songDuration = Number.isFinite(song.duration) ? song.duration : 0;

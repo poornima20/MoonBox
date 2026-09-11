@@ -24,7 +24,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
   let currentScreen = 0;
 
-
   /* ======================================================
         MOBILE SWIPE SETTINGS
   ====================================================== */
@@ -51,7 +50,6 @@ document.addEventListener("DOMContentLoaded", () => {
   */
   const SWIPE_DIRECTION_RATIO = 1.5;
 
-
   /* ======================================================
         SONG SELECTION STATE
 
@@ -62,7 +60,6 @@ document.addEventListener("DOMContentLoaded", () => {
   ====================================================== */
 
   let songSelected = false;
-
 
   /*
     Allow player.js / library.js to tell navigation that
@@ -81,7 +78,6 @@ document.addEventListener("DOMContentLoaded", () => {
     songSelected = Boolean(selected);
   };
 
-
   /* ======================================================
         MOVE INDICATOR
   ====================================================== */
@@ -99,13 +95,10 @@ document.addEventListener("DOMContentLoaded", () => {
 
     indicator.style.height = `${buttonRect.height}px`;
 
-    indicator.style.left =
-      `${buttonRect.left - navRect.left}px`;
+    indicator.style.left = `${buttonRect.left - navRect.left}px`;
 
-    indicator.style.top =
-      `${buttonRect.top - navRect.top}px`;
+    indicator.style.top = `${buttonRect.top - navRect.top}px`;
   }
-
 
   /* ======================================================
         UPDATE ACTIVE BUTTON
@@ -120,7 +113,6 @@ document.addEventListener("DOMContentLoaded", () => {
       buttons[index].classList.add("active");
     }
   }
-
 
   /* ======================================================
         PLAYER NAVIGATION CHECK
@@ -137,7 +129,6 @@ document.addEventListener("DOMContentLoaded", () => {
     return songSelected === true;
   }
 
-
   /* ======================================================
         CHANGE SCREEN
   ====================================================== */
@@ -151,7 +142,6 @@ document.addEventListener("DOMContentLoaded", () => {
       index = TOTAL_SCREENS - 1;
     }
 
-
     /* ==================================================
         PLAYER GUARD
 
@@ -161,19 +151,15 @@ document.addEventListener("DOMContentLoaded", () => {
     ================================================== */
 
     if (index === 2) {
-
       /*
         Existing MoonBox navigation guard
       */
 
-      if (
-        typeof checkMoonBoxNavigation === "function"
-      ) {
+      if (typeof checkMoonBoxNavigation === "function") {
         if (!checkMoonBoxNavigation()) {
           return;
         }
       }
-
 
       /*
         IMPORTANT:
@@ -181,26 +167,17 @@ document.addEventListener("DOMContentLoaded", () => {
         Do not allow Player to open unless a song
         has actually been selected.
       */
-
-      if (!canOpenPlayer()) {
-        return;
-      }
     }
-
 
     /* ==================================================
         EXISTING GUARD FOR LIBRARY
     ================================================== */
 
-    if (
-      index === 1 &&
-      typeof checkMoonBoxNavigation === "function"
-    ) {
+    if (index === 1 && typeof checkMoonBoxNavigation === "function") {
       if (!checkMoonBoxNavigation()) {
         return;
       }
     }
-
 
     /* ==================================================
         ACTUAL SCREEN CHANGE
@@ -208,14 +185,12 @@ document.addEventListener("DOMContentLoaded", () => {
 
     currentScreen = index;
 
-    workspace.style.transform =
-      `translateX(-${currentScreen * 100}vw)`;
+    workspace.style.transform = `translateX(-${currentScreen * 100}vw)`;
 
     updateButtons(currentScreen);
 
     moveIndicator(currentScreen);
   }
-
 
   /* ======================================================
         CLICK EVENTS
@@ -227,13 +202,11 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   });
 
-
   /* ======================================================
         KEYBOARD
   ====================================================== */
 
   document.addEventListener("keydown", (e) => {
-
     if (e.key === "ArrowRight") {
       goToScreen(currentScreen + 1);
     }
@@ -242,7 +215,6 @@ document.addEventListener("DOMContentLoaded", () => {
       goToScreen(currentScreen - 1);
     }
   });
-
 
   /* ======================================================
         TOUCH SWIPE
@@ -258,13 +230,11 @@ document.addEventListener("DOMContentLoaded", () => {
 
   let swipeTarget = null;
 
-
   /* ======================================================
         ELEMENTS THAT SHOULD NEVER START NAVIGATION
   ====================================================== */
 
   function isNoSwipeElement(target) {
-
     if (!target) {
       return false;
     }
@@ -309,12 +279,11 @@ document.addEventListener("DOMContentLoaded", () => {
           ".player-tag-picker-window",
 
           ".folder-overlay",
-          ".folder-window"
-        ].join(",")
-      )
+          ".folder-window",
+        ].join(","),
+      ),
     );
   }
-
 
   /* ======================================================
         TOUCH START
@@ -323,7 +292,6 @@ document.addEventListener("DOMContentLoaded", () => {
   workspace.addEventListener(
     "touchstart",
     (e) => {
-
       /*
         Only support one finger.
 
@@ -331,19 +299,14 @@ document.addEventListener("DOMContentLoaded", () => {
         becoming navigation gestures.
       */
 
-      if (
-        !e.touches ||
-        e.touches.length !== 1
-      ) {
+      if (!e.touches || e.touches.length !== 1) {
         dragging = false;
         return;
       }
 
-
       const touch = e.touches[0];
 
       swipeTarget = e.target;
-
 
       /*
         Interactive areas should never initiate
@@ -355,7 +318,6 @@ document.addEventListener("DOMContentLoaded", () => {
         return;
       }
 
-
       startX = touch.clientX;
       startY = touch.clientY;
 
@@ -365,10 +327,9 @@ document.addEventListener("DOMContentLoaded", () => {
       dragging = true;
     },
     {
-      passive: true
-    }
+      passive: true,
+    },
   );
-
 
   /* ======================================================
         TOUCH MOVE
@@ -377,38 +338,29 @@ document.addEventListener("DOMContentLoaded", () => {
   workspace.addEventListener(
     "touchmove",
     (e) => {
-
       if (!dragging) {
         return;
       }
-
 
       /*
         If another finger appears, cancel navigation.
       */
 
-      if (
-        !e.touches ||
-        e.touches.length !== 1
-      ) {
+      if (!e.touches || e.touches.length !== 1) {
         dragging = false;
         return;
       }
-
 
       const touch = e.touches[0];
 
       currentX = touch.clientX;
       currentY = touch.clientY;
 
-
       const dx = currentX - startX;
       const dy = currentY - startY;
 
-
       const absX = Math.abs(dx);
       const absY = Math.abs(dy);
-
 
       /*
         ==================================================
@@ -427,25 +379,20 @@ document.addEventListener("DOMContentLoaded", () => {
         return;
       }
 
-
       /*
         If movement becomes strongly diagonal,
         don't navigate.
       */
 
-      if (
-        absY > 10 &&
-        absX < absY * SWIPE_DIRECTION_RATIO
-      ) {
+      if (absY > 10 && absX < absY * SWIPE_DIRECTION_RATIO) {
         dragging = false;
         return;
       }
     },
     {
-      passive: true
-    }
+      passive: true,
+    },
   );
-
 
   /* ======================================================
         TOUCH END
@@ -454,19 +401,15 @@ document.addEventListener("DOMContentLoaded", () => {
   workspace.addEventListener(
     "touchend",
     () => {
-
       if (!dragging) {
         return;
       }
 
-
       const dx = currentX - startX;
       const dy = currentY - startY;
 
-
       const absX = Math.abs(dx);
       const absY = Math.abs(dy);
-
 
       /* ==================================================
           SAFETY CHECK 1
@@ -479,20 +422,16 @@ document.addEventListener("DOMContentLoaded", () => {
         return;
       }
 
-
       /* ==================================================
           SAFETY CHECK 2
 
           Horizontal swipe must be clearly dominant.
       ================================================== */
 
-      if (
-        absX < absY * SWIPE_DIRECTION_RATIO
-      ) {
+      if (absX < absY * SWIPE_DIRECTION_RATIO) {
         dragging = false;
         return;
       }
-
 
       /* ==================================================
           SAFETY CHECK 3
@@ -505,13 +444,11 @@ document.addEventListener("DOMContentLoaded", () => {
         return;
       }
 
-
       /* ==================================================
           REAL HORIZONTAL SWIPE
       ================================================== */
 
       if (dx < 0) {
-
         /*
           Swipe LEFT
 
@@ -521,7 +458,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
         const nextScreen = currentScreen + 1;
 
-
         /*
           Extra Player protection.
 
@@ -530,19 +466,8 @@ document.addEventListener("DOMContentLoaded", () => {
           without a selected song.
         */
 
-        if (
-          nextScreen === 2 &&
-          !canOpenPlayer()
-        ) {
-          dragging = false;
-          return;
-        }
-
-
         goToScreen(nextScreen);
-
       } else {
-
         /*
           Swipe RIGHT
 
@@ -552,7 +477,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
         goToScreen(currentScreen - 1);
       }
-
 
       /* ==================================================
           RESET
@@ -569,10 +493,9 @@ document.addEventListener("DOMContentLoaded", () => {
       swipeTarget = null;
     },
     {
-      passive: true
-    }
+      passive: true,
+    },
   );
-
 
   /* ======================================================
         TOUCH CANCEL
@@ -581,7 +504,6 @@ document.addEventListener("DOMContentLoaded", () => {
   workspace.addEventListener(
     "touchcancel",
     () => {
-
       dragging = false;
 
       startX = 0;
@@ -593,10 +515,9 @@ document.addEventListener("DOMContentLoaded", () => {
       swipeTarget = null;
     },
     {
-      passive: true
-    }
+      passive: true,
+    },
   );
-
 
   /* ======================================================
         MOUSE WHEEL — HORIZONTAL
@@ -605,19 +526,15 @@ document.addEventListener("DOMContentLoaded", () => {
   let wheelLock = false;
 
   window.addEventListener("wheel", (e) => {
-
     if (wheelLock) {
       return;
     }
-
 
     if (Math.abs(e.deltaX) < 20) {
       return;
     }
 
-
     wheelLock = true;
-
 
     if (e.deltaX > 0) {
       goToScreen(currentScreen + 1);
@@ -625,12 +542,10 @@ document.addEventListener("DOMContentLoaded", () => {
       goToScreen(currentScreen - 1);
     }
 
-
     setTimeout(() => {
       wheelLock = false;
     }, 450);
   });
-
 
   /* ======================================================
         WINDOW RESIZE
@@ -639,19 +554,14 @@ document.addEventListener("DOMContentLoaded", () => {
   let resizeTimer;
 
   window.addEventListener("resize", () => {
-
     clearTimeout(resizeTimer);
 
     resizeTimer = setTimeout(() => {
-
       moveIndicator(currentScreen);
 
-      workspace.style.transform =
-        `translateX(-${currentScreen * 100}vw)`;
-
+      workspace.style.transform = `translateX(-${currentScreen * 100}vw)`;
     }, 100);
   });
-
 
   /* ======================================================
         RESIZE OBSERVER
@@ -660,7 +570,6 @@ document.addEventListener("DOMContentLoaded", () => {
   const nav = document.querySelector(".nav-pill");
 
   if (nav) {
-
     const resizeObserver = new ResizeObserver(() => {
       moveIndicator(currentScreen);
     });
@@ -668,14 +577,11 @@ document.addEventListener("DOMContentLoaded", () => {
     resizeObserver.observe(nav);
   }
 
-
   /* ======================================================
         FOLDER BUTTON
   ====================================================== */
 
-  const folderButton =
-    document.querySelector(".folder-button");
-
+  const folderButton = document.querySelector(".folder-button");
 
   /* ======================================================
         INITIALIZE
@@ -685,7 +591,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
   goToScreen(0);
 });
-
 
 /* ==========================================================
    LUCIDE
