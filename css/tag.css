@@ -1969,15 +1969,18 @@
 
 /* ==========================================================
    28. MOBILE — TAG SCREEN
-   ========================================================== */
+========================================================== */
 
 @media (max-width: 768px) {
+  /* ======================================================
+     TAG SCREEN
+  ====================================================== */
+
   .tag-screen {
     position: relative;
 
     width: 100%;
     height: 100%;
-
     min-height: 0;
 
     display: flex;
@@ -1987,13 +1990,21 @@
 
     box-sizing: border-box;
 
+    /*
+      Vertical gestures belong to the Tag screen.
+      navigation.js handles horizontal navigation.
+    */
     touch-action: pan-y;
+
+    overflow: hidden;
   }
 
-  /* ---------- Header ---------- */
+  /* ======================================================
+     HEADER
+  ====================================================== */
 
   .tag-header {
-    flex-shrink: 0;
+    flex: 0 0 auto;
 
     margin-bottom: 18px;
   }
@@ -2006,11 +2017,12 @@
 
   .tag-header p {
     font-size: 12px;
-
     line-height: 1.4;
   }
 
-  /* ---------- Manage Button ---------- */
+  /* ======================================================
+     MANAGE BUTTON
+  ====================================================== */
 
   .tag-manage-button {
     width: 44px;
@@ -2030,19 +2042,21 @@
     height: 20px;
   }
 
-  /* ---------- Search ---------- */
+  /* ======================================================
+     SEARCH
+  ====================================================== */
 
   .tag-search {
     width: 100%;
     height: 44px;
 
-    flex-shrink: 0;
+    flex: 0 0 auto;
 
     gap: 10px;
 
     padding: 0 14px;
 
-    margin-bottom: 22px;
+    margin-bottom: 14px;
 
     border-radius: 18px;
   }
@@ -2050,13 +2064,17 @@
   .tag-search svg {
     width: 18px;
     height: 18px;
+
+    flex-shrink: 0;
   }
 
   .tag-search input {
     font-size: 14px;
   }
 
-  /* ---------- Manage Popup ---------- */
+  /* ======================================================
+     MANAGE POPUP
+  ====================================================== */
 
   .tag-menu {
     width: 250px;
@@ -2094,14 +2112,19 @@
     font-size: 11px;
   }
 
-  /* ---------- Tag Grid ---------- */
+  /* ======================================================
+     TAG GRID
+     
+     THIS IS THE ACTUAL MOBILE SCROLL AREA.
+  ====================================================== */
 
   .tag-grid {
-    flex: 1 1 auto;
-
-    min-height: 0;
+    flex: 1 1 0;
 
     width: 100%;
+
+    min-width: 0;
+    min-height: 0;
 
     display: grid;
 
@@ -2112,40 +2135,148 @@
 
     align-content: start;
 
+    /*
+      IMPORTANT:
+      The grid itself scrolls vertically.
+    */
     overflow-y: auto;
     overflow-x: hidden;
 
-    padding: 0 2px 85px;
+    /*
+      Space above the first heading
+      and below the last tag.
+    */
+    padding: 8px 2px 110px;
 
     margin: 0;
 
     box-sizing: border-box;
 
+    /*
+      Mobile scrolling.
+    */
     -webkit-overflow-scrolling: touch;
 
+    /*
+      Tell browser this surface is vertical.
+    */
     touch-action: pan-y;
+
+    /*
+      Don't bounce the entire workspace when
+      the Tag list reaches its end.
+    */
     overscroll-behavior-y: contain;
+
+    /*
+      Hide scrollbar.
+    */
+    scrollbar-width: none;
   }
 
-  /* ---------- Tags ---------- */
+  .tag-grid::-webkit-scrollbar {
+    display: none;
+  }
+
+  /* ======================================================
+     CUSTOM GROUP HEADING
+  ====================================================== */
+
+  .tag-group-heading {
+    grid-column: 1 / -1;
+
+    width: 100%;
+
+    margin: 4px 0 2px;
+
+    padding: 0 4px;
+
+    box-sizing: border-box;
+
+    color: #858585;
+
+    font-size: 10px;
+    font-weight: 700;
+
+    line-height: 1.5;
+
+    letter-spacing: 1.2px;
+
+    white-space: nowrap;
+
+    overflow: visible;
+
+    text-overflow: ellipsis;
+  }
+
+  .tag-group-heading::after {
+    content: "";
+
+    display: block;
+
+    height: 1px;
+
+    margin-top: 7px;
+
+    background: rgba(255, 255, 255, 0.06);
+  }
+
+  /* ======================================================
+     ALPHABETICAL LETTER
+  ====================================================== */
+
+  .tag-letter {
+    grid-column: 1 / -1;
+
+    width: 100%;
+
+    margin: 4px 0 2px;
+
+    padding: 0 4px;
+
+    font-size: 10px;
+
+    letter-spacing: 1.2px;
+  }
+
+  /* ======================================================
+     TAG
+  ====================================================== */
 
   .tag {
     width: 100%;
-
     min-width: 0;
 
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+
     gap: 7px;
+
+    padding: 5px 2px;
+
+    box-sizing: border-box;
   }
+
+  /* ======================================================
+     TAG CIRCLE
+  ====================================================== */
 
   .tag-circle {
     width: 72px;
     height: 72px;
+
+    flex-shrink: 0;
   }
 
   .tag-circle svg {
     width: 25px;
     height: 25px;
   }
+
+  /* ======================================================
+     TAG NAME
+  ====================================================== */
 
   .tag-name,
   .tag span {
@@ -2164,33 +2295,29 @@
     text-overflow: ellipsis;
   }
 
+  /* ======================================================
+     SONG COUNT
+  ====================================================== */
+
   .tag-song-count {
     margin-top: -3px;
 
     font-size: 8px;
   }
 
-  .tag-group-heading {
-    margin-top: 10px;
-
-    font-size: 10px;
-
-    letter-spacing: 1.2px;
-  }
-  /* ========================================================
-     MOBILE SELECTION FOOTER
-
-     Absolute inside .tag-screen.
-     This keeps it visible without fighting
-     the mobile viewport.
-     ======================================================== */
+  /* ======================================================
+     SELECTION FOOTER
+  ====================================================== */
 
   .tag-selection-footer {
     position: fixed;
+
     left: 10px;
     right: 10px;
-    bottom: 10px;
-    top: 78vh;
+
+    bottom: max(10px, env(safe-area-inset-bottom));
+
+    top: auto;
 
     width: auto;
 
@@ -2219,8 +2346,14 @@
     opacity: 1;
   }
 
+  /* ======================================================
+     SELECTION INFO
+  ====================================================== */
+
   .tag-selection-info {
     gap: 8px;
+
+    min-width: 0;
 
     flex: 1 1 auto;
   }
@@ -2243,6 +2376,8 @@
 
   .tag-selection-text {
     gap: 2px;
+
+    min-width: 0;
   }
 
   .tag-selection-text strong {
@@ -2253,23 +2388,31 @@
     font-size: 8px;
   }
 
-  /* ---------- Clear Selection ---------- */
+  /* ======================================================
+     CLEAR SELECTION
+  ====================================================== */
 
   .tag-clear-selection {
     display: block;
+
+    flex-shrink: 0;
 
     margin: 0 7px;
 
     font-size: 8px;
   }
 
-  /* ---------- View Library ---------- */
+  /* ======================================================
+     VIEW LIBRARY
+  ====================================================== */
 
   .tag-view-library {
     width: 112px;
     min-width: 112px;
 
     height: 42px;
+
+    flex-shrink: 0;
 
     gap: 6px;
 
@@ -2285,9 +2428,9 @@
     height: 15px;
   }
 
-  /* ========================================================
+  /* ======================================================
      MOBILE MODAL
-     ======================================================== */
+  ====================================================== */
 
   .tag-modal-overlay {
     position: fixed;
@@ -2313,6 +2456,7 @@
 
     z-index: 1000000;
   }
+
   .tag-modal {
     position: relative;
 
@@ -2338,21 +2482,9 @@
     z-index: 999999999;
   }
 
-  @keyframes tagModalMobileIn {
-    from {
-      opacity: 0;
-
-      transform: scale(0.97) translateY(8px);
-    }
-
-    to {
-      opacity: 1;
-
-      transform: scale(1) translateY(0);
-    }
-  }
-
-  /* ---------- Modal Header ---------- */
+  /* ======================================================
+     MODAL HEADER
+  ====================================================== */
 
   .tag-modal-header {
     padding: 17px 18px 11px;
@@ -2360,7 +2492,6 @@
 
   .tag-modal-header h2 {
     font-size: 20px;
-
     line-height: 1.2;
   }
 
@@ -2370,7 +2501,6 @@
     max-width: 300px;
 
     font-size: 11px;
-
     line-height: 1.4;
   }
 
@@ -2381,7 +2511,9 @@
     border-radius: 10px;
   }
 
-  /* ---------- Modal Body ---------- */
+  /* ======================================================
+     MODAL BODY
+  ====================================================== */
 
   .tag-modal-body {
     flex: 1 1 auto;
@@ -2393,9 +2525,13 @@
     padding: 3px 18px 8px;
 
     -webkit-overflow-scrolling: touch;
+
+    touch-action: pan-y;
   }
 
-  /* ---------- Modal Footer ---------- */
+  /* ======================================================
+     MODAL FOOTER
+  ====================================================== */
 
   .tag-modal-footer {
     flex-shrink: 0;
@@ -2405,18 +2541,9 @@
     padding: 10px 18px max(12px, env(safe-area-inset-bottom));
   }
 
-  .tag-secondary-button,
-  .tag-primary-button {
-    height: 40px;
-
-    flex: 1;
-
-    font-size: 12px;
-
-    border-radius: 10px;
-  }
-
-  /* ---------- Form ---------- */
+  /* ======================================================
+     FORM
+  ====================================================== */
 
   .tag-form-label {
     margin-top: 5px;
@@ -2441,7 +2568,9 @@
     font-size: 10px;
   }
 
-  /* ---------- Icon Picker ---------- */
+  /* ======================================================
+     ICON PICKER
+  ====================================================== */
 
   .tag-icon-picker {
     grid-template-columns: repeat(7, minmax(0, 1fr));
@@ -2460,12 +2589,18 @@
     height: 17px;
   }
 
-  /* ---------- Edit Rows ---------- */
+  /* ======================================================
+     EDIT ROWS
+  ====================================================== */
 
   .tag-edit-row {
     min-height: 56px;
 
-    grid-template-columns: 38px minmax(0, 1fr) 36px 36px;
+    grid-template-columns:
+      38px
+      minmax(0, 1fr)
+      36px
+      36px;
 
     gap: 7px;
 
@@ -2486,7 +2621,9 @@
     height: 32px;
   }
 
-  /* ---------- Grouped Custom Order ---------- */
+  /* ======================================================
+     CUSTOM ORDER
+  ====================================================== */
 
   .tag-add-group-button {
     height: 44px;
@@ -2544,7 +2681,10 @@
   .tag-order-row {
     min-height: 52px;
 
-    grid-template-columns: 32px 38px minmax(0, 1fr);
+    grid-template-columns:
+      32px
+      38px
+      minmax(0, 1fr);
 
     gap: 8px;
 
@@ -2567,17 +2707,9 @@
     font-size: 13px;
   }
 
-  /* ---------- Letter Headings ---------- */
-
-  .tag-letter {
-    margin-top: 10px;
-
-    font-size: 10px;
-
-    letter-spacing: 1.2px;
-  }
-
-  /* ---------- Navigation Popup ---------- */
+  /* ======================================================
+     NAVIGATION POPUP
+  ====================================================== */
 
   .moonbox-navigation-overlay {
     padding: 16px;
@@ -2847,12 +2979,4 @@
 
 body:has(#tagModalRoot .tag-modal-overlay) .tag-selection-footer {
   display: none !important;
-}
-
-@media (max-width: 768px) {
-  .tag-grid {
-    height: 300px !important;
-    overflow-y: scroll !important;
-    touch-action: pan-y !important;
-  }
 }
