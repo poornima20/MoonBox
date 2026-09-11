@@ -685,6 +685,66 @@ document.addEventListener("DOMContentLoaded", () => {
       currentSong = 0;
     }
   });
+
+  /* ==========================================================
+   CLOUD METADATA RESTORED
+========================================================== */
+
+  document.addEventListener("moonbox:cloudSongMetadataReady", (event) => {
+    const cloudSong = event.detail?.song;
+
+    if (!cloudSong) {
+      return;
+    }
+
+    const current = songs[currentSong];
+
+    if (!current) {
+      return;
+    }
+
+    /*
+      Make sure Firebase metadata belongs to
+      the song currently displayed in Player.
+    */
+
+    if (String(cloudSong.id) !== String(current.id)) {
+      return;
+    }
+
+    /*
+      Firebase metadata has already been merged
+      into the SAME song object.
+
+      Refresh Player UI.
+    */
+
+    updateTitleEditor(current);
+
+    artist.textContent = current.artist || "MoonBox";
+
+    applySongCover(current);
+
+    loadSongDetails(current);
+
+    loadLyrics(current);
+
+    loadNotes(current);
+
+    requestPlayerTags();
+
+    renderPlayerTags();
+
+    renderPlayerTagPicker();
+
+    lucide.createIcons();
+
+    console.log("MoonBox Player: Firebase metadata restored", {
+      song: current.name,
+      cover: current.cover,
+      tags: current.tags,
+    });
+  });
   /* ==========================================================
    PLAY SONG FROM LIBRARY
 ========================================================== */

@@ -1073,7 +1073,7 @@ async function applyCloudMetadataToSong(song) {
 ========================================================== */
 
 document.addEventListener("moonbox:playFromLibrary", async (event) => {
-  if (!cloudReady) {
+  if (!cloudUser) {
     return;
   }
 
@@ -1115,65 +1115,6 @@ document.addEventListener("moonbox:playFromLibrary", async (event) => {
       },
     }),
   );
-});
-
-/* ==========================================================
-   CLOUD METADATA RESTORED
-========================================================== */
-
-document.addEventListener("moonbox:cloudSongMetadataReady", (event) => {
-  const cloudSong = event.detail?.song;
-
-  if (!cloudSong) {
-    return;
-  }
-
-  const current = songs[currentSong];
-
-  if (!current) {
-    return;
-  }
-
-  /*
-       Make sure this is the song currently displayed.
-    */
-
-  if (String(cloudSong.id) !== String(current.id)) {
-    return;
-  }
-
-  /*
-       The cloud layer has already merged the metadata
-       into the same song object.
-
-       Refresh everything that can have changed.
-    */
-
-  updateTitleEditor(current);
-
-  artist.textContent = current.artist || "MoonBox";
-
-  applySongCover(current);
-
-  loadSongDetails(current);
-
-  loadLyrics(current);
-
-  loadNotes(current);
-
-  requestPlayerTags();
-
-  renderPlayerTags();
-
-  renderPlayerTagPicker();
-
-  lucide.createIcons();
-
-  console.log("MoonBox Player: Firebase metadata restored", {
-    song: current.name,
-    cover: current.cover,
-    tags: current.tags,
-  });
 });
 
 /* ==========================================================
