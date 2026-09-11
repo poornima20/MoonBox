@@ -1989,6 +1989,9 @@
     box-sizing: border-box;
 
     overflow: hidden;
+     touch-action: pan-y;
+
+
   }
 
   /* ---------- Header ---------- */
@@ -2123,6 +2126,9 @@
     box-sizing: border-box;
 
     -webkit-overflow-scrolling: touch;
+
+      touch-action: pan-y;
+  overscroll-behavior-y: contain;
   }
 
   /* ---------- Tags ---------- */
