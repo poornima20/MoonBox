@@ -2,598 +2,249 @@
    MOON BOX
    navigation.js
 
-   Mobile navigation safeguards:
-   - Vertical scrolling never changes screens
-   - Horizontal swipe must be intentional
-   - Interactive elements never trigger navigation
-   - Player cannot be opened by swipe without a song
-========================================================== */
+   Responsibilities:
+   - Resizable Tags / Library panels
+   - Nothing else
+
+   Top navigation no longer switches screens.
+   ========================================================== */
 
 document.addEventListener("DOMContentLoaded", () => {
   /* ======================================================
         ELEMENTS
   ====================================================== */
 
-  const workspace = document.getElementById("workspace");
+  const musicWorkspace = document.querySelector(".music-workspace");
 
-  const buttons = document.querySelectorAll(".nav-button");
+  const divider = document.getElementById("workspaceDivider");
 
-  const indicator = document.querySelector(".nav-indicator");
+  const tagPanel = document.querySelector(".tag-screen");
 
-  const TOTAL_SCREENS = buttons.length;
-
-  let currentScreen = 0;
+  const libraryPanel = document.querySelector(".library-screen");
 
   /* ======================================================
-        MOBILE SWIPE SETTINGS
+        RESIZE STATE
   ====================================================== */
 
-  const SWIPE_DISTANCE = 90;
+  let resizingPanels = false;
+
+  /* ======================================================
+      MINIMUM PANEL WIDTHS
+====================================================== */
+
+  const DESKTOP_TAG_MIN = 350;
+  const DESKTOP_LIBRARY_MIN = 420;
 
   /*
-    Horizontal movement must be substantially larger
-    than vertical movement.
+  Tiny-device minimums.
 
-    Example:
-
-    dx = 100
-    dy = 20
-
-    100 > 20 * 1.5
-    YES → horizontal swipe
-
-    dx = 100
-    dy = 90
-
-    100 > 90 * 1.5
-    NO → ignore
-  */
-  const SWIPE_DIRECTION_RATIO = 1.5;
+  These are intentionally small because Tags and Library
+  must remain visible together even on very narrow screens.
+*/
+  const TINY_TAG_MIN = 140;
+  const TINY_LIBRARY_MIN = 140;
 
   /* ======================================================
-        SONG SELECTION STATE
+      GET MINIMUM WIDTHS
+====================================================== */
 
-        This is intentionally kept separate from navigation.
+  function getPanelMinimums() {
+    const isMobile = window.innerWidth <= 768;
 
-        Player navigation will only be allowed when this
-        becomes true.
-  ====================================================== */
-
-  let songSelected = false;
-
-  /*
-    Allow player.js / library.js to tell navigation that
-    a song has been selected.
-
-    Example from your player/library code:
-
-        window.moonBoxSongSelected(true);
-
-    When there is no active song:
-
-        window.moonBoxSongSelected(false);
-  */
-
-  window.moonBoxSongSelected = (selected) => {
-    songSelected = Boolean(selected);
-  };
-
-  /* ======================================================
-        MOVE INDICATOR
-  ====================================================== */
-
-  function moveIndicator(index) {
-    const button = buttons[index];
-
-    if (!button || !indicator) return;
-
-    const navRect = button.parentElement.getBoundingClientRect();
-
-    const buttonRect = button.getBoundingClientRect();
-
-    indicator.style.width = `${buttonRect.width}px`;
-
-    indicator.style.height = `${buttonRect.height}px`;
-
-    indicator.style.left = `${buttonRect.left - navRect.left}px`;
-
-    indicator.style.top = `${buttonRect.top - navRect.top}px`;
-  }
-
-  /* ======================================================
-        UPDATE ACTIVE BUTTON
-  ====================================================== */
-
-  function updateButtons(index) {
-    buttons.forEach((button) => {
-      button.classList.remove("active");
-    });
-
-    if (buttons[index]) {
-      buttons[index].classList.add("active");
+    if (!isMobile) {
+      return {
+        tagMin: DESKTOP_TAG_MIN,
+        libraryMin: DESKTOP_LIBRARY_MIN,
+      };
     }
+
+    if (!musicWorkspace || !divider) {
+      return {
+        tagMin: TINY_TAG_MIN,
+        libraryMin: TINY_LIBRARY_MIN,
+      };
+    }
+
+    const workspaceWidth = musicWorkspace.getBoundingClientRect().width;
+
+    const dividerWidth = divider.getBoundingClientRect().width || 8;
+
+    const availableWidth = Math.max(0, workspaceWidth - dividerWidth);
+
+    /*
+    Tags gets roughly 42% of the available space
+    as its preferred minimum.
+
+    But it is never allowed below 140px.
+  */
+    let tagMin = Math.max(TINY_TAG_MIN, Math.min(220, availableWidth * 0.42));
+
+    /*
+    Library gets the remaining usable space.
+
+    On normal phones this will approach 300px.
+    On very tiny devices it is allowed to shrink.
+  */
+    let libraryMin = Math.max(
+      TINY_LIBRARY_MIN,
+      Math.min(300, availableWidth - tagMin),
+    );
+
+    /*
+    Final safety check:
+    never demand more width than physically exists.
+  */
+    if (tagMin + libraryMin > availableWidth) {
+      libraryMin = Math.max(TINY_LIBRARY_MIN, availableWidth - tagMin);
+    }
+
+    if (tagMin + libraryMin > availableWidth) {
+      tagMin = Math.max(TINY_TAG_MIN, availableWidth - libraryMin);
+    }
+
+    return {
+      tagMin,
+      libraryMin,
+    };
   }
 
   /* ======================================================
-        PLAYER NAVIGATION CHECK
+        RESIZE PANELS
   ====================================================== */
 
-  function canOpenPlayer() {
-    /*
-      Player is screen 2.
+  function resizePanels(clientX) {
+    if (!musicWorkspace || !tagPanel || !libraryPanel || !divider) {
+      return;
+    }
 
-      Never allow navigation into Player unless a song
-      has actually been selected.
+    const workspaceRect = musicWorkspace.getBoundingClientRect();
+
+    const dividerWidth = divider.getBoundingClientRect().width || 8;
+
+    const { tagMin, libraryMin } = getPanelMinimums();
+
+    /*
+      Total usable width after removing divider.
     */
 
-    return songSelected === true;
+    const availableWidth = workspaceRect.width - dividerWidth;
+
+    /*
+      Maximum width Tags can have while
+      still leaving Library its minimum.
+    */
+
+    const maxTagWidth = availableWidth - libraryMin;
+
+    /*
+      Mouse / pointer position relative
+      to the workspace.
+    */
+
+    let newTagWidth = clientX - workspaceRect.left;
+
+    /*
+      Enforce minimum Tags width
+      and maximum Tags width.
+    */
+
+    newTagWidth = Math.max(tagMin, Math.min(newTagWidth, maxTagWidth));
+
+    /*
+      Apply width through CSS variable.
+    */
+
+    musicWorkspace.style.setProperty("--tags-width", `${newTagWidth}px`);
+    /*
+  Update Tags layout based on the actual
+  width of the Tags panel.
+*/
+    tagPanel.classList.toggle("narrow-tags", newTagWidth < 400);
+
+    tagPanel.classList.toggle("compact-tags", newTagWidth <= 270);
+
+    tagPanel.classList.toggle("tiny-tags", newTagWidth <= 210);
+
+    tagPanel.classList.toggle("ultra-tiny-tags", newTagWidth <= 165);
   }
 
   /* ======================================================
-        CHANGE SCREEN
+        POINTER DOWN
   ====================================================== */
 
-  function goToScreen(index) {
-    if (index < 0) {
-      index = 0;
-    }
-
-    if (index >= TOTAL_SCREENS) {
-      index = TOTAL_SCREENS - 1;
-    }
-
-    /* ==================================================
-        PLAYER GUARD
-
-        Screen 0 = Tags
-        Screen 1 = Library
-        Screen 2 = Player
-    ================================================== */
-
-    if (index === 2) {
+  if (divider) {
+    divider.addEventListener("pointerdown", (event) => {
       /*
-        Existing MoonBox navigation guard
+        Only allow primary mouse button.
       */
 
-      if (typeof checkMoonBoxNavigation === "function") {
-        if (!checkMoonBoxNavigation()) {
-          return;
-        }
-      }
-
-      /*
-        IMPORTANT:
-
-        Do not allow Player to open unless a song
-        has actually been selected.
-      */
-    }
-
-    /* ==================================================
-        EXISTING GUARD FOR LIBRARY
-    ================================================== */
-
-    if (index === 1 && typeof checkMoonBoxNavigation === "function") {
-      if (!checkMoonBoxNavigation()) {
-        return;
-      }
-    }
-
-    /* ==================================================
-        ACTUAL SCREEN CHANGE
-    ================================================== */
-
-    currentScreen = index;
-
-    workspace.style.transform = `translateX(-${currentScreen * 100}vw)`;
-
-    updateButtons(currentScreen);
-
-    moveIndicator(currentScreen);
-  }
-
-  /* ======================================================
-        CLICK EVENTS
-  ====================================================== */
-
-  buttons.forEach((button, index) => {
-    button.addEventListener("click", () => {
-      goToScreen(index);
-    });
-  });
-
-  /* ======================================================
-        KEYBOARD
-  ====================================================== */
-
-  document.addEventListener("keydown", (e) => {
-    if (e.key === "ArrowRight") {
-      goToScreen(currentScreen + 1);
-    }
-
-    if (e.key === "ArrowLeft") {
-      goToScreen(currentScreen - 1);
-    }
-  });
-
-  /* ======================================================
-        TOUCH SWIPE
-  ====================================================== */
-
-  let startX = 0;
-  let startY = 0;
-
-  let currentX = 0;
-  let currentY = 0;
-
-  let dragging = false;
-
-  let swipeTarget = null;
-
-  /* ======================================================
-        ELEMENTS THAT SHOULD NEVER START NAVIGATION
-  ====================================================== */
-
-  function isNoSwipeElement(target) {
-    if (!target) {
-      return false;
-    }
-
-    return Boolean(
-      target.closest(
-        [
-          "[data-no-swipe]",
-
-          "button",
-          "input",
-          "textarea",
-          "select",
-          "a",
-
-          ".tag",
-          ".tag-circle",
-          ".tag-name",
-
-          ".tag-manage-button",
-          ".tag-menu",
-
-          ".tag-selection-footer",
-
-          ".tag-modal",
-          ".tag-modal-overlay",
-
-          ".tag-drag-handle",
-          ".tag-group-drag-handle",
-
-          ".tag-order-row",
-          ".tag-order-group",
-
-          ".library-song",
-
-          ".library-song-list",
-
-          ".player-controls",
-          ".player-panel",
-
-          ".player-tag-picker-overlay",
-          ".player-tag-picker-window",
-
-          ".folder-overlay",
-          ".folder-window",
-        ].join(","),
-      ),
-    );
-  }
-
-  /* ======================================================
-        TOUCH START
-  ====================================================== */
-
-  workspace.addEventListener(
-    "touchstart",
-    (e) => {
-      /*
-        Only support one finger.
-
-        This also prevents pinch gestures from
-        becoming navigation gestures.
-      */
-
-      if (!e.touches || e.touches.length !== 1) {
-        dragging = false;
+      if (event.pointerType === "mouse" && event.button !== 0) {
         return;
       }
 
-      const touch = e.touches[0];
+      resizingPanels = true;
 
-      swipeTarget = e.target;
+      divider.setPointerCapture(event.pointerId);
 
-      /*
-        Interactive areas should never initiate
-        screen navigation.
-      */
+      document.body.classList.add("workspace-resizing");
 
-      if (isNoSwipeElement(swipeTarget)) {
-        dragging = false;
-        return;
-      }
-
-      startX = touch.clientX;
-      startY = touch.clientY;
-
-      currentX = startX;
-      currentY = startY;
-
-      dragging = true;
-    },
-    {
-      passive: true,
-    },
-  );
-
-  /* ======================================================
-        TOUCH MOVE
-  ====================================================== */
-
-  workspace.addEventListener(
-    "touchmove",
-    (e) => {
-      if (!dragging) {
-        return;
-      }
-
-      /*
-        If another finger appears, cancel navigation.
-      */
-
-      if (!e.touches || e.touches.length !== 1) {
-        dragging = false;
-        return;
-      }
-
-      const touch = e.touches[0];
-
-      currentX = touch.clientX;
-      currentY = touch.clientY;
-
-      const dx = currentX - startX;
-      const dy = currentY - startY;
-
-      const absX = Math.abs(dx);
-      const absY = Math.abs(dy);
-
-      /*
-        ==================================================
-        VERTICAL SCROLL PROTECTION
-
-        As soon as vertical movement is dominant,
-        this gesture belongs to the page/grid.
-
-        Navigation is cancelled permanently for
-        this gesture.
-        ==================================================
-      */
-
-      if (absY > absX) {
-        dragging = false;
-        return;
-      }
-
-      /*
-        If movement becomes strongly diagonal,
-        don't navigate.
-      */
-
-      if (absY > 10 && absX < absY * SWIPE_DIRECTION_RATIO) {
-        dragging = false;
-        return;
-      }
-    },
-    {
-      passive: true,
-    },
-  );
-
-  /* ======================================================
-        TOUCH END
-  ====================================================== */
-
-  workspace.addEventListener(
-    "touchend",
-    () => {
-      if (!dragging) {
-        return;
-      }
-
-      const dx = currentX - startX;
-      const dy = currentY - startY;
-
-      const absX = Math.abs(dx);
-      const absY = Math.abs(dy);
-
-      /* ==================================================
-          SAFETY CHECK 1
-
-          Vertical movement never navigates.
-      ================================================== */
-
-      if (absY >= absX) {
-        dragging = false;
-        return;
-      }
-
-      /* ==================================================
-          SAFETY CHECK 2
-
-          Horizontal swipe must be clearly dominant.
-      ================================================== */
-
-      if (absX < absY * SWIPE_DIRECTION_RATIO) {
-        dragging = false;
-        return;
-      }
-
-      /* ==================================================
-          SAFETY CHECK 3
-
-          Swipe must be large enough.
-      ================================================== */
-
-      if (absX < SWIPE_DISTANCE) {
-        dragging = false;
-        return;
-      }
-
-      /* ==================================================
-          REAL HORIZONTAL SWIPE
-      ================================================== */
-
-      if (dx < 0) {
-        /*
-          Swipe LEFT
-
-          Tags → Library
-          Library → Player
-        */
-
-        const nextScreen = currentScreen + 1;
-
-        /*
-          Extra Player protection.
-
-          Even if something changes elsewhere,
-          a left swipe can never open Player
-          without a selected song.
-        */
-
-        goToScreen(nextScreen);
-      } else {
-        /*
-          Swipe RIGHT
-
-          Player → Library
-          Library → Tags
-        */
-
-        goToScreen(currentScreen - 1);
-      }
-
-      /* ==================================================
-          RESET
-      ================================================== */
-
-      dragging = false;
-
-      startX = 0;
-      startY = 0;
-
-      currentX = 0;
-      currentY = 0;
-
-      swipeTarget = null;
-    },
-    {
-      passive: true,
-    },
-  );
-
-  /* ======================================================
-        TOUCH CANCEL
-  ====================================================== */
-
-  workspace.addEventListener(
-    "touchcancel",
-    () => {
-      dragging = false;
-
-      startX = 0;
-      startY = 0;
-
-      currentX = 0;
-      currentY = 0;
-
-      swipeTarget = null;
-    },
-    {
-      passive: true,
-    },
-  );
-
-  /* ======================================================
-        MOUSE WHEEL — HORIZONTAL
-  ====================================================== */
-
-  let wheelLock = false;
-
-  window.addEventListener("wheel", (e) => {
-    if (wheelLock) {
-      return;
-    }
-
-    if (Math.abs(e.deltaX) < 20) {
-      return;
-    }
-
-    wheelLock = true;
-
-    if (e.deltaX > 0) {
-      goToScreen(currentScreen + 1);
-    } else {
-      goToScreen(currentScreen - 1);
-    }
-
-    setTimeout(() => {
-      wheelLock = false;
-    }, 450);
-  });
-
-  /* ======================================================
-        WINDOW RESIZE
-  ====================================================== */
-
-  let resizeTimer;
-
-  window.addEventListener("resize", () => {
-    clearTimeout(resizeTimer);
-
-    resizeTimer = setTimeout(() => {
-      moveIndicator(currentScreen);
-
-      workspace.style.transform = `translateX(-${currentScreen * 100}vw)`;
-    }, 100);
-  });
-
-  /* ======================================================
-        RESIZE OBSERVER
-  ====================================================== */
-
-  const nav = document.querySelector(".nav-pill");
-
-  if (nav) {
-    const resizeObserver = new ResizeObserver(() => {
-      moveIndicator(currentScreen);
+      event.preventDefault();
     });
 
-    resizeObserver.observe(nav);
+    /* ====================================================
+          POINTER MOVE
+    ==================================================== */
+
+    divider.addEventListener("pointermove", (event) => {
+      if (!resizingPanels) {
+        return;
+      }
+
+      resizePanels(event.clientX);
+
+      event.preventDefault();
+    });
+
+    /* ====================================================
+          POINTER UP
+    ==================================================== */
+
+    divider.addEventListener("pointerup", (event) => {
+      resizingPanels = false;
+
+      if (divider.hasPointerCapture(event.pointerId)) {
+        divider.releasePointerCapture(event.pointerId);
+      }
+
+      document.body.classList.remove("workspace-resizing");
+    });
+
+    /* ====================================================
+          POINTER CANCEL
+    ==================================================== */
+
+    divider.addEventListener("pointercancel", (event) => {
+      resizingPanels = false;
+
+      if (divider.hasPointerCapture(event.pointerId)) {
+        divider.releasePointerCapture(event.pointerId);
+      }
+
+      document.body.classList.remove("workspace-resizing");
+    });
   }
 
   /* ======================================================
-        FOLDER BUTTON
+        DEFAULT WIDTH
   ====================================================== */
 
-  const folderButton = document.querySelector(".folder-button");
+  if (musicWorkspace) {
+    const existingWidth = getComputedStyle(musicWorkspace)
+      .getPropertyValue("--tags-width")
+      .trim();
 
-  /* ======================================================
-        INITIALIZE
-  ====================================================== */
-
-  moveIndicator(0);
-
-  goToScreen(0);
+    if (!existingWidth) {
+      musicWorkspace.style.setProperty("--tags-width", "50%");
+    }
+  }
 });
-
-/* ==========================================================
-   LUCIDE
-========================================================== */
-
-lucide.createIcons();

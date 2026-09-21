@@ -1,6 +1,6 @@
 /* ==========================================================
    MOONBOX — TAGS
-   Clean / Consolidated Stylesheet
+   Consolidated / Responsive / Panel-width aware
    ========================================================== */
 
 /* ==========================================================
@@ -9,6 +9,15 @@
 
 .tag-screen {
   position: relative;
+  width: 100%;
+  min-width: 0;
+  min-height: 0;
+  box-sizing: border-box;
+  overflow: hidden;
+}
+
+.tag-screen,
+.tag-screen * {
   box-sizing: border-box;
 }
 
@@ -18,29 +27,24 @@
 
 .tag-header {
   position: relative;
-
   display: flex;
   align-items: flex-start;
   justify-content: space-between;
-
+  gap: 12px;
   margin-bottom: 30px;
 }
 
 .tag-header h1 {
   margin: 0 0 10px;
-
   color: var(--section-title-color);
-
-  font-size: 32px;
+  font-size: clamp(20px, 2vw, 32px);
   line-height: 1.2;
 }
 
 .tag-header p {
   margin: 0;
-
   color: var(--section-sub-title-color);
-
-  font-size: 13px;
+  font-size: clamp(10px, 1vw, 13px);
   line-height: 1.5;
 }
 
@@ -49,37 +53,26 @@
    ========================================================== */
 
 .tag-search {
+  width: 100%;
   height: 48px;
-
   display: flex;
   align-items: center;
-
-  gap: 14px;
-
+  gap: 12px;
   padding: 0 16px;
   margin-bottom: 42px;
-
-  box-sizing: border-box;
-
   background: #111;
   border: 1px solid rgba(255, 255, 255, 0.06);
   border-radius: 22px;
 }
 
 .tag-search input {
-  flex: 1;
-
+  flex: 1 1 auto;
   min-width: 0;
-
   padding: 0;
-
-  border: none;
-  outline: none;
-
+  border: 0;
+  outline: 0;
   background: transparent;
-
   color: #fff;
-
   font-family: var(--font-main, sans-serif);
   font-size: 15px;
 }
@@ -88,34 +81,35 @@
   color: #666;
 }
 
+.tag-search svg {
+  flex: 0 0 auto;
+  width: 19px;
+  height: 19px;
+}
+
 /* ==========================================================
    4. MANAGE TAGS BUTTON
    ========================================================== */
 
 .tag-manage-button {
+  flex: 0 0 auto;
+  min-width: 52px;
   height: 52px;
-
-  display: flex;
+  display: inline-flex;
   align-items: center;
   justify-content: center;
-
   gap: 10px;
-
   padding: 0 18px;
-
   border: 1px solid var(--border);
   border-radius: 16px;
-
   background: var(--gradient-nav);
   color: var(--text-muted);
-
   box-shadow: var(--shadow-nav);
-
   cursor: pointer;
-
   transition:
     background 0.2s ease,
     color 0.2s ease,
+    border-color 0.2s ease,
     transform 0.2s ease;
 }
 
@@ -124,22 +118,23 @@
   color: var(--text);
 }
 
+.tag-manage-button:active {
+  transform: scale(0.97);
+}
+
 .tag-manage-button svg {
   width: 22px;
   height: 22px;
-
+  flex: 0 0 auto;
   color: inherit;
-
   stroke-width: 2;
 }
 
 .tag-manage-button span {
   color: inherit;
-
   font-family: var(--font-main, sans-serif);
   font-size: 14px;
   font-weight: 600;
-
   white-space: nowrap;
 }
 
@@ -149,32 +144,22 @@
 
 .tag-menu {
   position: absolute;
-
   top: 85px;
-  right: 45px;
-
-  width: 290px;
-
+  right: 8px;
+  width: min(290px, calc(100% - 16px));
+  max-width: calc(100% - 16px);
   box-sizing: border-box;
-
   padding: 18px;
-
   background: linear-gradient(180deg, #141414, #111);
-
   border: 1px solid rgba(255, 255, 255, 0.06);
   border-radius: 24px;
-
   box-shadow:
     0 25px 60px rgba(0, 0, 0, 0.55),
     inset 0 1px rgba(255, 255, 255, 0.03);
-
   z-index: 100;
-
   opacity: 0;
   transform: translateY(10px) scale(0.98);
-
   pointer-events: none;
-
   transition:
     opacity 0.18s ease,
     transform 0.18s ease;
@@ -182,51 +167,37 @@
 
 .tag-menu.show {
   opacity: 1;
-
   transform: translateY(0) scale(1);
-
   pointer-events: auto;
 }
 
 .tag-menu-title {
   margin: 0 0 18px;
   padding-left: 8px;
-
   color: #8b8b8b;
-
   font-size: 11px;
   font-weight: 600;
-
   letter-spacing: 1.4px;
-
   text-transform: uppercase;
 }
 
 .tag-divider {
   height: 1px;
-
   margin: 10px 0;
-
   background: rgba(255, 255, 255, 0.06);
 }
 
 .tag-menu button {
   width: 100%;
-
   display: flex;
   align-items: flex-start;
-
   gap: 16px;
-
   padding: 12px 8px;
-
-  border: none;
+  border: 0;
   border-radius: 14px;
-
   background: transparent;
-
+  color: inherit;
   cursor: pointer;
-
   transition: background 0.2s ease;
 }
 
@@ -237,13 +208,9 @@
 .tag-menu button svg {
   width: 18px;
   height: 18px;
-
-  flex-shrink: 0;
-
+  flex: 0 0 auto;
   margin-top: 3px;
-
   color: #f3f3f3;
-
   stroke-width: 2;
 }
 
@@ -251,24 +218,19 @@
   display: flex;
   flex-direction: column;
   align-items: flex-start;
-
   min-width: 0;
 }
 
 .tag-menu button span {
   color: #f2f2f2;
-
   font-size: 15px;
   font-weight: 500;
 }
 
 .tag-menu button small {
   display: block;
-
   margin-top: 3px;
-
   color: #8d8d8d;
-
   font-size: 12px;
 }
 
@@ -278,15 +240,23 @@
 
 .tag-grid {
   display: grid;
-
   grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
-
   gap: 22px;
+  width: 100%;
+  min-width: 0;
+  min-height: 0;
+  padding: 5px 5px 50px;
+  align-content: start;
+  overflow-y: auto;
+  overflow-x: hidden;
+  scrollbar-width: none;
+  -webkit-overflow-scrolling: touch;
+  touch-action: pan-y;
+  overscroll-behavior-y: contain;
+}
 
-  padding: 5px;
-  box-sizing: border-box;
-
-  padding-bottom: 50px;
+.tag-grid::-webkit-scrollbar {
+  display: none;
 }
 
 /* ==========================================================
@@ -294,41 +264,31 @@
    ========================================================== */
 
 .tag {
+  width: 100%;
+  min-width: 0;
   display: flex;
   flex-direction: column;
   align-items: center;
-
   gap: 14px;
-
-  padding: 0;
-
-  border: none;
   padding: 5px;
-
+  border: 0;
   background: transparent;
-
   color: #fff;
-
   cursor: pointer;
+  text-align: center;
 }
 
 .tag-circle {
-  width: 96px;
-  height: 96px;
-
+  width: clamp(58px, 7vw, 96px);
+  height: clamp(58px, 7vw, 96px);
   display: flex;
   align-items: center;
   justify-content: center;
-
-  flex-shrink: 0;
-
+  flex: 0 0 auto;
   box-sizing: border-box;
-
   background: #101010;
-
   border: 1px solid rgba(255, 255, 255, 0.06);
   border-radius: 50%;
-
   transition:
     transform 0.25s ease,
     background 0.25s ease,
@@ -336,42 +296,41 @@
 }
 
 .tag-circle svg {
-  width: 34px;
-  height: 34px;
+  width: clamp(20px, 2.5vw, 34px);
+  height: clamp(20px, 2.5vw, 34px);
 }
 
 .tag.selected .tag-circle {
   background: #fff;
-
   color: #000;
-
   transform: scale(1.05);
-
   box-shadow: 0 0 25px rgba(255, 255, 255, 0.18);
 }
 
 .tag-name {
+  width: 100%;
   max-width: 100%;
-
+  min-width: 0;
   color: inherit;
-
   font-size: 13px;
   font-weight: 500;
-
   line-height: 1.2;
-
   text-align: center;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .tag-song-count {
+  max-width: 100%;
   margin-top: -8px;
-
   color: #666;
-
   font-size: 10px;
   font-weight: 400;
-
   line-height: 1;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .tag.selected .tag-song-count {
@@ -379,283 +338,96 @@
 }
 
 /* ==========================================================
-   8. TAG SELECTION FOOTER — DESKTOP
+   8. GRID HEADINGS
    ========================================================== */
 
-.tag-selection-footer {
-  position: fixed;
-
-  left: 10px;
-  right: 10px;
-  bottom: max(10px, env(safe-area-inset-bottom));
-
-  width: auto;
-  height: 64px;
-
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-
-  padding: 8px;
-
-  box-sizing: border-box;
-
-  background: var(--bg);
-
-  border: 1px solid rgba(255, 255, 255, 0.04);
-  border-radius: 16px;
-
-  box-shadow:
-    0 12px 35px rgba(0, 0, 0, 0.65),
-    0 0 0 1px rgba(255, 255, 255, 0.02);
-
-  backdrop-filter: blur(18px);
-  -webkit-backdrop-filter: blur(18px);
-
-  z-index: 99999;
-
-  visibility: visible;
-  opacity: 1;
-}
-
-/* ==========================================================
-   9. SELECTION FOOTER — INFO
-   ========================================================== */
-
-.tag-selection-info {
-  display: flex;
-  align-items: center;
-
-  gap: 9px;
-
+.tag-letter,
+.tag-group-heading {
+  grid-column: 1 / -1;
+  width: 100%;
   min-width: 0;
-
-  flex: 1;
-}
-
-.tag-selection-icon {
-  width: 38px;
-  height: 38px;
-
-  min-width: 38px;
-
-  display: flex;
-  align-items: center;
-  justify-content: center;
-
-  box-sizing: border-box;
-
-  background: #151515;
-
-  border: 1px solid rgba(255, 255, 255, 0.16);
-  border-radius: 11px;
-}
-
-.tag-selection-icon svg {
-  width: 18px;
-  height: 18px;
-}
-
-.tag-selection-text {
-  display: flex;
-  flex-direction: column;
-
-  gap: 3px;
-
-  min-width: 0;
-}
-
-.tag-selection-text strong {
-  color: #f2f2f2;
-
-  font-size: 12px;
-
-  white-space: nowrap;
-}
-
-.tag-selection-text span {
-  color: #777;
-
-  font-size: 9px;
-
-  white-space: nowrap;
-}
-
-/* ==========================================================
-   10. CLEAR SELECTION
-   ========================================================== */
-
-.tag-clear-selection {
-  display: none;
-
-  flex-shrink: 0;
-
-  margin: 0 8px;
-
-  padding: 0;
-
-  border: none;
-
-  background: transparent;
-
-  color: #8f8f8f;
-
-  font-family: var(--font-main, sans-serif);
-  font-size: 9px;
-  font-weight: 500;
-
-  line-height: 1;
-
-  white-space: nowrap;
-
-  cursor: pointer;
-
-  text-decoration: underline;
-  text-decoration-color: rgba(255, 255, 255, 0.22);
-  text-underline-offset: 3px;
-
-  transition:
-    color 0.18s ease,
-    text-decoration-color 0.18s ease;
-}
-
-.tag-clear-selection:hover,
-.tag-clear-selection:active {
-  color: #f0f0f0;
-
-  text-decoration-color: rgba(255, 255, 255, 0.5);
-}
-
-/* ==========================================================
-   11. VIEW LIBRARY BUTTON
-   ========================================================== */
-
-.tag-view-library {
-  width: 132px;
-  min-width: 132px;
-  height: 46px;
-
-  display: flex;
-  align-items: center;
-  justify-content: center;
-
-  flex-shrink: 0;
-
-  gap: 9px;
-
-  padding: 0 12px;
-
-  box-sizing: border-box;
-
-  border: none;
-  border-radius: 12px;
-
-  background: #f4f4f4;
-  color: #111;
-
+  margin: 12px 0 -6px;
+  padding: 0 4px;
+  color: #858585;
   font-size: 11px;
-  font-weight: 650;
-
-  cursor: pointer;
+  font-weight: 700;
+  line-height: 1.5;
+  letter-spacing: 1.4px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
-.tag-view-library svg {
-  width: 16px;
-  height: 16px;
+.tag-letter:first-child,
+.tag-group-heading:first-child {
+  margin-top: 0;
+}
+
+.tag-letter::after,
+.tag-group-heading::after {
+  content: "";
+  display: block;
+  height: 1px;
+  margin-top: 7px;
+  background: rgba(255, 255, 255, 0.06);
 }
 
 /* ==========================================================
-   12. TAG MODALS — ROOT
+   9. TAG MODAL ROOT / OVERLAY
    ========================================================== */
 
 #tagModalRoot {
   position: fixed;
-
   inset: 0;
-
   width: 100%;
   height: 100%;
-
   z-index: 999999;
-
   pointer-events: none;
 }
 
 #tagModalRoot .tag-modal-overlay {
-  position: fixed;
-
-  inset: 0;
-
-  z-index: 1000000;
-
   pointer-events: auto;
 }
-
-/* ==========================================================
-   13. MODAL OVERLAY
-   ========================================================== */
 
 .tag-modal-overlay {
   position: fixed;
   inset: 0;
-
   display: flex;
   align-items: center;
   justify-content: center;
-
   padding: 24px;
-
   box-sizing: border-box;
-
   background: rgba(0, 0, 0, 0.72);
-
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
-
   animation: tagModalFadeIn 0.18s ease;
 }
 
 @keyframes tagModalFadeIn {
-  from {
-    opacity: 0;
-  }
-
-  to {
-    opacity: 1;
-  }
+  from { opacity: 0; }
+  to { opacity: 1; }
 }
 
 /* ==========================================================
-   14. MODAL
+   10. TAG MODAL
    ========================================================== */
 
 .tag-modal {
   position: relative;
-
   width: min(620px, 100%);
-
   max-height: min(760px, calc(100dvh - 48px));
-
+  min-height: 0;
   display: flex;
   flex-direction: column;
-
-  min-height: 0;
-
   overflow: hidden;
-
   box-sizing: border-box;
-
   background: linear-gradient(180deg, #151515 0%, #101010 100%);
-
   border: 1px solid rgba(255, 255, 255, 0.08);
   border-radius: 24px;
-
   box-shadow:
     0 30px 90px rgba(0, 0, 0, 0.65),
     inset 0 1px rgba(255, 255, 255, 0.035);
-
   animation: tagModalScaleIn 0.2s ease;
-
   z-index: 1000001;
 }
 
@@ -664,79 +436,51 @@
     opacity: 0;
     transform: translateY(8px) scale(0.985);
   }
-
   to {
     opacity: 1;
     transform: translateY(0) scale(1);
   }
 }
 
-/* ==========================================================
-   15. MODAL HEADER
-   ========================================================== */
-
 .tag-modal-header {
   display: flex;
   align-items: flex-start;
   justify-content: space-between;
-
-  gap: 20px;
-
+  gap: 16px;
   padding: 24px 24px 18px;
-
-  flex-shrink: 0;
-
-  z-index: 9999999;
+  flex: 0 0 auto;
+  z-index: 2;
 }
 
 .tag-modal-header h2 {
   margin: 0;
-
   color: #f5f5f5;
-
   font-size: 24px;
   font-weight: 650;
-
   line-height: 1.2;
-
   letter-spacing: -0.3px;
 }
 
 .tag-modal-header p {
   margin: 7px 0 0;
-
   color: #8e8e8e;
-
   font-size: 13px;
-
   line-height: 1.5;
 }
-
-/* ==========================================================
-   16. MODAL CLOSE
-   ========================================================== */
 
 .tag-modal-close {
   width: 38px;
   height: 38px;
-
-  flex-shrink: 0;
-
+  flex: 0 0 auto;
   display: flex;
   align-items: center;
   justify-content: center;
-
   padding: 0;
-
   border: 1px solid rgba(255, 255, 255, 0.08);
   border-radius: 11px;
-
   background: rgba(255, 255, 255, 0.035);
-
   color: #bdbdbd;
-
   cursor: pointer;
-
   transition:
     background 0.2s ease,
     color 0.2s ease,
@@ -746,11 +490,8 @@
 
 .tag-modal-close:hover {
   background: rgba(255, 255, 255, 0.08);
-
   color: #fff;
-
   border-color: rgba(255, 255, 255, 0.14);
-
   transform: scale(1.03);
 }
 
@@ -759,23 +500,15 @@
   height: 18px;
 }
 
-/* ==========================================================
-   17. MODAL BODY
-   ========================================================== */
-
 .tag-modal-body {
   flex: 1 1 auto;
-
   min-height: 0;
-
   overflow-y: auto;
   overflow-x: hidden;
-
   padding: 4px 24px 24px;
-
   scrollbar-width: thin;
-
   scrollbar-color: rgba(255, 255, 255, 0.16) transparent;
+  -webkit-overflow-scrolling: touch;
 }
 
 .tag-modal-body::-webkit-scrollbar {
@@ -788,7 +521,6 @@
 
 .tag-modal-body::-webkit-scrollbar-thumb {
   background: rgba(255, 255, 255, 0.14);
-
   border-radius: 10px;
 }
 
@@ -796,51 +528,37 @@
   background: rgba(255, 255, 255, 0.22);
 }
 
-/* ==========================================================
-   18. MODAL FOOTER
-   ========================================================== */
-
 .tag-modal-footer {
   flex: 0 0 auto;
-
   display: flex;
   align-items: center;
   justify-content: flex-end;
-
+  flex-wrap: wrap;
   gap: 10px;
-
   margin: 0;
-
   padding: 14px 24px;
-
   border-top: 1px solid rgba(255, 255, 255, 0.07);
-
   background: #111;
-
   z-index: 5;
 }
 
 /* ==========================================================
-   19. FORM
+   11. FORM
    ========================================================== */
 
 .tag-form {
   display: flex;
   flex-direction: column;
+  min-width: 0;
 }
 
 .tag-form-label {
   display: block;
-
   margin: 8px 0 9px;
-
   color: #858585;
-
   font-size: 10px;
   font-weight: 600;
-
   letter-spacing: 1.1px;
-
   text-transform: uppercase;
 }
 
@@ -851,23 +569,15 @@
 .tag-form-input {
   width: 100%;
   height: 44px;
-
   box-sizing: border-box;
-
   padding: 0 14px;
-
   border: 1px solid rgba(255, 255, 255, 0.08);
   border-radius: 12px;
-
-  outline: none;
-
+  outline: 0;
   background: rgba(255, 255, 255, 0.045);
-
   color: #f5f5f5;
-
   font-family: var(--font-main, sans-serif);
   font-size: 14px;
-
   transition:
     border-color 0.2s ease,
     background 0.2s ease,
@@ -880,60 +590,43 @@
 
 .tag-form-input:focus {
   background: rgba(255, 255, 255, 0.06);
-
   border-color: rgba(255, 255, 255, 0.24);
-
   box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.035);
 }
 
 .tag-form-hint {
   margin-top: 8px;
-
   color: #777;
-
   font-size: 11px;
-
   line-height: 1.4;
 }
 
 /* ==========================================================
-   20. ICON PICKER
+   12. ICON PICKER
    ========================================================== */
 
 .tag-icon-picker {
   display: grid;
-
   grid-template-columns: repeat(10, minmax(0, 1fr));
-
   gap: 8px;
-
   padding: 2px 0;
 }
 
 .tag-icon-option {
   width: 100%;
-
   aspect-ratio: 1;
-
   min-width: 0;
-
+  min-height: 0;
   display: flex;
   align-items: center;
   justify-content: center;
-
   padding: 0;
-
   box-sizing: border-box;
-
   border: 1px solid rgba(255, 255, 255, 0.07);
   border-radius: 12px;
-
   background: rgba(255, 255, 255, 0.025);
-
   color: #a7a7a7;
-
   cursor: pointer;
-
   transition:
     background 0.18s ease,
     border-color 0.18s ease,
@@ -943,21 +636,15 @@
 
 .tag-icon-option:hover {
   background: rgba(255, 255, 255, 0.07);
-
   border-color: rgba(255, 255, 255, 0.14);
-
   color: #fff;
-
   transform: translateY(-1px);
 }
 
 .tag-icon-option.selected {
   background: #f3f3f3;
-
   border-color: #fff;
-
   color: #111;
-
   box-shadow:
     0 0 0 2px rgba(255, 255, 255, 0.08),
     0 5px 20px rgba(255, 255, 255, 0.08);
@@ -966,36 +653,29 @@
 .tag-icon-option svg {
   width: 20px;
   height: 20px;
-
   stroke-width: 1.8;
 }
 
 /* ==========================================================
-   21. MODAL BUTTONS
+   13. MODAL BUTTONS
    ========================================================== */
 
 .tag-secondary-button,
 .tag-primary-button {
+  min-width: 0;
   height: 40px;
-
   border-radius: 11px;
-
   font-family: var(--font-main, sans-serif);
   font-size: 13px;
   font-weight: 600;
-
   cursor: pointer;
 }
 
 .tag-secondary-button {
   padding: 0 16px;
-
   border: 1px solid rgba(255, 255, 255, 0.08);
-
   background: rgba(255, 255, 255, 0.035);
-
   color: #a5a5a5;
-
   transition:
     background 0.2s ease,
     color 0.2s ease,
@@ -1004,23 +684,16 @@
 
 .tag-secondary-button:hover {
   background: rgba(255, 255, 255, 0.08);
-
   border-color: rgba(255, 255, 255, 0.14);
-
   color: #fff;
 }
 
 .tag-primary-button {
   padding: 0 18px;
-
   border: 1px solid rgba(255, 255, 255, 0.12);
-
   background: #f2f2f2;
-
   color: #111;
-
   font-weight: 650;
-
   transition:
     background 0.2s ease,
     transform 0.2s ease,
@@ -1029,9 +702,7 @@
 
 .tag-primary-button:hover {
   background: #fff;
-
   transform: translateY(-1px);
-
   box-shadow: 0 7px 20px rgba(255, 255, 255, 0.08);
 }
 
@@ -1040,7 +711,7 @@
 }
 
 /* ==========================================================
-   22. EDIT TAG SEARCH
+   14. EDIT TAG SEARCH
    ========================================================== */
 
 .tag-edit-toolbar {
@@ -1049,43 +720,30 @@
 
 .tag-edit-search {
   height: 42px;
-
   display: flex;
   align-items: center;
-
   gap: 10px;
-
   padding: 0 13px;
-
   box-sizing: border-box;
-
   border: 1px solid rgba(255, 255, 255, 0.07);
   border-radius: 12px;
-
   background: rgba(255, 255, 255, 0.035);
 }
 
 .tag-edit-search svg {
   width: 17px;
   height: 17px;
-
-  flex-shrink: 0;
-
+  flex: 0 0 auto;
   color: #777;
 }
 
 .tag-edit-search input {
   width: 100%;
-
   min-width: 0;
-
-  border: none;
-  outline: none;
-
+  border: 0;
+  outline: 0;
   background: transparent;
-
   color: #eee;
-
   font-family: var(--font-main, sans-serif);
   font-size: 13px;
 }
@@ -1095,36 +753,27 @@
 }
 
 /* ==========================================================
-   23. EDIT TAG LIST
+   15. EDIT TAG LIST
    ========================================================== */
 
 .tag-edit-list {
   display: flex;
   flex-direction: column;
-
   gap: 6px;
+  min-width: 0;
 }
 
 .tag-edit-row {
   min-height: 58px;
-
   display: grid;
-
   grid-template-columns: 38px minmax(0, 1fr) 38px 38px;
-
   align-items: center;
-
   gap: 10px;
-
   padding: 7px 8px;
-
   box-sizing: border-box;
-
   border: 1px solid transparent;
   border-radius: 13px;
-
   background: rgba(255, 255, 255, 0.025);
-
   transition:
     background 0.18s ease,
     border-color 0.18s ease;
@@ -1132,24 +781,18 @@
 
 .tag-edit-row:hover {
   background: rgba(255, 255, 255, 0.05);
-
   border-color: rgba(255, 255, 255, 0.06);
 }
 
 .tag-edit-icon {
   width: 38px;
   height: 38px;
-
   display: flex;
   align-items: center;
   justify-content: center;
-
   border-radius: 10px;
-
   background: #181818;
-
   border: 1px solid rgba(255, 255, 255, 0.07);
-
   color: #d0d0d0;
 }
 
@@ -1160,42 +803,30 @@
 
 .tag-edit-name {
   min-width: 0;
-
   overflow: hidden;
-
   color: #e8e8e8;
-
   font-size: 14px;
   font-weight: 500;
-
   white-space: nowrap;
-
   text-overflow: ellipsis;
 }
 
 /* ==========================================================
-   24. EDIT ROW ACTIONS
+   16. EDIT ROW ACTIONS
    ========================================================== */
 
 .tag-row-action {
   width: 34px;
   height: 34px;
-
   display: flex;
   align-items: center;
   justify-content: center;
-
   padding: 0;
-
   border: 1px solid transparent;
   border-radius: 9px;
-
   background: transparent;
-
   color: #777;
-
   cursor: pointer;
-
   transition:
     background 0.18s ease,
     color 0.18s ease,
@@ -1204,9 +835,7 @@
 
 .tag-row-action:hover {
   background: rgba(255, 255, 255, 0.07);
-
   border-color: rgba(255, 255, 255, 0.07);
-
   color: #fff;
 }
 
@@ -1217,15 +846,13 @@
 
 .tag-row-delete:hover {
   background: rgba(255, 70, 70, 0.09);
-
   border-color: rgba(255, 70, 70, 0.13);
-
   color: #ff7777;
 }
 
 /* ==========================================================
-   25. CUSTOM ORDER — GROUPED
-========================================================== */
+   17. CUSTOM ORDER
+   ========================================================== */
 
 .tag-group-toolbar {
   margin-bottom: 14px;
@@ -1234,30 +861,20 @@
 .tag-add-group-button {
   width: 100%;
   height: 46px;
-
   display: flex;
   align-items: center;
   justify-content: center;
-
   gap: 9px;
-
   padding: 0 16px;
-
   box-sizing: border-box;
-
   border: 1px dashed rgba(255, 255, 255, 0.13);
   border-radius: 12px;
-
   background: rgba(255, 255, 255, 0.018);
-
   color: #cfcfcf;
-
   font-family: var(--font-main, sans-serif);
   font-size: 13px;
   font-weight: 600;
-
   cursor: pointer;
-
   transition:
     background 0.18s ease,
     border-color 0.18s ease,
@@ -1266,9 +883,7 @@
 
 .tag-add-group-button:hover {
   background: rgba(255, 255, 255, 0.05);
-
   border-color: rgba(255, 255, 255, 0.22);
-
   color: #fff;
 }
 
@@ -1277,60 +892,21 @@
   height: 17px;
 }
 
-.tag-order-group.drop-target {
-  border-color: rgba(255, 255, 255, 0.22);
-
-  background: rgba(255, 255, 255, 0.045);
-
-  box-shadow:
-    inset 0 0 0 1px rgba(255, 255, 255, 0.025),
-    0 0 0 2px rgba(255, 255, 255, 0.025);
-}
-
-.tag-order-row.dragging {
-  position: relative;
-
-  opacity: 0.55;
-
-  background: rgba(255, 255, 255, 0.08);
-
-  border-color: rgba(255, 255, 255, 0.14);
-
-  transform: scale(1.015);
-
-  z-index: 100;
-}
-
-/* ==========================================================
-   GROUP LIST
-========================================================== */
-
 .tag-order-groups {
   display: flex;
   flex-direction: column;
-
   gap: 14px;
-
   user-select: none;
   -webkit-user-select: none;
 }
 
-/* ==========================================================
-   GROUP
-========================================================== */
-
 .tag-order-group {
   width: 100%;
-
   box-sizing: border-box;
-
+  overflow: hidden;
   border: 1px solid rgba(255, 255, 255, 0.055);
   border-radius: 16px;
-
   background: rgba(255, 255, 255, 0.018);
-
-  overflow: hidden;
-
   transition:
     background 0.15s ease,
     border-color 0.15s ease,
@@ -1340,42 +916,38 @@
 
 .tag-order-group:hover {
   border-color: rgba(255, 255, 255, 0.09);
-
   background: rgba(255, 255, 255, 0.025);
 }
 
-.tag-order-group.dragging {
+.tag-order-group.dragging,
+.tag-order-row.dragging {
   opacity: 0.55;
-
-  border-color: rgba(255, 255, 255, 0.16);
-
+  border-color: rgba(255, 255, 255, 0.14);
+  background: rgba(255, 255, 255, 0.08);
   transform: scale(1.015);
 }
 
+.tag-order-group.drop-target {
+  border-color: rgba(255, 255, 255, 0.22);
+  background: rgba(255, 255, 255, 0.045);
+  box-shadow:
+    inset 0 0 0 1px rgba(255, 255, 255, 0.025),
+    0 0 0 2px rgba(255, 255, 255, 0.025);
+}
+
 /* ==========================================================
-   GROUP HEADER
-========================================================== */
+   18. GROUP HEADER
+   ========================================================== */
+
 .tag-order-group-header {
   min-height: 56px;
-
   display: grid;
-
-  grid-template-columns:
-    34px
-    minmax(0, 1fr)
-    auto
-    auto;
-
+  grid-template-columns: 34px minmax(0, 1fr) auto auto;
   align-items: center;
-
   gap: 8px;
-
   padding: 7px 10px;
-
   box-sizing: border-box;
-
   background: rgba(255, 255, 255, 0.025);
-
   border-bottom: 1px solid rgba(255, 255, 255, 0.045);
 }
 
@@ -1383,122 +955,25 @@
   display: flex;
   align-items: center;
   justify-content: flex-end;
-
   gap: 4px;
-
-  min-width: 32px;
-
+  min-width: 0;
   flex-shrink: 0;
 }
 
 .tag-group-edit-button,
 .tag-group-confirm-button,
 .tag-group-delete-button {
-  width: 30px;
-  height: 30px;
-}
-
-.tag-group-name-input {
-  height: 32px;
-
-  font-size: 13px;
-}
-
-/* ==========================================================
-   GROUP DRAG HANDLE
-========================================================== */
-
-.tag-group-drag-handle {
-  width: 34px;
-  height: 40px;
-
-  display: flex;
-  align-items: center;
-  justify-content: center;
-
-  padding: 0;
-
-  border: none;
-
-  background: transparent;
-
-  color: #666;
-
-  cursor: grab;
-
-  touch-action: none;
-
-  -webkit-tap-highlight-color: transparent;
-}
-
-.tag-group-drag-handle:active {
-  cursor: grabbing;
-
-  color: #fff;
-}
-
-.tag-group-drag-handle svg {
-  width: 18px;
-  height: 18px;
-}
-
-/* ==========================================================
-   GROUP TITLE
-========================================================== */
-
-.tag-group-title {
-  min-width: 0;
-
-  overflow: hidden;
-
-  color: #e8e8e8;
-
-  font-size: 15px;
-  font-weight: 600;
-
-  white-space: nowrap;
-
-  text-overflow: ellipsis;
-}
-
-/* ==========================================================
-   GROUP COUNT
-========================================================== */
-
-.tag-group-count {
-  color: #777;
-
-  font-size: 11px;
-  font-weight: 500;
-
-  white-space: nowrap;
-}
-
-/* ==========================================================
-   GROUP EDIT CONTROLS
-========================================================== */
-
-.tag-group-edit-button,
-.tag-group-confirm-button,
-.tag-group-delete-button {
   width: 32px;
   height: 32px;
-
   display: flex;
   align-items: center;
   justify-content: center;
-
   padding: 0;
-
   border: 1px solid transparent;
   border-radius: 9px;
-
   background: transparent;
-
   color: #777;
-
   cursor: pointer;
-
   transition:
     background 0.18s ease,
     color 0.18s ease,
@@ -1508,17 +983,13 @@
 .tag-group-edit-button:hover,
 .tag-group-confirm-button:hover {
   background: rgba(255, 255, 255, 0.07);
-
   border-color: rgba(255, 255, 255, 0.08);
-
   color: #fff;
 }
 
 .tag-group-delete-button:hover {
   background: rgba(255, 70, 70, 0.09);
-
   border-color: rgba(255, 70, 70, 0.13);
-
   color: #ff7777;
 }
 
@@ -1529,30 +1000,59 @@
   height: 15px;
 }
 
-/* ==========================================================
-   GROUP NAME INPUT
-========================================================== */
+.tag-group-drag-handle {
+  width: 34px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: #666;
+  cursor: grab;
+  touch-action: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.tag-group-drag-handle:active {
+  cursor: grabbing;
+  color: #fff;
+}
+
+.tag-group-drag-handle svg {
+  width: 18px;
+  height: 18px;
+}
+
+.tag-group-title {
+  min-width: 0;
+  overflow: hidden;
+  color: #e8e8e8;
+  font-size: 15px;
+  font-weight: 600;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.tag-group-count {
+  color: #777;
+  font-size: 11px;
+  font-weight: 500;
+  white-space: nowrap;
+}
 
 .tag-group-name-input {
   width: 100%;
-
   min-width: 0;
-
   height: 34px;
-
   padding: 0 10px;
-
   box-sizing: border-box;
-
   border: 1px solid rgba(255, 255, 255, 0.16);
   border-radius: 9px;
-
-  outline: none;
-
+  outline: 0;
   background: rgba(255, 255, 255, 0.055);
-
   color: #fff;
-
   font-family: var(--font-main, sans-serif);
   font-size: 14px;
   font-weight: 600;
@@ -1560,47 +1060,31 @@
 
 .tag-group-name-input:focus {
   border-color: rgba(255, 255, 255, 0.28);
-
   background: rgba(255, 255, 255, 0.07);
 }
 
 /* ==========================================================
-   TAGS INSIDE GROUP
-========================================================== */
+   19. TAGS INSIDE CUSTOM GROUPS
+   ========================================================== */
 
 .tag-order-group-tags {
   display: flex;
   flex-direction: column;
-
   gap: 5px;
-
   padding: 7px;
 }
 
-/* ==========================================================
-   TAG ROW
-========================================================== */
-
 .tag-order-row {
   min-height: 56px;
-
   display: grid;
-
   grid-template-columns: 34px 40px minmax(0, 1fr);
-
   align-items: center;
-
   gap: 10px;
-
   padding: 7px 10px;
-
   box-sizing: border-box;
-
   border: 1px solid rgba(255, 255, 255, 0.045);
   border-radius: 12px;
-
   background: rgba(255, 255, 255, 0.018);
-
   transition:
     background 0.15s ease,
     border-color 0.15s ease,
@@ -1610,52 +1094,26 @@
 
 .tag-order-row:hover {
   background: rgba(255, 255, 255, 0.05);
-
   border-color: rgba(255, 255, 255, 0.07);
 }
-
-.tag-order-row.dragging {
-  opacity: 0.55;
-
-  background: rgba(255, 255, 255, 0.08);
-
-  border-color: rgba(255, 255, 255, 0.14);
-
-  transform: scale(1.015);
-
-  z-index: 10;
-}
-
-/* ==========================================================
-   TAG DRAG HANDLE
-========================================================== */
 
 .tag-drag-handle {
   width: 34px;
   height: 40px;
-
   display: flex;
   align-items: center;
   justify-content: center;
-
   padding: 0;
-
-  border: none;
-
+  border: 0;
   background: transparent;
-
   color: #666;
-
   cursor: grab;
-
   touch-action: none;
-
   -webkit-tap-highlight-color: transparent;
 }
 
 .tag-drag-handle:active {
   cursor: grabbing;
-
   color: #fff;
 }
 
@@ -1664,24 +1122,15 @@
   height: 18px;
 }
 
-/* ==========================================================
-   TAG ICON
-========================================================== */
-
 .tag-order-icon {
   width: 40px;
   height: 40px;
-
   display: flex;
   align-items: center;
   justify-content: center;
-
   border-radius: 10px;
-
   background: #181818;
-
   border: 1px solid rgba(255, 255, 255, 0.07);
-
   color: #ccc;
 }
 
@@ -1690,183 +1139,66 @@
   height: 18px;
 }
 
-/* ==========================================================
-   TAG NAME
-========================================================== */
-
 .tag-order-name {
   min-width: 0;
-
   overflow: hidden;
-
   color: #e8e8e8;
-
   font-size: 14px;
   font-weight: 500;
-
   white-space: nowrap;
-
   text-overflow: ellipsis;
 }
 
 /* ==========================================================
-   26. ALPHABETICAL LETTER HEADINGS
-   ========================================================== */
-
-.tag-letter {
-  grid-column: 1 / -1;
-
-  width: 100%;
-
-  margin: 12px 0 -6px;
-  padding: 0 4px;
-
-  color: #858585;
-
-  font-size: 11px;
-  font-weight: 700;
-
-  letter-spacing: 1.4px;
-
-  line-height: 1.5;
-
-  text-transform: uppercase;
-}
-
-.tag-letter:first-child {
-  margin-top: 0;
-}
-
-.tag-letter::after {
-  content: "";
-
-  display: block;
-
-  height: 1px;
-
-  margin-top: 7px;
-
-  background: rgba(255, 255, 255, 0.06);
-}
-
-/* ==========================================================
-   CUSTOM GROUP HEADINGS
-========================================================== */
-
-.tag-group-heading {
-  grid-column: 1 / -1;
-
-  width: 100%;
-
-  margin: 12px 0 -6px;
-  padding: 0 4px;
-
-  box-sizing: border-box;
-
-  color: #858585;
-
-  font-size: 11px;
-  font-weight: 700;
-
-  letter-spacing: 1.4px;
-
-  line-height: 1.5;
-
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-.tag-group-heading:first-child {
-  margin-top: 0;
-}
-
-.tag-group-heading::after {
-  content: "";
-
-  display: block;
-
-  height: 1px;
-
-  margin-top: 7px;
-
-  background: rgba(255, 255, 255, 0.06);
-}
-
-/* ==========================================================
-   27. MOONBOX NAVIGATION POPUP
+   20. MOONBOX NAVIGATION POPUP
    ========================================================== */
 
 #moonboxNavigationPopup {
   position: fixed;
-
   inset: 0;
-
   z-index: 10000000;
-
   pointer-events: auto;
 }
 
 .moonbox-navigation-overlay {
   position: fixed;
-
   inset: 0;
-
   display: flex;
   align-items: center;
   justify-content: center;
-
   padding: 20px;
-
   box-sizing: border-box;
-
   background: rgba(0, 0, 0, 0.72);
-
   backdrop-filter: blur(10px);
   -webkit-backdrop-filter: blur(10px);
-
   animation: moonboxPopupFade 0.18s ease;
 }
 
 @keyframes moonboxPopupFade {
-  from {
-    opacity: 0;
-  }
-
-  to {
-    opacity: 1;
-  }
+  from { opacity: 0; }
+  to { opacity: 1; }
 }
 
 .moonbox-navigation-popup {
   width: min(390px, 100%);
-
   padding: 26px;
-
   box-sizing: border-box;
-
   background: #111;
-
   border: 1px solid rgba(255, 255, 255, 0.08);
   border-radius: 22px;
-
   box-shadow:
     0 30px 90px rgba(0, 0, 0, 0.7),
     inset 0 1px rgba(255, 255, 255, 0.035);
-
   animation: moonboxPopupIn 0.2s ease;
 }
 
 @keyframes moonboxPopupIn {
   from {
     opacity: 0;
-
     transform: translateY(8px) scale(0.97);
   }
-
   to {
     opacity: 1;
-
     transform: translateY(0) scale(1);
   }
 }
@@ -1874,92 +1206,69 @@
 .moonbox-popup-logo {
   width: 48px;
   height: 48px;
-
   display: flex;
   align-items: center;
   justify-content: center;
-
   margin-bottom: 18px;
-
   border-radius: 14px;
-
   background: #181818;
-
   border: 1px solid rgba(255, 255, 255, 0.08);
-
   overflow: hidden;
 }
 
 .moonbox-popup-logo img {
   width: 30px;
   height: 30px;
-
   object-fit: contain;
 }
 
 .moonbox-popup-content h2 {
   margin: 0;
-
   color: #f5f5f5;
-
   font-size: 20px;
   font-weight: 650;
-
   letter-spacing: -0.2px;
 }
 
 .moonbox-popup-content p {
   margin: 8px 0 0;
-
   color: #858585;
-
   font-size: 13px;
-
   line-height: 1.55;
 }
 
 .moonbox-popup-actions {
   display: flex;
   justify-content: flex-end;
-
   gap: 9px;
-
   margin-top: 24px;
 }
 
 .moonbox-popup-actions button {
+  min-width: 0;
   height: 40px;
-
   padding: 0 15px;
-
   border-radius: 10px;
-
   font-family: var(--font-main, sans-serif);
   font-size: 12px;
   font-weight: 600;
-
   cursor: pointer;
 }
 
 .moonbox-popup-secondary {
   border: 1px solid rgba(255, 255, 255, 0.08);
-
   background: rgba(255, 255, 255, 0.035);
-
   color: #999;
 }
 
 .moonbox-popup-secondary:hover {
   background: rgba(255, 255, 255, 0.07);
-
   color: #fff;
 }
 
 .moonbox-popup-primary {
   border: 1px solid rgba(255, 255, 255, 0.12);
-
   background: #f2f2f2;
-
   color: #111;
 }
 
@@ -1968,68 +1277,306 @@
 }
 
 /* ==========================================================
-   28. MOBILE — TAG SCREEN
-========================================================== */
+   21. RESIZED TAG PANEL
+   These classes are added by navigation.js according to the
+   REAL width of the Tags panel.
+
+   Normal:      400px+
+   Narrow:      270–399px
+   Compact:     210–269px
+   Tiny:        165–209px
+   Ultra-tiny:  below 165px
+   ========================================================== */
+
+/* ---------- Narrow: two-column circles ---------- */
+
+.tag-screen.narrow-tags .tag-grid {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px 8px;
+}
+
+.tag-screen.narrow-tags .tag-circle {
+  width: 64px;
+  height: 64px;
+}
+
+.tag-screen.narrow-tags .tag-circle svg {
+  width: 22px;
+  height: 22px;
+}
+
+.tag-screen.narrow-tags .tag-name {
+  font-size: 11px;
+}
+
+.tag-screen.narrow-tags .tag-song-count {
+  font-size: 8px;
+}
+
+/* ---------- Compact: one-column horizontal rows ---------- */
+
+.tag-screen.compact-tags .tag-grid,
+.tag-screen.tiny-tags .tag-grid,
+.tag-screen.ultra-tiny-tags .tag-grid {
+  grid-template-columns: 1fr;
+  gap: 8px;
+}
+
+.tag-screen.compact-tags .tag {
+  display: grid;
+  grid-template-columns: 54px minmax(0, 1fr);
+  grid-template-rows: auto auto;
+  column-gap: 9px;
+  row-gap: 2px;
+  align-items: center;
+  padding: 4px 2px;
+  text-align: left;
+}
+
+.tag-screen.compact-tags .tag-circle {
+  width: 54px;
+  height: 54px;
+  grid-column: 1;
+  grid-row: 1 / span 2;
+}
+
+.tag-screen.compact-tags .tag-circle svg {
+  width: 19px;
+  height: 19px;
+}
+
+.tag-screen.compact-tags .tag-name {
+  grid-column: 2;
+  grid-row: 1;
+  width: 100%;
+  margin: 0;
+  text-align: left;
+  font-size: 11px;
+}
+
+.tag-screen.compact-tags .tag-song-count {
+  grid-column: 2;
+  grid-row: 2;
+  margin: 0;
+  text-align: left;
+  font-size: 8px;
+}
+
+/* ---------- Tiny: smaller horizontal rows ---------- */
+
+.tag-screen.tiny-tags {
+  --tiny-pad: 8px;
+}
+
+.tag-screen.tiny-tags .tag-grid {
+  gap: 6px;
+  padding-left: 0;
+  padding-right: 0;
+}
+
+.tag-screen.tiny-tags .tag {
+  grid-template-columns: 42px minmax(0, 1fr);
+  column-gap: 7px;
+  row-gap: 1px;
+  padding: 3px 0;
+}
+
+.tag-screen.tiny-tags .tag-circle {
+  width: 42px;
+  height: 42px;
+}
+
+.tag-screen.tiny-tags .tag-circle svg {
+  width: 16px;
+  height: 16px;
+}
+
+.tag-screen.tiny-tags .tag-name {
+  font-size: 10px;
+}
+
+.tag-screen.tiny-tags .tag-song-count {
+  font-size: 7px;
+}
+
+.tag-screen.tiny-tags .tag-menu {
+  top: 48px;
+  right: 4px;
+  width: min(220px, calc(100% - 8px));
+  padding: 10px;
+  border-radius: 15px;
+}
+
+.tag-screen.tiny-tags .tag-menu-title {
+  margin-bottom: 7px;
+  padding-left: 4px;
+  font-size: 8px;
+}
+
+.tag-screen.tiny-tags .tag-menu button {
+  gap: 9px;
+  padding: 7px 4px;
+}
+
+.tag-screen.tiny-tags .tag-menu button svg {
+  width: 15px;
+  height: 15px;
+}
+
+.tag-screen.tiny-tags .tag-menu button span {
+  font-size: 11px;
+}
+
+.tag-screen.tiny-tags .tag-menu button small {
+  font-size: 8px;
+}
+
+/* ---------- Ultra-tiny: absolute minimum ---------- */
+
+.tag-screen.ultra-tiny-tags {
+  --ultra-pad: 6px;
+}
+
+.tag-screen.ultra-tiny-tags .tag-header {
+  margin-bottom: 10px;
+}
+
+.tag-screen.ultra-tiny-tags .tag-header h1 {
+  margin-bottom: 4px;
+  font-size: 18px;
+}
+
+.tag-screen.ultra-tiny-tags .tag-header p {
+  display: none;
+}
+
+.tag-screen.ultra-tiny-tags .tag-manage-button {
+  width: 32px;
+  min-width: 32px;
+  height: 32px;
+  padding: 0;
+  border-radius: 9px;
+}
+
+.tag-screen.ultra-tiny-tags .tag-manage-button span {
+  display: none;
+}
+
+.tag-screen.ultra-tiny-tags .tag-manage-button svg {
+  width: 15px;
+  height: 15px;
+}
+
+.tag-screen.ultra-tiny-tags .tag-search {
+  height: 36px;
+  gap: 7px;
+  padding: 0 9px;
+  margin-bottom: 8px;
+  border-radius: 12px;
+}
+
+.tag-screen.ultra-tiny-tags .tag-search input {
+  font-size: 11px;
+}
+
+.tag-screen.ultra-tiny-tags .tag-grid {
+  gap: 5px;
+  padding: 4px 0 30px;
+}
+
+.tag-screen.ultra-tiny-tags .tag {
+  grid-template-columns: 34px minmax(0, 1fr);
+  column-gap: 6px;
+  row-gap: 1px;
+  padding: 2px 0;
+}
+
+.tag-screen.ultra-tiny-tags .tag-circle {
+  width: 34px;
+  height: 34px;
+}
+
+.tag-screen.ultra-tiny-tags .tag-circle svg {
+  width: 13px;
+  height: 13px;
+}
+
+.tag-screen.ultra-tiny-tags .tag-name {
+  font-size: 9px;
+}
+
+.tag-screen.ultra-tiny-tags .tag-song-count {
+  font-size: 6px;
+}
+
+.tag-screen.ultra-tiny-tags .tag-menu {
+  top: 40px;
+  right: 2px;
+  width: min(190px, calc(100% - 4px));
+  padding: 7px;
+  border-radius: 13px;
+}
+
+.tag-screen.ultra-tiny-tags .tag-menu-title {
+  margin-bottom: 5px;
+  padding-left: 3px;
+  font-size: 7px;
+  letter-spacing: 1px;
+}
+
+.tag-screen.ultra-tiny-tags .tag-menu button {
+  gap: 7px;
+  padding: 6px 3px;
+}
+
+.tag-screen.ultra-tiny-tags .tag-menu button svg {
+  width: 13px;
+  height: 13px;
+}
+
+.tag-screen.ultra-tiny-tags .tag-menu button span {
+  font-size: 10px;
+}
+
+.tag-screen.ultra-tiny-tags .tag-menu button small {
+  font-size: 7px;
+}
+
+/* ==========================================================
+   22. MOBILE / SMALL SCREEN
+   Only controls screen-height/interaction behavior.
+   Horizontal density is controlled by panel-width classes.
+   ========================================================== */
 
 @media (max-width: 768px) {
-  /* ======================================================
-     TAG SCREEN
-  ====================================================== */
-
   .tag-screen {
-    position: relative;
-
-    width: 100%;
     height: 100%;
     min-height: 0;
-
     display: flex;
     flex-direction: column;
-
-    padding: 18px 18px 14px;
-
-    box-sizing: border-box;
-
-    /*
-      Vertical gestures belong to the Tag screen.
-      navigation.js handles horizontal navigation.
-    */
+    padding: 18px;
     touch-action: pan-y;
-
-    overflow: hidden;
   }
-
-  /* ======================================================
-     HEADER
-  ====================================================== */
 
   .tag-header {
     flex: 0 0 auto;
-
     margin-bottom: 18px;
   }
 
   .tag-header h1 {
     margin-bottom: 7px;
-
-    font-size: 28px;
+    font-size: clamp(22px, 7vw, 28px);
   }
 
   .tag-header p {
     font-size: 12px;
-    line-height: 1.4;
   }
-
-  /* ======================================================
-     MANAGE BUTTON
-  ====================================================== */
 
   .tag-manage-button {
     width: 44px;
+    min-width: 44px;
     height: 44px;
-
     padding: 0;
-
     border-radius: 14px;
   }
 
@@ -2042,449 +1589,76 @@
     height: 20px;
   }
 
-  /* ======================================================
-     SEARCH
-  ====================================================== */
-
   .tag-search {
-    width: 100%;
-    height: 44px;
-
     flex: 0 0 auto;
-
+    height: 44px;
     gap: 10px;
-
     padding: 0 14px;
-
     margin-bottom: 14px;
-
     border-radius: 18px;
-  }
-
-  .tag-search svg {
-    width: 18px;
-    height: 18px;
-
-    flex-shrink: 0;
   }
 
   .tag-search input {
     font-size: 14px;
   }
 
-  /* ======================================================
-     MANAGE POPUP
-  ====================================================== */
-
-  .tag-menu {
-    width: 250px;
-
-    top: 70px;
-    right: 35px;
-
-    padding: 14px;
-
-    border-radius: 20px;
-  }
-
-  .tag-menu-title {
-    margin-bottom: 14px;
-
-    font-size: 10px;
-  }
-
-  .tag-menu button {
-    gap: 14px;
-
-    padding: 10px 6px;
-  }
-
-  .tag-menu button svg {
-    width: 17px;
-    height: 17px;
-  }
-
-  .tag-menu button span {
-    font-size: 14px;
-  }
-
-  .tag-menu button small {
-    font-size: 11px;
-  }
-
-  /* ======================================================
-     TAG GRID
-     
-     THIS IS THE ACTUAL MOBILE SCROLL AREA.
-  ====================================================== */
-
   .tag-grid {
     flex: 1 1 0;
-
     width: 100%;
-
     min-width: 0;
     min-height: 0;
-
-    display: grid;
-
-    grid-template-columns: repeat(4, minmax(0, 1fr));
-
-    column-gap: 8px;
-    row-gap: 18px;
-
-    align-content: start;
-
-    /*
-      IMPORTANT:
-      The grid itself scrolls vertically.
-    */
+    padding: 8px 2px max(30px, env(safe-area-inset-bottom));
+    margin: 0;
     overflow-y: auto;
     overflow-x: hidden;
-
-    /*
-      Space above the first heading
-      and below the last tag.
-    */
-    padding: 8px 2px 110px;
-
-    margin: 0;
-
-    box-sizing: border-box;
-
-    /*
-      Mobile scrolling.
-    */
-    -webkit-overflow-scrolling: touch;
-
-    /*
-      Tell browser this surface is vertical.
-    */
     touch-action: pan-y;
-
-    /*
-      Don't bounce the entire workspace when
-      the Tag list reaches its end.
-    */
     overscroll-behavior-y: contain;
-
-    /*
-      Hide scrollbar.
-    */
-    scrollbar-width: none;
+    -webkit-overflow-scrolling: touch;
   }
 
-  .tag-grid::-webkit-scrollbar {
-    display: none;
-  }
-
-  /* ======================================================
-     CUSTOM GROUP HEADING
-  ====================================================== */
-
-  .tag-group-heading {
-    grid-column: 1 / -1;
-
-    width: 100%;
-
-    margin: 4px 0 2px;
-
-    padding: 0 4px;
-
-    box-sizing: border-box;
-
-    color: #858585;
-
-    font-size: 10px;
-    font-weight: 700;
-
-    line-height: 1.5;
-
-    letter-spacing: 1.2px;
-
-    white-space: nowrap;
-
-    overflow: visible;
-
-    text-overflow: ellipsis;
-  }
-
-  .tag-group-heading::after {
-    content: "";
-
-    display: block;
-
-    height: 1px;
-
-    margin-top: 7px;
-
-    background: rgba(255, 255, 255, 0.06);
-  }
-
-  /* ======================================================
-     ALPHABETICAL LETTER
-  ====================================================== */
-
+  .tag-group-heading,
   .tag-letter {
-    grid-column: 1 / -1;
-
-    width: 100%;
-
-    margin: 4px 0 2px;
-
+    margin-top: 4px;
+    margin-bottom: 2px;
     padding: 0 4px;
-
     font-size: 10px;
-
     letter-spacing: 1.2px;
   }
 
-  /* ======================================================
-     TAG
-  ====================================================== */
+  .tag-group-heading::after,
+  .tag-letter::after {
+    margin-top: 7px;
+  }
 
   .tag {
-    width: 100%;
-    min-width: 0;
-
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-
     gap: 7px;
-
     padding: 5px 2px;
-
-    box-sizing: border-box;
   }
 
-  /* ======================================================
-     TAG CIRCLE
-  ====================================================== */
-
-  .tag-circle {
-    width: 72px;
-    height: 72px;
-
-    flex-shrink: 0;
-  }
-
-  .tag-circle svg {
-    width: 25px;
-    height: 25px;
-  }
-
-  /* ======================================================
-     TAG NAME
-  ====================================================== */
-
-  .tag-name,
-  .tag span {
-    max-width: 100%;
-
+  .tag-name {
     font-size: 11px;
-
-    line-height: 1.2;
-
-    text-align: center;
-
-    white-space: nowrap;
-
-    overflow: hidden;
-
-    text-overflow: ellipsis;
   }
-
-  /* ======================================================
-     SONG COUNT
-  ====================================================== */
 
   .tag-song-count {
     margin-top: -3px;
-
     font-size: 8px;
   }
-
-  /* ======================================================
-     SELECTION FOOTER
-  ====================================================== */
-
-  .tag-selection-footer {
-    position: fixed;
-
-    left: 10px;
-    right: 10px;
-
-    bottom: max(10px, env(safe-area-inset-bottom));
-
-    top: auto;
-
-    width: auto;
-
-    height: 60px;
-    min-height: 60px;
-
-    margin: 0;
-    padding: 7px 8px;
-
-    box-sizing: border-box;
-
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-
-    background: transparent;
-
-    border: 1px solid transparent;
-    border-radius: 15px;
-
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
-
-    z-index: 999999;
-
-    visibility: visible;
-    opacity: 1;
-  }
-
-  /* ======================================================
-     SELECTION INFO
-  ====================================================== */
-
-  .tag-selection-info {
-    gap: 8px;
-
-    min-width: 0;
-
-    flex: 1 1 auto;
-  }
-
-  .tag-selection-icon {
-    width: 36px;
-    height: 36px;
-
-    min-width: 36px;
-
-    border-radius: 10px;
-
-    background: #181818;
-  }
-
-  .tag-selection-icon svg {
-    width: 17px;
-    height: 17px;
-  }
-
-  .tag-selection-text {
-    gap: 2px;
-
-    min-width: 0;
-  }
-
-  .tag-selection-text strong {
-    font-size: 10px;
-  }
-
-  .tag-selection-text span {
-    font-size: 8px;
-  }
-
-  /* ======================================================
-     CLEAR SELECTION
-  ====================================================== */
-
-  .tag-clear-selection {
-    display: block;
-
-    flex-shrink: 0;
-
-    margin: 0 7px;
-
-    font-size: 8px;
-  }
-
-  /* ======================================================
-     VIEW LIBRARY
-  ====================================================== */
-
-  .tag-view-library {
-    width: 112px;
-    min-width: 112px;
-
-    height: 42px;
-
-    flex-shrink: 0;
-
-    gap: 6px;
-
-    padding: 0 9px;
-
-    border-radius: 11px;
-
-    font-size: 10px;
-  }
-
-  .tag-view-library svg {
-    width: 15px;
-    height: 15px;
-  }
-
-  /* ======================================================
-     MOBILE MODAL
-  ====================================================== */
 
   .tag-modal-overlay {
-    position: fixed;
-    inset: 0;
-
-    width: 100vw;
-    height: 100dvh;
-
-    display: flex;
     align-items: flex-start;
     justify-content: center;
-
     padding: 18px 12px;
-
-    box-sizing: border-box;
-
+    overflow: hidden;
     background: rgba(0, 0, 0, 0.62);
-
     backdrop-filter: blur(7px);
     -webkit-backdrop-filter: blur(7px);
-
-    overflow: hidden;
-
-    z-index: 1000000;
   }
 
   .tag-modal {
-    position: relative;
-
-    width: calc(100vw - 24px);
-    max-width: 560px;
-
-    height: calc(100dvh - 150px);
+    width: min(560px, 100%);
     max-height: calc(100dvh - 36px);
-
-    min-height: 0;
-
-    margin: 0;
-
-    display: flex;
-    flex-direction: column;
-
-    overflow: hidden;
-
-    box-sizing: border-box;
-
     border-radius: 20px;
-
-    z-index: 999999999;
   }
-
-  /* ======================================================
-     MODAL HEADER
-  ====================================================== */
 
   .tag-modal-header {
     padding: 17px 18px 11px;
@@ -2492,14 +1666,11 @@
 
   .tag-modal-header h2 {
     font-size: 20px;
-    line-height: 1.2;
   }
 
   .tag-modal-header p {
     margin-top: 4px;
-
     max-width: 300px;
-
     font-size: 11px;
     line-height: 1.4;
   }
@@ -2507,48 +1678,23 @@
   .tag-modal-close {
     width: 36px;
     height: 36px;
-
     border-radius: 10px;
   }
 
-  /* ======================================================
-     MODAL BODY
-  ====================================================== */
-
   .tag-modal-body {
-    flex: 1 1 auto;
-
-    min-height: 0;
-
-    overflow-y: auto;
-
     padding: 3px 18px 8px;
-
     -webkit-overflow-scrolling: touch;
-
     touch-action: pan-y;
   }
 
-  /* ======================================================
-     MODAL FOOTER
-  ====================================================== */
-
   .tag-modal-footer {
-    flex-shrink: 0;
-
     gap: 8px;
-
     padding: 10px 18px max(12px, env(safe-area-inset-bottom));
   }
-
-  /* ======================================================
-     FORM
-  ====================================================== */
 
   .tag-form-label {
     margin-top: 5px;
     margin-bottom: 7px;
-
     font-size: 9px;
   }
 
@@ -2558,29 +1704,21 @@
 
   .tag-form-input {
     height: 42px;
-
     font-size: 13px;
   }
 
   .tag-form-hint {
     margin-top: 5px;
-
     font-size: 10px;
   }
 
-  /* ======================================================
-     ICON PICKER
-  ====================================================== */
-
   .tag-icon-picker {
     grid-template-columns: repeat(7, minmax(0, 1fr));
-
     gap: 6px;
   }
 
   .tag-icon-option {
     min-height: 38px;
-
     border-radius: 9px;
   }
 
@@ -2589,21 +1727,9 @@
     height: 17px;
   }
 
-  /* ======================================================
-     EDIT ROWS
-  ====================================================== */
-
   .tag-edit-row {
-    min-height: 56px;
-
-    grid-template-columns:
-      38px
-      minmax(0, 1fr)
-      36px
-      36px;
-
+    grid-template-columns: 38px minmax(0, 1fr) 36px 36px;
     gap: 7px;
-
     padding: 6px;
   }
 
@@ -2621,15 +1747,9 @@
     height: 32px;
   }
 
-  /* ======================================================
-     CUSTOM ORDER
-  ====================================================== */
-
   .tag-add-group-button {
     height: 44px;
-
     font-size: 12px;
-
     border-radius: 11px;
   }
 
@@ -2643,15 +1763,8 @@
 
   .tag-order-group-header {
     min-height: 52px;
-
-    grid-template-columns:
-      32px
-      minmax(0, 1fr)
-      auto
-      auto;
-
-    gap: 8px;
-
+    grid-template-columns: 32px minmax(0, 1fr) auto auto;
+    gap: 6px;
     padding: 6px 8px;
   }
 
@@ -2674,22 +1787,14 @@
 
   .tag-order-group-tags {
     gap: 5px;
-
     padding: 6px;
   }
 
   .tag-order-row {
     min-height: 52px;
-
-    grid-template-columns:
-      32px
-      38px
-      minmax(0, 1fr);
-
+    grid-template-columns: 32px 38px minmax(0, 1fr);
     gap: 8px;
-
     padding: 6px 8px;
-
     border-radius: 11px;
   }
 
@@ -2707,10 +1812,6 @@
     font-size: 13px;
   }
 
-  /* ======================================================
-     NAVIGATION POPUP
-  ====================================================== */
-
   .moonbox-navigation-overlay {
     padding: 16px;
   }
@@ -2718,16 +1819,13 @@
   .moonbox-navigation-popup {
     width: 100%;
     max-width: 360px;
-
     padding: 22px;
-
     border-radius: 20px;
   }
 
   .moonbox-popup-logo {
     width: 44px;
     height: 44px;
-
     margin-bottom: 16px;
   }
 
@@ -2749,66 +1847,39 @@
   }
 
   .moonbox-popup-actions button {
-    height: 40px;
-
-    flex: 1;
+    flex: 1 1 0;
   }
 }
 
 /* ==========================================================
-   29. SMALL PHONES
+   23. VERY NARROW / VERY SHORT SCREENS
+   Uses fluid sizing instead of another duplicate layout.
    ========================================================== */
 
-@media (max-width: 420px) {
+@media (max-width: 420px), (max-height: 600px) {
   .tag-screen {
-    padding-left: 14px;
-    padding-right: 14px;
+    padding: 14px;
+  }
+
+  .tag-header {
+    margin-bottom: 12px;
+  }
+
+  .tag-search {
+    margin-bottom: 10px;
   }
 
   .tag-grid {
-    column-gap: 5px;
-    row-gap: 15px;
+    padding-bottom: max(24px, env(safe-area-inset-bottom));
   }
-
-  .tag-circle {
-    width: 64px;
-    height: 64px;
-  }
-
-  .tag-circle svg {
-    width: 22px;
-    height: 22px;
-  }
-
-  .tag-selection-icon {
-    display: none;
-  }
-
-  .tag-selection-text strong {
-    font-size: 9px;
-  }
-
-  .tag-selection-text span {
-    font-size: 8px;
-  }
-
-  .tag-view-library {
-    width: 105px;
-    min-width: 105px;
-
-    height: 42px;
-  }
-
-  /* ---------- Small Modal ---------- */
 
   .tag-modal {
-    max-height: calc(100dvh - 50px);
-
+    max-height: calc(100dvh - 28px);
     border-radius: 18px;
   }
 
   .tag-modal-header {
-    padding: 15px 15px 10px;
+    padding: 14px 15px 9px;
   }
 
   .tag-modal-header h2 {
@@ -2826,32 +1897,22 @@
 
   .tag-icon-picker {
     grid-template-columns: repeat(6, minmax(0, 1fr));
-
-    gap: 7px;
-  }
-
-  .tag-icon-option {
-    border-radius: 10px;
+    gap: 6px;
   }
 
   .tag-icon-option svg {
-    width: 18px;
-    height: 18px;
-  }
-
-  .tag-form-hint {
-    font-size: 10px;
+    width: 17px;
+    height: 17px;
   }
 
   .tag-edit-row {
-    grid-template-columns: 36px minmax(0, 1fr) 32px 32px;
-
+    grid-template-columns: 34px minmax(0, 1fr) 30px 30px;
     gap: 5px;
   }
 
   .tag-edit-icon {
-    width: 34px;
-    height: 34px;
+    width: 32px;
+    height: 32px;
   }
 
   .tag-row-action {
@@ -2860,81 +1921,28 @@
   }
 
   .tag-order-row {
-    grid-template-columns: 32px 36px minmax(0, 1fr);
-
-    gap: 7px;
+    grid-template-columns: 30px 34px minmax(0, 1fr);
+    gap: 6px;
   }
 
   .tag-drag-handle {
-    width: 32px;
+    width: 30px;
   }
 
   .tag-order-icon {
-    width: 36px;
-    height: 36px;
-  }
-
-  .tag-clear-selection {
-    font-size: 8px;
-
-    margin-left: 4px;
-    margin-right: 6px;
+    width: 34px;
+    height: 34px;
   }
 }
 
 /* ==========================================================
-   30. VERY SMALL PHONES
-   ========================================================== */
-
-@media (max-width: 350px) {
-  .tag-circle {
-    width: 58px;
-    height: 58px;
-  }
-
-  .tag-circle svg {
-    width: 20px;
-    height: 20px;
-  }
-
-  .tag-name,
-  .tag span {
-    font-size: 9px;
-  }
-
-  .tag-view-library {
-    width: 98px;
-    min-width: 98px;
-
-    font-size: 9px;
-  }
-
-  .tag-selection-text strong {
-    font-size: 9px;
-  }
-
-  .tag-selection-text span {
-    font-size: 8px;
-  }
-
-  .tag-clear-selection {
-    font-size: 8px;
-
-    margin-left: 3px;
-    margin-right: 5px;
-  }
-
-  .tag-icon-picker {
-    grid-template-columns: repeat(5, minmax(0, 1fr));
-  }
-}
-
-/* ==========================================================
-   31. TOUCH / ACCESSIBILITY
+   24. TOUCH / ACCESSIBILITY
    ========================================================== */
 
 .tag-modal button,
-.tag-modal input {
+.tag-modal input,
+.tag-screen button,
+.tag-screen input {
   -webkit-tap-highlight-color: transparent;
 }
 
@@ -2948,35 +1956,59 @@
     min-height: 32px;
   }
 
-  .tag-drag-handle {
-    min-width: 34px;
-    min-height: 42px;
-  }
-
+  .tag-drag-handle,
   .tag-group-drag-handle {
     min-width: 34px;
     min-height: 42px;
   }
 }
 
-/* ==========================================================
-   32. REDUCED MOTION
-   ========================================================== */
-
 @media (prefers-reduced-motion: reduce) {
-  .tag-menu,
-  .tag-modal-overlay,
-  .tag-modal,
-  .tag-icon-option,
-  .tag-edit-row,
-  .tag-order-row,
-  .moonbox-navigation-overlay,
-  .moonbox-navigation-popup {
-    animation: none !important;
-    transition: none !important;
+  .tag-screen *,
+  .tag-screen *::before,
+  .tag-screen *::after {
+    scroll-behavior: auto !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
   }
 }
 
-body:has(#tagModalRoot .tag-modal-overlay) .tag-selection-footer {
-  display: none !important;
+/* ==========================================================
+   25. SAFETY NETS
+   Prevent long names, buttons and modal content from forcing
+   the Tags panel wider than its actual available width.
+   ========================================================== */
+
+.tag-screen h1,
+.tag-screen h2,
+.tag-screen p,
+.tag-screen span,
+.tag-screen button,
+.tag-screen input,
+.tag-screen .tag-menu,
+.tag-screen .tag-modal,
+.tag-screen .tag-order-group,
+.tag-screen .tag-edit-row {
+  max-width: 100%;
+}
+
+.tag-screen button {
+  font-family: inherit;
+}
+
+.tag-screen img,
+.tag-screen svg {
+  max-width: 100%;
+}
+
+.tag-modal,
+.tag-menu {
+  overflow: hidden;
+}
+
+.tag-modal-body,
+.tag-edit-list,
+.tag-order-groups {
+  min-width: 0;
 }

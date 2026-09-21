@@ -44,45 +44,16 @@
       <!-- ==========================================================
                             TOP NAVIGATION
         =========================================================== -->
-
       <header class="top-nav">
         <!-- Logo -->
-
         <div class="logo" id="moonboxAccountButton">
           <img src="assets/MoonBox_192.png" alt="Moon Box Logo" />
-
           <span id="moonboxName">MoonBox</span>
         </div>
 
-        <!-- Navigation -->
-
-        <nav class="nav-pill">
-          <button class="nav-button active" data-screen="0">
-            <i data-lucide="tags" class="icon"></i>
-
-            <span class="text">Tags</span>
-          </button>
-
-          <button class="nav-button" data-screen="1">
-            <i data-lucide="library-big" class="icon"></i>
-
-            <span class="text">Library</span>
-          </button>
-
-          <button class="nav-button" data-screen="2">
-            <i data-lucide="play-circle" class="icon"></i>
-
-            <span class="text">Player</span>
-          </button>
-
-          <!-- Sliding indicator -->
-
-          <div class="nav-indicator"></div>
-        </nav>
-
         <!-- Folder -->
-
         <button class="folder-button" id="openFolders">
+          <span class="folder-button-text">Import Songs</span>
           <i data-lucide="box"></i>
         </button>
       </header>
@@ -92,329 +63,299 @@
         =========================================================== -->
 
       <main class="workspace" id="workspace">
-        <!-- ======================================================
+        <div class="music-workspace">
+          <!-- ======================================================
                     TAG SCREEN
         ======================================================= -->
 
-        <section class="screen tag-screen">
-          <!-- Header -->
+          <section class="screen tag-screen">
+            <!-- Header -->
 
-          <div class="tag-header">
-            <div>
-              <h1>Make your Mix</h1>
+            <div class="tag-header">
+              <div>
+                <h1>Make your Mix</h1>
 
-              <p>Choose one or more tags to shape your songs for MoonBox.</p>
+                <p>Choose one or more tags to shape your songs for MoonBox.</p>
+              </div>
+
+              <!-- Manage -->
+
+              <button class="tag-manage-button" id="tagManageButton">
+                <i data-lucide="sliders-horizontal"></i>
+                <span>Manage</span>
+              </button>
             </div>
 
-            <!-- Manage -->
+            <!-- Search -->
 
-            <button class="tag-manage-button" id="tagManageButton">
-              <i data-lucide="sliders-horizontal"></i>
-              <span>Manage</span>
-            </button>
-          </div>
+            <div class="tag-search">
+              <i data-lucide="search"></i>
 
-          <!-- Search -->
+              <input type="text" placeholder="Search tags..." id="tagSearch" />
+            </div>
 
-          <div class="tag-search">
-            <i data-lucide="search"></i>
+            <!-- Popup -->
 
-            <input type="text" placeholder="Search tags..." id="tagSearch" />
-          </div>
+            <div class="tag-menu" id="tagMenu">
+              <div class="tag-menu-title">MANAGE TAGS</div>
+              <button>
+                <i data-lucide="plus"></i>
 
-          <!-- Popup -->
+                <div>
+                  <span>Add Tag</span>
 
-          <div class="tag-menu" id="tagMenu">
-            <div class="tag-menu-title">MANAGE TAGS</div>
-            <button>
-              <i data-lucide="plus"></i>
+                  <small>Create new tag</small>
+                </div>
+              </button>
 
-              <div>
-                <span>Add Tag</span>
+              <div class="tag-divider"></div>
 
-                <small>Create new tag</small>
-              </div>
-            </button>
+              <button type="button">
+                <i data-lucide="tags"></i>
 
-            <div class="tag-divider"></div>
+                <div>
+                  <span>Tags</span>
+                  <small>Normal tag view</small>
+                </div>
+              </button>
 
+              <button>
+                <i data-lucide="move"></i>
+
+                <div>
+                  <span>Custom Order</span>
+
+                  <small>Drag to reorder</small>
+                </div>
+              </button>
+
+              <button>
+                <i data-lucide="arrow-down-a-z"></i>
+
+                <div>
+                  <span>Alphabetical</span>
+
+                  <small>Sort A → Z</small>
+                </div>
+              </button>
+
+              <div class="tag-divider"></div>
+
+              <button>
+                <i data-lucide="pencil"></i>
+
+                <div>
+                  <span>Edit Tags</span>
+
+                  <small>Rename / Delete</small>
+                </div>
+              </button>
+            </div>
+
+            <!-- Tags -->
+
+            <div class="tag-grid" id="tagGrid"></div>
+
+            <div id="tagModalRoot"></div>
+          </section>
+
+          <div class="workspace-divider" id="workspaceDivider">
             <button type="button">
-              <i data-lucide="tags"></i>
-
-              <div>
-                <span>Tags</span>
-                <small>Normal tag view</small>
-              </div>
-            </button>
-
-            <button>
-              <i data-lucide="move"></i>
-
-              <div>
-                <span>Custom Order</span>
-
-                <small>Drag to reorder</small>
-              </div>
-            </button>
-
-            <button>
-              <i data-lucide="arrow-down-a-z"></i>
-
-              <div>
-                <span>Alphabetical</span>
-
-                <small>Sort A → Z</small>
-              </div>
-            </button>
-
-            <div class="tag-divider"></div>
-
-            <button>
-              <i data-lucide="pencil"></i>
-
-              <div>
-                <span>Edit Tags</span>
-
-                <small>Rename / Delete</small>
-              </div>
+              <i data-lucide="chevrons-left-right"></i>
             </button>
           </div>
 
-          <!-- Tags -->
-
-          <div class="tag-grid" id="tagGrid"></div>
-
-          <div id="tagModalRoot"></div>
-        </section>
-
-        <!-- ==========================================================
-     TAG SELECTION FOOTER
-========================================================== -->
-
-        <div class="tag-selection-footer" id="tagSelectionFooter">
-          <!-- LEFT: Selection information -->
-
-          <div class="tag-selection-info">
-            <div class="tag-selection-icon">
-              <i data-lucide="tag"></i>
-            </div>
-
-            <div class="tag-selection-text">
-              <strong id="selectedTagCount"> 0 tags selected </strong>
-
-              <span id="selectedSongCount"> 0 songs match your selection </span>
-            </div>
-          </div>
-
-          <!-- RIGHT: View Library -->
-
-          <!-- CLEAR + VIEW LIBRARY -->
-
-          <button
-            class="tag-clear-selection"
-            id="tagClearSelection"
-            type="button"
-          >
-            Clear Tags
-          </button>
-
-          <button class="tag-view-library" id="tagViewLibrary" type="button">
-            <span>View Library</span>
-
-            <i data-lucide="list-music"></i>
-          </button>
-        </div>
-
-        <!-- ======================================================
+          <!-- ======================================================
                     LIBRARY SCREEN
         ======================================================= -->
 
-        <section class="screen library-screen">
-          <!-- ====================================================
+          <section class="screen library-screen">
+            <!-- ====================================================
                         HEADER
   ===================================================== -->
 
-          <div class="library-header">
-            <div>
-              <h1>Your MoonBox</h1>
+            <div class="library-header">
+              <div>
+                <h1>Your MoonBox</h1>
 
-              <p>Showing songs for the selected tags.</p>
-            </div>
+                <p>Showing songs for the selected tags.</p>
+              </div>
 
-            <div class="library-header-actions">
-              <!-- Edit Mode
+              <div class="library-header-actions">
+                <!-- Edit Mode
 
               <button class="library-sort-option" data-sort="custom" disabled>
                 <span>Custom Order</span>
               </button> -->
 
-              <!-- Union / Intersection -->
+                <!-- Union / Intersection -->
 
-              <div class="library-filter-wrapper">
-                <button class="library-filter-button" id="libraryFilterButton">
-                  <i id="libraryFilterIcon" data-lucide="squares-unite"></i>
+                <div class="library-filter-wrapper">
+                  <button
+                    class="library-filter-button"
+                    id="libraryFilterButton"
+                  >
+                    <i id="libraryFilterIcon" data-lucide="squares-unite"></i>
 
-                  <span id="libraryFilterLabel"> Union </span>
+                    <span id="libraryFilterLabel"> Union </span>
+
+                    <i data-lucide="chevron-down"></i>
+                  </button>
+
+                  <!-- Dropdown -->
+
+                  <div class="library-filter-menu" id="libraryFilterMenu">
+                    <div class="library-filter-title">FILTER MODE</div>
+
+                    <button class="library-filter-option" data-mode="union">
+                      <i data-lucide="squares-unite"></i>
+
+                      <div>
+                        <span>Union</span>
+
+                        <small>Songs with any selected tag</small>
+                      </div>
+                    </button>
+
+                    <div class="library-filter-divider"></div>
+                    <button
+                      class="library-filter-option"
+                      data-mode="intersection"
+                    >
+                      <i data-lucide="squares-intersect"></i>
+
+                      <div>
+                        <span>Intersection</span>
+
+                        <small>Songs with every selected tag</small>
+                      </div>
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- ====================================================
+                        SELECTED TAGS
+  ===================================================== -->
+
+            <div class="library-selected-tags" id="librarySelectedTags">
+              <!-- Filled by JS -->
+            </div>
+
+            <!-- ====================================================
+                        SEARCH
+  ===================================================== -->
+
+            <div class="library-search">
+              <i data-lucide="search"></i>
+
+              <input
+                id="librarySearch"
+                type="text"
+                placeholder="Search songs..."
+              />
+            </div>
+
+            <!-- ====================================================
+     LIBRARY INFO + SORT
+===================================================== -->
+
+            <div class="library-meta-row">
+              <div class="library-stats">
+                <span id="librarySongCount">0 Songs</span>
+
+                <span class="library-meta-divider">•</span>
+
+                <span id="libraryTotalDuration">0m</span>
+              </div>
+
+              <div class="library-sort-wrapper">
+                <button
+                  class="library-sort-button"
+                  id="librarySortButton"
+                  type="button"
+                >
+                  <span>Sort: </span>
+
+                  <strong id="librarySortLabel"> Alphabetically </strong>
 
                   <i data-lucide="chevron-down"></i>
                 </button>
 
-                <!-- Dropdown -->
+                <div class="library-sort-menu" id="librarySortMenu">
+                  <div class="library-sort-title">SORT BY</div>
 
-                <div class="library-filter-menu" id="libraryFilterMenu">
-                  <div class="library-filter-title">FILTER MODE</div>
+                  <button
+                    class="library-sort-option active"
+                    data-sort="alphabetical"
+                    type="button"
+                  >
+                    <span>Alphabetically</span>
 
-                  <button class="library-filter-option" data-mode="union">
-                    <i data-lucide="squares-unite"></i>
-
-                    <div>
-                      <span>Union</span>
-
-                      <small>Songs with any selected tag</small>
-                    </div>
+                    <i data-lucide="check"></i>
                   </button>
 
-                  <div class="library-filter-divider"></div>
                   <button
-                    class="library-filter-option"
-                    data-mode="intersection"
+                    class="library-sort-option"
+                    data-sort="most-played"
+                    type="button"
+                    disabled
                   >
-                    <i data-lucide="squares-intersect"></i>
+                    <span>Most Played</span>
+                  </button>
 
-                    <div>
-                      <span>Intersection</span>
+                  <button
+                    class="library-sort-option"
+                    data-sort="least-played"
+                    type="button"
+                    disabled
+                  >
+                    <span>Least Played</span>
+                  </button>
 
-                      <small>Songs with every selected tag</small>
-                    </div>
+                  <button
+                    class="library-sort-option"
+                    data-sort="custom"
+                    type="button"
+                    disabled
+                  >
+                    <span>Custom Order</span>
                   </button>
                 </div>
               </div>
             </div>
-          </div>
 
-          <!-- ====================================================
-                        SELECTED TAGS
-  ===================================================== -->
-
-          <div class="library-selected-tags" id="librarySelectedTags">
-            <!-- Filled by JS -->
-          </div>
-
-          <!-- ====================================================
-                        SEARCH
-  ===================================================== -->
-
-          <div class="library-search">
-            <i data-lucide="search"></i>
-
-            <input
-              id="librarySearch"
-              type="text"
-              placeholder="Search songs..."
-            />
-          </div>
-
-          <!-- ====================================================
-     LIBRARY INFO + SORT
-===================================================== -->
-
-          <div class="library-meta-row">
-            <div class="library-stats">
-              <span id="librarySongCount">0 Songs</span>
-
-              <span class="library-meta-divider">•</span>
-
-              <span id="libraryTotalDuration">0m</span>
-            </div>
-
-            <div class="library-sort-wrapper">
-              <button
-                class="library-sort-button"
-                id="librarySortButton"
-                type="button"
-              >
-                <span>Sort: </span>
-
-                <strong id="librarySortLabel"> Alphabetically </strong>
-
-                <i data-lucide="chevron-down"></i>
-              </button>
-
-              <div class="library-sort-menu" id="librarySortMenu">
-                <div class="library-sort-title">SORT BY</div>
-
-                <button
-                  class="library-sort-option active"
-                  data-sort="alphabetical"
-                  type="button"
-                >
-                  <span>Alphabetically</span>
-
-                  <i data-lucide="check"></i>
-                </button>
-
-                <button
-                  class="library-sort-option"
-                  data-sort="most-played"
-                  type="button"
-                  disabled
-                >
-                  <span>Most Played</span>
-                </button>
-
-                <button
-                  class="library-sort-option"
-                  data-sort="least-played"
-                  type="button"
-                  disabled
-                >
-                  <span>Least Played</span>
-                </button>
-
-                <button
-                  class="library-sort-option"
-                  data-sort="custom"
-                  type="button"
-                  disabled
-                >
-                  <span>Custom Order</span>
-                </button>
-              </div>
-            </div>
-          </div>
-
-          <!-- ====================================================
+            <!-- ====================================================
                         SONG LIST
   ===================================================== -->
 
-          <div class="library-song-list" id="librarySongList">
-            <!-- Songs generated by library.js -->
-          </div>
-        </section>
+            <div class="library-song-list" id="librarySongList">
+              <!-- Songs generated by library.js -->
+            </div>
+          </section>
+        </div>
 
         <!-- ======================================================
                             PLAYER SCREEN
         ======================================================= -->
-        <!-- ======================================================
-                    PLAYER SCREEN
-======================================================= -->
+        <!-- ==========================================================
+                     PLAYER SCREEN
+=========================================================== -->
 
         <section class="screen" id="playerScreen">
           <div class="player-layout">
-            <!-- ==================================================
+            <!-- ========================================================
                          MAIN PLAYER
-    =================================================== -->
+    ========================================================= -->
 
             <section class="player-top">
-              <!-- ==================================================
-                           ALBUM ART
-      =================================================== -->
+              <!-- ------------------------------------------------------
+                         HIDDEN ARTWORK
+           Kept for player.js compatibility
+      ------------------------------------------------------- -->
 
-              <div class="player-album">
-                <!--
-          Kept for player.js compatibility.
-          Hidden visually by player.css.
-        -->
+              <div class="player-album" aria-hidden="true">
                 <div class="record-wrapper">
                   <div class="vinyl">
                     <div class="shine"></div>
@@ -425,8 +366,6 @@
                   </div>
                 </div>
 
-                <!-- Main artwork -->
-
                 <img
                   id="playerCover"
                   class="album-cover"
@@ -435,234 +374,237 @@
                 />
               </div>
 
-              <!-- ==================================================
-                         PLAYER INFORMATION
-      =================================================== -->
-
+              <!-- ------------------------------------------------------
+                         PLAYER CONTENT
+      ------------------------------------------------------- -->
               <div class="player-info">
-                <!-- ==================================================
-                         SONG TITLE
-        =================================================== -->
+                <!-- ==========================================================
+       COLUMN 1 — SONG INFORMATION
+  =========================================================== -->
 
-                <div class="song-meta">
-                  <div class="player-title-editor" id="playerTitleEditor">
-                    <div class="player-title-row">
-                      <h2 id="playerTitle">Sailing</h2>
+                <div class="player-column player-column-left">
+                  <div class="song-meta">
+                    <div class="player-title-editor" id="playerTitleEditor">
+                      <div class="player-title-row">
+                        <h2 id="playerTitle">Sailing</h2>
 
-                      <button
-                        type="button"
-                        id="editPlayerTitle"
-                        class="player-title-edit"
-                        aria-label="Edit song title"
-                      >
-                        <i data-lucide="pencil"></i>
-                      </button>
+                        <button
+                          type="button"
+                          id="editPlayerTitle"
+                          class="player-title-edit"
+                          aria-label="Edit song title"
+                          title="Edit song title"
+                        >
+                          <i data-lucide="pencil"></i>
+                        </button>
+                      </div>
+
+                      <div class="player-title-editing">
+                        <input
+                          id="playerTitleInput"
+                          type="text"
+                          autocomplete="off"
+                          spellcheck="false"
+                        />
+
+                        <button
+                          type="button"
+                          id="restorePlayerTitle"
+                          class="player-title-restore"
+                          aria-label="Restore original title"
+                          title="Restore original title"
+                        >
+                          <i data-lucide="undo-2"></i>
+                        </button>
+                      </div>
                     </div>
 
-                    <div class="player-title-editing">
-                      <input
-                        id="playerTitleInput"
-                        type="text"
-                        autocomplete="off"
-                        spellcheck="false"
-                      />
+                    <span id="playerArtist">MoonBox</span>
+                  </div>
+                </div>
 
-                      <button
-                        type="button"
-                        id="restorePlayerTitle"
-                        class="player-title-restore"
-                        aria-label="Restore original title"
-                        title="Restore original title"
-                      >
-                        <i data-lucide="undo-2"></i>
-                      </button>
+                <!-- ==========================================================
+       COLUMN 2 — CENTER PLAYER
+  =========================================================== -->
+
+                <div class="player-column player-column-center">
+                  <!-- Progress -->
+
+                  <div class="player-progress">
+                    <span id="currentTime">0:00</span>
+
+                    <input
+                      id="progressBar"
+                      type="range"
+                      min="0"
+                      max="100"
+                      value="0"
+                      aria-label="Song progress"
+                    />
+
+                    <span id="totalTime">0:00</span>
+                  </div>
+
+                  <!-- Controls -->
+
+                  <div class="player-controls">
+                    <!-- Shuffle -->
+
+                    <button
+                      class="player-toggle player-text-control"
+                      id="shuffleControl"
+                      type="button"
+                    >
+                      <span>Shuffle</span>
+                    </button>
+
+                    <!-- Previous -->
+
+                    <button
+                      id="previousSong"
+                      type="button"
+                      aria-label="Previous song"
+                      title="Previous"
+                    >
+                      <i data-lucide="skip-back"></i>
+                    </button>
+
+                    <!-- Play / Pause -->
+
+                    <button
+                      id="playPause"
+                      class="play-main"
+                      type="button"
+                      aria-label="Play"
+                      title="Play"
+                    >
+                      <i data-lucide="play"></i>
+                    </button>
+
+                    <!-- Next -->
+
+                    <button
+                      id="nextSong"
+                      type="button"
+                      aria-label="Next song"
+                      title="Next"
+                    >
+                      <i data-lucide="skip-forward"></i>
+                    </button>
+
+                    <!-- Repeat -->
+
+                    <button
+                      class="player-toggle player-text-control"
+                      id="repeatControl"
+                      type="button"
+                    >
+                      <span>Repeat</span>
+                    </button>
+                  </div>
+                </div>
+
+                <!-- ==========================================================
+       COLUMN 3 — PLAYER ACTIONS
+       Future buttons can be added here.
+  =========================================================== -->
+
+                <div class="player-column player-column-right">
+                  <div class="player-actions">
+                    <!-- Tags -->
+
+                    <button
+                      id="togglePlayerTags"
+                      class="player-action-button player-tags-toggle"
+                      type="button"
+                      aria-label="Expand tags"
+                      aria-expanded="false"
+                      title="Show tags"
+                    >
+                      <i data-lucide="tags"></i>
+                    </button>
+
+                    <!-- Future player buttons go here -->
+                  </div>
+                </div>
+
+                <!-- ==========================================================
+       HIDDEN COMPATIBILITY ELEMENTS
+  =========================================================== -->
+
+                <div
+                  id="playerCompatibility"
+                  style="display: none !important"
+                  aria-hidden="true"
+                >
+                  <textarea id="journalText"></textarea>
+
+                  <div class="lyrics-view" id="lyricsView"></div>
+
+                  <textarea id="lyricsEditor" class="lyrics-editor"></textarea>
+
+                  <input type="file" id="lyricsFile" accept=".txt,.lrc" />
+
+                  <div class="player-details">
+                    <div class="detail-item">
+                      <span>Album</span>
+                      <div class="detail-display"></div>
+                      <input class="detail-input" type="text" />
                     </div>
-                  </div>
 
-                  <span id="playerArtist"> MoonBox </span>
-                </div>
+                    <div class="detail-item">
+                      <span>Artist</span>
+                      <div class="detail-display"></div>
+                      <input class="detail-input" type="text" />
+                    </div>
 
-                <!-- ==================================================
-                         PROGRESS
-        =================================================== -->
+                    <div class="detail-item">
+                      <span>Year</span>
+                      <div class="detail-display"></div>
+                      <input class="detail-input" type="text" />
+                    </div>
 
-                <div class="player-progress">
-                  <span id="currentTime"> 0:00 </span>
+                    <div class="detail-item">
+                      <span>Genre</span>
+                      <div class="detail-display"></div>
+                      <input class="detail-input" type="text" />
+                    </div>
 
-                  <input
-                    id="progressBar"
-                    type="range"
-                    min="0"
-                    max="100"
-                    value="0"
-                  />
+                    <div class="detail-item">
+                      <span>Bitrate</span>
+                      <div class="detail-display"></div>
+                      <input class="detail-input" type="text" />
+                    </div>
 
-                  <span id="totalTime"> 0:00 </span>
-                </div>
-
-                <!-- ==================================================
-                         PLAYER CONTROLS
-                         
-             Shuffle
-             Previous
-             Play / Pause
-             Next
-             Repeat
-        =================================================== -->
-
-                <div class="player-controls">
-                  <!-- Shuffle -->
-
-                  <button
-                    class="player-toggle player-text-control"
-                    id="shuffleControl"
-                    type="button"
-                  >
-                    <span>Shuffle</span>
-                  </button>
-
-                  <!-- Previous -->
-
-                  <button
-                    id="previousSong"
-                    type="button"
-                    aria-label="Previous song"
-                  >
-                    <i data-lucide="skip-back"></i>
-                  </button>
-
-                  <!-- Play / Pause -->
-
-                  <button
-                    id="playPause"
-                    class="play-main"
-                    type="button"
-                    aria-label="Play"
-                  >
-                    <i data-lucide="play"></i>
-                  </button>
-
-                  <!-- Next -->
-
-                  <button id="nextSong" type="button" aria-label="Next song">
-                    <i data-lucide="skip-forward"></i>
-                  </button>
-
-                  <!-- Repeat -->
-
-                  <button
-                    class="player-toggle player-text-control"
-                    id="repeatControl"
-                    type="button"
-                  >
-                    <span>Repeat</span>
-                  </button>
-                </div>
-              </div>
-
-              <!-- ==================================================
-              HIDDEN COMPATIBILITY ELEMENTS
-              
-              These are kept because player.js still expects
-              them to exist. They do not appear visually.
-      =================================================== -->
-
-              <div
-                id="playerCompatibility"
-                style="display: none !important"
-                aria-hidden="true"
-              >
-                <!-- Notes -->
-
-                <textarea id="journalText"></textarea>
-
-                <!-- Lyrics -->
-
-                <div class="lyrics-view" id="lyricsView"></div>
-
-                <textarea id="lyricsEditor" class="lyrics-editor"></textarea>
-
-                <input type="file" id="lyricsFile" accept=".txt,.lrc" />
-
-                <!-- Details -->
-
-                <div class="player-details">
-                  <div class="detail-item">
-                    <span>Album</span>
-
-                    <div class="detail-display"></div>
-
-                    <input class="detail-input" type="text" />
-                  </div>
-
-                  <div class="detail-item">
-                    <span>Artist</span>
-
-                    <div class="detail-display"></div>
-
-                    <input class="detail-input" type="text" />
-                  </div>
-
-                  <div class="detail-item">
-                    <span>Year</span>
-
-                    <div class="detail-display"></div>
-
-                    <input class="detail-input" type="text" />
-                  </div>
-
-                  <div class="detail-item">
-                    <span>Genre</span>
-
-                    <div class="detail-display"></div>
-
-                    <input class="detail-input" type="text" />
-                  </div>
-
-                  <div class="detail-item">
-                    <span>Bitrate</span>
-
-                    <div class="detail-display"></div>
-
-                    <input class="detail-input" type="text" />
-                  </div>
-
-                  <div class="detail-item">
-                    <span>Format</span>
-
-                    <div class="detail-display"></div>
-
-                    <input class="detail-input" type="text" />
+                    <div class="detail-item">
+                      <span>Format</span>
+                      <div class="detail-display"></div>
+                      <input class="detail-input" type="text" />
+                    </div>
                   </div>
                 </div>
               </div>
             </section>
 
-            <!-- ==================================================
-                         TAGS PANEL
-                         
-             This is the ONLY visible bordered section.
-    =================================================== -->
+            <!-- ========================================================
+                         TAGS SECTION
+              Opens / closes with the 🏷 toggle
+    ========================================================= -->
 
             <aside class="player-panel">
               <div class="player-tab active" id="tagsPanel">
-                <!-- ==================================================
-                         TAG HEADER
-        =================================================== -->
+                <!-- Tags header -->
 
                 <div class="panel-header">
                   <h3>Tags</h3>
 
                   <button id="addPlayerTag" type="button">
                     <i data-lucide="plus"></i>
-
-                    <span> Add Tag </span>
+                    <span>Add Tag</span>
                   </button>
                 </div>
 
-                <!-- ==================================================
-                         SELECTED TAGS
-        =================================================== -->
+                <!-- Selected tags -->
 
                 <div id="playerSelectedTags" class="player-selected-tags"></div>
               </div>

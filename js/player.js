@@ -210,33 +210,7 @@ document.addEventListener("DOMContentLoaded", () => {
     );
 
     availablePlayerTags = masterTags;
-
     return availablePlayerTags;
-  }
-
-  /* ==========================================================
-   OPEN PLAYER TAG PICKER
-========================================================== */
-
-  if (addPlayerTag) {
-    addPlayerTag.addEventListener("click", () => {
-      /* Clear search first */
-      if (playerTagSearch) {
-        playerTagSearch.value = "";
-      }
-
-      /* Get latest master tags */
-      requestPlayerTags();
-
-      /* Render available tags */
-      renderPlayerTagPicker();
-
-      /* Show popup */
-      playerTagPicker?.classList.add("open");
-
-      /* Refresh Lucide icons */
-      lucide.createIcons();
-    });
   }
 
   /* ==========================================================
@@ -1603,6 +1577,76 @@ document.addEventListener("DOMContentLoaded", () => {
       }
     });
   });
+
+  /* ==========================================================
+   ADD TAG BUTTON
+   Always opens the tag picker.
+========================================================== */
+
+  if (addPlayerTag) {
+    addPlayerTag.addEventListener("click", () => {
+      const playerScreen = document.getElementById("playerScreen");
+
+      if (!playerScreen) return;
+
+      if (playerTagSearch) {
+        playerTagSearch.value = "";
+      }
+
+      requestPlayerTags();
+      renderPlayerTagPicker();
+
+      playerTagPicker?.classList.add("open");
+
+      lucide.createIcons();
+    });
+  }
+
+  /* ==========================================================
+   TOGGLE TAG SECTION
+========================================================== */
+
+  const togglePlayerTags = document.getElementById("togglePlayerTags");
+
+  if (togglePlayerTags) {
+    togglePlayerTags.addEventListener("click", () => {
+      const playerScreen = document.getElementById("playerScreen");
+
+      if (!playerScreen) return;
+
+      const isCollapsed = playerScreen.classList.toggle("tags-collapsed");
+
+      /*
+       * Opening the Tags section:
+       * show the tags already assigned to the song.
+       */
+      if (!isCollapsed) {
+        playerScreen.classList.add("tags-expanded");
+
+        requestPlayerTags();
+        renderPlayerTags();
+      } else {
+        /*
+         * Closing the Tags section.
+         */
+        playerScreen.classList.remove("tags-expanded");
+      }
+
+      togglePlayerTags.setAttribute("aria-expanded", String(!isCollapsed));
+
+      togglePlayerTags.setAttribute(
+        "aria-label",
+        isCollapsed ? "Expand tags" : "Collapse tags",
+      );
+
+      togglePlayerTags.setAttribute(
+        "title",
+        isCollapsed ? "Expand tags" : "Collapse tags",
+      );
+
+      lucide.createIcons();
+    });
+  }
 
   /* ==========================================================
    INITIALIZE

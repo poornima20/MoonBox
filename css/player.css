@@ -1,2623 +1,3254 @@
-/* ==========================================================
-   MOON BOX
-   PLAYER.CSS — DESKTOP
-   Clean / Minimal Player
-========================================================== */
+/* ============================================================
+   MOONBOX — PLAYER.CSS
+   Clean player layout for the current player HTML
+   ============================================================ */
 
-/* ==========================================================
+/* ============================================================
+   VARIABLES
+   ============================================================ */
+
+:root {
+  --player-main-height: 126px;
+  --player-tags-height: 82px;
+  --player-expanded-tags-height: 126px;
+
+  --player-total-height: calc(
+    var(--player-main-height) + var(--player-tags-height)
+  );
+
+  --player-expanded-height: calc(
+    var(--player-main-height) + var(--player-expanded-tags-height)
+  );
+
+  --player-bg: #080808;
+  --player-panel-bg: #101010;
+
+  --player-border: rgba(255, 255, 255, 0.08);
+
+  --player-text: #f4f4f4;
+  --player-soft: #c8c8c8;
+  --player-muted: #858585;
+  --player-dim: #666666;
+}
+
+/* ============================================================
    PLAYER SCREEN
-========================================================== */
+   ============================================================ */
 
 #playerScreen {
-  height: calc(100vh - 88px);
-  padding: 24px 28px;
+  position: fixed !important;
 
-  box-sizing: border-box;
+  left: 0 !important;
+  right: 0 !important;
+  bottom: 0 !important;
+
+  width: 100vw !important;
+
+  height: var(--player-total-height) !important;
+  min-height: var(--player-total-height) !important;
+  max-height: var(--player-total-height) !important;
+
+  margin: 0 !important;
+  padding: 0 !important;
+
+  box-sizing: border-box !important;
+
+  z-index: 9000 !important;
+
+  background: var(--player-bg) !important;
+
+  border: 0 !important;
+  border-top: 1px solid var(--player-border) !important;
+  border-radius: 0 !important;
+
+  box-shadow: 0 -16px 45px rgba(0, 0, 0, 0.45) !important;
+
+  overflow: hidden !important;
+
+  visibility: visible !important;
+  transform: none !important;
 }
 
-/* ==========================================================
-   MAIN PLAYER LAYOUT
-========================================================== */
+/* ============================================================
+   COLLAPSED TAGS
+   ============================================================ */
 
-.player-layout {
-  display: grid;
+#playerScreen.tags-collapsed {
+  height: var(--player-main-height) !important;
+  min-height: var(--player-main-height) !important;
+  max-height: var(--player-main-height) !important;
+}
+
+#playerScreen.tags-collapsed .player-panel {
+  display: none !important;
+}
+
+/* ============================================================
+   EXPANDED TAGS
+   ============================================================ */
+
+#playerScreen.tags-expanded {
+  height: var(--player-expanded-height) !important;
+  min-height: var(--player-expanded-height) !important;
+  max-height: var(--player-expanded-height) !important;
+}
+
+/* ============================================================
+   WORKSPACE HEIGHT
+   ============================================================ */
+
+.workspace {
+  min-height: 0 !important;
+}
+
+.music-workspace {
+  min-height: 0 !important;
+
+  height: calc(100% - var(--player-total-height)) !important;
+}
+
+.workspace:has(#playerScreen.tags-expanded) .music-workspace {
+  height: calc(100% - var(--player-expanded-height)) !important;
+}
+
+.workspace:has(#playerScreen.tags-collapsed) .music-workspace {
+  height: calc(100% - var(--player-main-height)) !important;
+}
+
+/* ============================================================
+   MAIN PLAYER LAYOUT
+   ============================================================ */
+
+#playerScreen .player-layout {
+  width: 100% !important;
+  height: 100% !important;
+
+  min-width: 0 !important;
+  min-height: 0 !important;
+
+  display: flex !important;
+  flex-direction: column !important;
+
+  margin: 0 !important;
+  padding: 0 !important;
+
+  gap: 0 !important;
+
+  box-sizing: border-box !important;
+}
+
+/* ============================================================
+   MAIN PLAYER AREA
+   ============================================================ */
+
+#playerScreen .player-top {
+  width: 100% !important;
+  height: var(--player-main-height) !important;
+  min-height: var(--player-main-height) !important;
+
+  margin: 0 !important;
+  padding: 10px 28px !important;
+
+  box-sizing: border-box !important;
+
+  display: block !important;
+
+  background: var(--player-bg) !important;
+
+  border: 0 !important;
+
+  overflow: hidden !important;
+}
+
+/* ============================================================
+   HIDE ALBUM ART
+   Kept in HTML for player.js compatibility.
+   ============================================================ */
+
+#playerScreen .player-album,
+#playerScreen .album-cover,
+#playerScreen .record-wrapper,
+#playerScreen .vinyl,
+#playerScreen .record-label,
+#playerScreen .record-label img,
+#playerScreen .shine,
+#playerScreen #playerCover,
+#playerScreen #playerVinylCover {
+  display: none !important;
+
+  width: 0 !important;
+  height: 0 !important;
+
+  min-width: 0 !important;
+  min-height: 0 !important;
+
+  max-width: 0 !important;
+  max-height: 0 !important;
+}
+
+/* ============================================================
+   PLAYER INFO — THREE COLUMN LAYOUT
+   30% = Song
+   50% = Main player
+   20% = Actions
+   ============================================================ */
+
+#playerScreen .player-info {
+  position: relative !important;
+
+  width: 100% !important;
+  height: 100% !important;
+
+  min-width: 0 !important;
+  min-height: 0 !important;
+
+  display: grid !important;
 
   grid-template-columns:
-    minmax(600px, 2.25fr)
-    minmax(280px, 0.9fr);
+    30%
+    50%
+    20% !important;
 
-  gap: 36px;
+  align-items: center !important;
 
-  width: 100%;
-  height: 100%;
+  margin: 0 !important;
+  padding: 0 !important;
 
-  box-sizing: border-box;
+  box-sizing: border-box !important;
 }
 
-/* ==========================================================
-   REMOVE OLD LEFT SIDEBAR
-========================================================== */
+/* ============================================================
+   PLAYER INFO — THREE COLUMN LAYOUT
+   30% = Song
+   50% = Main player
+   20% = Actions
+   ============================================================ */
 
-.player-sidebar {
+#playerScreen .player-info {
+  position: relative !important;
+
+  width: 100% !important;
+  height: 100% !important;
+
+  min-width: 0 !important;
+  min-height: 0 !important;
+
+  display: grid !important;
+
+  grid-template-columns:
+    30%
+    50%
+    20% !important;
+
+  align-items: center !important;
+
+  margin: 0 !important;
+  padding: 0 !important;
+
+  box-sizing: border-box !important;
+}
+
+/* ============================================================
+   ROW 1 — SONG INFORMATION
+   ============================================================ */
+
+#playerScreen .player-song-row {
+  grid-column: 1 !important;
+  grid-row: 1 !important;
+
+  width: 100% !important;
+  min-width: 0 !important;
+
+  display: flex !important;
+
+  align-items: center !important;
+  justify-content: space-between !important;
+
+  gap: 16px !important;
+
+  margin: 0 !important;
+  padding: 0 !important;
+
+  box-sizing: border-box !important;
+}
+
+/* ============================================================
+   SONG META
+   ============================================================ */
+
+#playerScreen .song-meta {
+  width: 100% !important;
+  min-width: 0 !important;
+
+  display: flex !important;
+  flex-direction: column !important;
+
+  align-items: flex-start !important;
+  justify-content: center !important;
+
+  gap: 2px !important;
+
+  margin: 0 !important;
+  padding: 0 !important;
+
+  text-align: left !important;
+}
+
+/* ============================================================
+   TITLE EDITOR
+   ============================================================ */
+
+#playerScreen .player-title-editor {
+  width: 100% !important;
+  min-width: 0 !important;
+}
+
+/* ============================================================
+   TITLE ROW
+   ============================================================ */
+
+#playerScreen .player-title-row {
+  width: 100% !important;
+  min-width: 0 !important;
+
+  display: flex !important;
+  align-items: center !important;
+
+  gap: 7px !important;
+
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
+/* ============================================================
+   TITLE
+   ============================================================ */
+
+#playerScreen #playerTitle {
+  display: block !important;
+
+  max-width: 100% !important;
+  min-width: 0 !important;
+
+  margin: 0 !important;
+  padding: 0 !important;
+
+  color: var(--player-text) !important;
+
+  font-size: 17px !important;
+  line-height: 21px !important;
+
+  font-weight: 600 !important;
+
+  white-space: nowrap !important;
+
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+}
+
+/* ============================================================
+   TITLE EDIT BUTTON
+
+   Hidden visually, but kept in DOM because player.js
+   still expects it.
+   ============================================================ */
+
+#playerScreen .player-title-edit,
+#playerScreen .player-title-editing,
+#playerScreen .player-title-restore {
   display: none !important;
 }
 
-/* ==========================================================
-   MAIN PLAYER
-   IMPORTANT:
-   No card / no border / no background
-========================================================== */
+/* ============================================================
+   CENTER PROGRESS
+   ============================================================ */
 
-.player-top {
-  position: relative;
+#playerScreen .player-progress {
+  width: min(620px, 92%) !important;
 
-  display: grid;
+  min-width: 0 !important;
 
-  grid-template-columns: 300px minmax(0, 1fr);
+  display: grid !important;
 
-  gap: 58px;
+  grid-template-columns:
+    34px
+    minmax(0, 1fr)
+    34px !important;
 
-  align-items: center;
+  align-items: center !important;
 
-  width: 100%;
-  height: 100%;
+  gap: 8px !important;
 
-  padding: 30px;
+  margin: 0 !important;
+  padding: 0 !important;
 
-  box-sizing: border-box;
-
-  overflow: visible;
-
-  background: transparent;
-
-  border: none;
-
-  border-radius: 0;
-
-  box-shadow: none;
+  box-sizing: border-box !important;
 }
 
-/* Never create a card effect on hover */
+/* ============================================================
+   FOLDER / ARTIST
+   ============================================================ */
 
-.player-top:hover {
-  background: transparent;
+#playerScreen #playerArtist {
+  display: block !important;
 
-  border: none;
+  width: 100% !important;
+  min-width: 0 !important;
 
-  box-shadow: none;
+  margin: 0 !important;
+  padding: 0 !important;
 
-  transform: none;
+  color: var(--player-muted) !important;
+
+  font-size: 11px !important;
+  line-height: 14px !important;
+
+  white-space: nowrap !important;
+
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
 }
 
-/* ==========================================================
-   ALBUM AREA
-========================================================== */
+/* ============================================================
+   TAG SECTION TOGGLE
+   Located on the far right of ROW 1.
+   ============================================================ */
 
-.player-album {
-  position: relative;
+#playerScreen .player-tags-toggle {
+  flex: 0 0 34px !important;
 
-  width: 300px;
-  height: 300px;
+  width: 34px !important;
+  height: 34px !important;
 
-  display: flex;
+  min-width: 34px !important;
 
-  align-items: center;
-  justify-content: flex-start;
+  display: inline-flex !important;
 
-  flex-shrink: 0;
+  align-items: center !important;
+  justify-content: center !important;
 
-  margin: 0;
-}
+  margin: 0 !important;
+  padding: 0 !important;
 
-/* ==========================================================
-   HIDE VINYL
-   The reference design uses only the album artwork.
-========================================================== */
+  border: 1px solid rgba(255, 255, 255, 0.12) !important;
 
-.record-wrapper,
-.vinyl,
-.record-label {
-  display: none !important;
-}
+  border-radius: 9px !important;
 
-/* ==========================================================
-   ALBUM COVER
-========================================================== */
+  background: transparent !important;
 
-.album-cover {
-  position: absolute;
+  color: #999 !important;
 
-  left: 0;
-  top: 0;
+  cursor: pointer !important;
 
-  width: 250px;
-  height: 250px;
-
-  object-fit: cover;
-
-  border-radius: 18px;
-
-  border: none;
-
-  background: #111;
-
-  z-index: 10;
-
-  box-shadow: 0 30px 60px rgba(0, 0, 0, 0.55);
-
-  cursor: pointer;
+  box-sizing: border-box !important;
 
   transition:
-    transform 0.25s ease,
-    box-shadow 0.25s ease;
+    background 0.18s ease,
+    border-color 0.18s ease,
+    color 0.18s ease,
+    transform 0.15s ease !important;
 }
 
-/* Subtle artwork hover */
+#playerScreen .player-tags-toggle:hover {
+  background: rgba(255, 255, 255, 0.06) !important;
 
-.album-cover:hover {
-  transform: translateY(-2px);
+  border-color: rgba(255, 255, 255, 0.2) !important;
 
-  box-shadow: 0 35px 70px rgba(0, 0, 0, 0.62);
+  color: #fff !important;
 }
 
-/* Remove old player album glow */
-
-.player-album::before {
-  display: none !important;
+#playerScreen .player-tags-toggle:active {
+  transform: scale(0.94) !important;
 }
 
-/* ==========================================================
-   PLAYER INFORMATION
-========================================================== */
+#playerScreen .player-tags-toggle svg {
+  width: 16px !important;
+  height: 16px !important;
 
-.player-info {
-  display: flex;
+  flex: 0 0 16px !important;
 
-  flex-direction: column;
-
-  justify-content: center;
-
-  align-self: center;
-
-  width: 100%;
-
-  min-width: 0;
-
-  gap: 28px;
-
-  margin: 0;
+  stroke-width: 1.8 !important;
 }
 
-/* ==========================================================
-   REMOVE OLD TOP SHUFFLE / REPEAT AREA
-========================================================== */
+/* Slight visual state when tags are collapsed */
 
-.player-top-buttons {
-  display: none !important;
+#playerScreen.tags-collapsed .player-tags-toggle {
+  color: #777 !important;
 }
 
-/* ==========================================================
-   SONG TITLE + ARTIST
-========================================================== */
-
-.song-meta {
-  display: flex;
-
-  flex-direction: column;
-
-  gap: 8px;
-
-  margin: 0;
+#playerScreen.tags-collapsed .player-tags-toggle:hover {
+  color: #fff !important;
 }
 
-.song-meta h2 {
-  margin: 0;
+/* ============================================================
+   ROW 2 — PROGRESS
+   ============================================================ */
 
-  color: #ffffff;
+#playerScreen .player-progress {
+  grid-column: 1 !important;
+  grid-row: 2 !important;
 
-  font-family: var(--font-main);
+  width: 100% !important;
+  min-width: 0 !important;
 
-  font-size: 34px;
-
-  line-height: 1.1;
-
-  font-weight: 600;
-
-  letter-spacing: -0.5px;
-}
-
-.song-meta span {
-  margin: 0;
-
-  color: #999999;
-
-  font-family: var(--font-main);
-
-  font-size: 16px;
-
-  line-height: 1.4;
-
-  font-weight: 400;
-}
-
-/* ==========================================================
-   REMOVE YEAR / GENRE / DURATION
-========================================================== */
-
-.song-extra {
-  display: none !important;
-}
-
-/* ==========================================================
-   PROGRESS AREA
-========================================================== */
-
-.player-progress {
-  display: grid;
+  display: grid !important;
 
   grid-template-columns:
-    38px
-    minmax(160px, 1fr)
-    38px;
+    36px
+    minmax(0, 1fr)
+    36px !important;
 
-  align-items: center;
+  align-items: center !important;
 
-  width: 100%;
+  gap: 8px !important;
 
-  margin: 0;
+  margin: 0 !important;
+  padding: 0 !important;
 
-  gap: 14px;
+  box-sizing: border-box !important;
 }
 
-.player-progress span {
-  display: block;
+/* ============================================================
+   TIME
+   ============================================================ */
 
-  color: #888888;
+#playerScreen .player-progress span {
+  display: block !important;
 
-  font-family: var(--font-main);
+  width: 100% !important;
 
-  font-size: 12px;
+  margin: 0 !important;
+  padding: 0 !important;
 
-  font-weight: 400;
+  color: var(--player-muted) !important;
 
-  line-height: 1;
+  font-size: 10px !important;
+  line-height: 1 !important;
 
-  text-align: center;
+  text-align: center !important;
 
-  white-space: nowrap;
+  white-space: nowrap !important;
 }
 
-/* ==========================================================
+/* ============================================================
    PROGRESS BAR
-========================================================== */
+   ============================================================ */
 
-#progressBar {
-  appearance: none;
+#playerScreen #progressBar {
+  appearance: none !important;
+  -webkit-appearance: none !important;
 
-  width: 100%;
-  height: 4px;
+  display: block !important;
 
-  margin: 0;
+  width: 100% !important;
+  min-width: 0 !important;
 
-  padding: 0;
+  height: 5px !important;
 
-  border: none;
+  margin: 0 !important;
+  padding: 0 !important;
 
-  border-radius: 999px;
+  border: 0 !important;
+  border-radius: 999px !important;
 
-  outline: none;
+  outline: none !important;
 
-  background: #292929;
+  background: #292929 !important;
 
-  cursor: pointer;
-
-  overflow: hidden;
-
-  transition: opacity 0.2s ease;
+  cursor: pointer !important;
 }
 
 /* Chrome / Safari */
 
-#progressBar::-webkit-slider-runnable-track {
-  width: 100%;
-  height: 4px;
+#playerScreen #progressBar::-webkit-slider-runnable-track {
+  width: 100% !important;
+  height: 5px !important;
 
-  border: none;
+  border: 0 !important;
+  border-radius: 999px !important;
 
-  border-radius: 999px;
-
-  background: #292929;
+  background: #292929 !important;
 }
 
-#progressBar::-webkit-slider-thumb {
-  appearance: none;
+#playerScreen #progressBar::-webkit-slider-thumb {
+  appearance: none !important;
+  -webkit-appearance: none !important;
 
-  width: 12px;
-  height: 12px;
+  width: 11px !important;
+  height: 11px !important;
 
-  margin-top: -4px;
+  margin-top: -3px !important;
 
-  border: none;
+  border: 0 !important;
+  border-radius: 50% !important;
 
-  border-radius: 50%;
+  background: #fff !important;
 
-  background: #ffffff;
+  box-shadow: none !important;
 
-  box-shadow: -1000px 0 0 1000px #bdbdbd;
-
-  cursor: pointer;
-}
-
-#progressBar::-webkit-slider-thumb:hover {
-  transform: scale(1.15);
+  cursor: pointer !important;
 }
 
 /* Firefox */
 
-#progressBar::-moz-range-track {
-  width: 100%;
-  height: 4px;
+#playerScreen #progressBar::-moz-range-track {
+  width: 100% !important;
+  height: 5px !important;
 
-  border: none;
+  border: 0 !important;
+  border-radius: 999px !important;
 
-  border-radius: 999px;
-
-  background: #292929;
+  background: #292929 !important;
 }
 
-#progressBar::-moz-range-progress {
-  height: 4px;
+#playerScreen #progressBar::-moz-range-progress {
+  height: 5px !important;
 
-  border-radius: 999px;
+  border: 0 !important;
+  border-radius: 999px !important;
 
-  background: #bdbdbd;
+  background: #bdbdbd !important;
 }
 
-#progressBar::-moz-range-thumb {
-  width: 12px;
-  height: 12px;
-
-  border: none;
-
-  border-radius: 50%;
-
-  background: #ffffff;
-
-  cursor: pointer;
-}
-
-/* ==========================================================
-   PLAYER CONTROLS
-   Shuffle / Previous / Play / Next / Repeat
-   Single horizontal line
-========================================================== */
-
-.player-controls {
-  display: flex;
-
-  align-items: center;
-
-  justify-content: flex-start;
-
-  gap: 22px;
-
-  width: 100%;
-
-  margin: 0;
-
-  padding: 0;
-}
-
-/* ==========================================================
-   ALL CONTROL BUTTONS
-========================================================== */
-
-.player-controls button {
-  width: 42px;
-  height: 42px;
-
-  padding: 0;
-
-  display: flex;
-
-  align-items: center;
-  justify-content: center;
-
-  flex-shrink: 0;
-
-  border: none;
-
-  border-radius: 50%;
-
-  background: transparent;
-
-  color: #b0b0b0;
-
-  box-shadow: none;
-
-  cursor: pointer;
-
-  transition:
-    color 0.2s ease,
-    transform 0.2s ease,
-    opacity 0.2s ease;
-}
-
-/* Icon */
-
-.player-controls button svg {
-  width: 20px;
-  height: 20px;
-
-  stroke-width: 1.8;
-}
-
-/* Hover */
-
-.player-controls button:hover {
-  color: #ffffff;
-
-  background: transparent;
-
-  border: none;
-
-  box-shadow: none;
-
-  transform: scale(1.08);
-}
-
-/* ==========================================================
-   SHUFFLE + REPEAT TEXT BUTTONS
-========================================================== */
-
-.player-text-control {
-  width: auto !important;
-  min-width: auto !important;
-
-  height: 42px;
-
-  padding: 0 3px !important;
-
-  border-radius: 0 !important;
-
-  background: transparent !important;
-
-  border: none !important;
-
-  box-shadow: none !important;
-
-  color: #a0a0a0 !important;
-
-  font-family: var(--font-main);
-
-  font-size: 14px;
-
-  font-weight: 400;
-
-  white-space: nowrap;
-
-  cursor: pointer;
-
-  transform: none !important;
-}
-
-.player-text-control:hover {
-  color: #ffffff !important;
-
-  background: transparent !important;
-
-  border: none !important;
-
-  box-shadow: none !important;
-
-  transform: none !important;
-}
-
-/* Active shuffle / repeat */
-
-.player-text-control.active {
-  color: #ffffff !important;
-
-  background: transparent !important;
-
-  border: none !important;
-
-  box-shadow: none !important;
-}
-
-/* ==========================================================
-   MAIN PLAY BUTTON
-========================================================== */
-
-.play-main {
-  width: 64px !important;
-  height: 64px !important;
-
-  padding: 0 !important;
-
-  margin: 0 2px;
-
-  flex-shrink: 0;
-
-  border: none !important;
-
+#playerScreen #progressBar::-moz-range-thumb {
+  width: 11px !important;
+  height: 11px !important;
+
+  border: 0 !important;
   border-radius: 50% !important;
 
-  background: #f3f1eb !important;
+  background: #fff !important;
 
-  color: #111111 !important;
-
-  box-shadow: 0 8px 25px rgba(255, 255, 255, 0.1) !important;
-
-  display: flex;
-
-  align-items: center;
-  justify-content: center;
-
-  transition:
-    transform 0.2s ease,
-    box-shadow 0.2s ease;
+  cursor: pointer !important;
 }
 
-.play-main svg {
-  width: 26px !important;
-  height: 26px !important;
+/* ============================================================
+   CENTER CONTROLS
+   Positioned below the progress bar
+   ============================================================ */
 
-  stroke-width: 2.4 !important;
+#playerScreen .player-controls {
+  width: auto !important;
+
+  height: 42px !important;
+
+  display: flex !important;
+
+  align-items: center !important;
+  justify-content: center !important;
+
+  gap: 8px !important;
+
+  margin: 18px 0 0 0 !important;
+  padding: 0 !important;
+
+  flex-wrap: nowrap !important;
+
+  box-sizing: border-box !important;
 }
 
-.play-main:hover {
-  transform: scale(1.06) !important;
+/* ============================================================
+   PLAYER ACTIONS
+   Designed to grow with future buttons.
+   ============================================================ */
 
-  background: #ffffff !important;
+#playerScreen .player-actions {
+  display: flex !important;
 
-  color: #000000 !important;
+  align-items: center !important;
+  justify-content: flex-end !important;
 
-  border: none !important;
+  gap: 8px !important;
 
-  box-shadow: 0 10px 30px rgba(255, 255, 255, 0.16) !important;
+  max-width: 100% !important;
+
+  min-width: 0 !important;
 }
 
-.play-main.playing {
-  background: #ffffff !important;
+#playerScreen .player-action-button {
+  width: 38px !important;
+  height: 38px !important;
 
-  color: #000000 !important;
+  min-width: 38px !important;
 
-  box-shadow: 0 10px 30px rgba(255, 255, 255, 0.16) !important;
-}
+  flex: 0 0 38px !important;
 
-/* ==========================================================
-   REMOVE OLD PLAYER BOTTOM LINKS
-========================================================== */
+  display: inline-flex !important;
 
-.player-library-link,
-.player-visualization-toggle {
-  display: none !important;
-}
+  align-items: center !important;
+  justify-content: center !important;
 
-/* ==========================================================
-   REMOVE VISUALIZATION MODE UI
-========================================================== */
+  margin: 0 !important;
+  padding: 0 !important;
 
-#playerScreen.visualization-mode .player-sidebar,
-#playerScreen.visualization-mode .player-panel {
-  display: none !important;
-}
+  border: 1px solid rgba(255, 255, 255, 0.1) !important;
 
-#playerScreen.visualization-mode .player-top {
+  border-radius: 10px !important;
+
   background: transparent !important;
 
-  border: none !important;
+  color: #999 !important;
 
-  box-shadow: none !important;
-}
-
-/* ==========================================================
-   TAGS PANEL
-   This is the ONLY visible player card.
-========================================================== */
-
-.player-panel {
-  display: flex;
-
-  flex-direction: column;
-
-  width: 100%;
-  height: 100%;
-
-  min-width: 0;
-  min-height: 0;
-
-  box-sizing: border-box;
-
-  background: rgba(16, 16, 16, 0.72);
-
-  border: 1px solid rgba(255, 255, 255, 0.08);
-
-  border-radius: 28px;
-
-  overflow: hidden;
-
-  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.35);
+  cursor: pointer !important;
 
   transition:
-    border-color 0.25s ease,
-    box-shadow 0.25s ease;
+    background 0.18s ease,
+    color 0.18s ease,
+    border-color 0.18s ease,
+    transform 0.15s ease !important;
 }
 
-.player-panel:hover {
-  border-color: rgba(255, 255, 255, 0.11);
+#playerScreen .player-action-button:hover {
+  color: #fff !important;
 
-  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.38);
+  background: rgba(255, 255, 255, 0.06) !important;
+
+  border-color: rgba(255, 255, 255, 0.18) !important;
 }
 
-/* ==========================================================
-   PANEL TABS
-========================================================== */
-
-.player-tab {
-  display: none;
-
-  flex-direction: column;
-
-  width: 100%;
-  height: 100%;
-
-  min-height: 0;
-
-  padding: 28px;
-
-  box-sizing: border-box;
+#playerScreen .player-action-button:active {
+  transform: scale(0.94) !important;
 }
 
-/* Force TAGS to be the only visible panel */
+#playerScreen .player-action-button svg {
+  width: 18px !important;
+  height: 18px !important;
 
-#journalPanel,
-#lyricsPanel,
-#detailsPanel {
+  flex: 0 0 18px !important;
+}
+/* ============================================================
+   ALL CONTROL BUTTONS
+   ============================================================ */
+
+#playerScreen .player-controls button {
+  width: 36px !important;
+  height: 36px !important;
+
+  min-width: 36px !important;
+
+  flex: 0 0 36px !important;
+
+  display: inline-flex !important;
+
+  align-items: center !important;
+  justify-content: center !important;
+
+  margin: 0 !important;
+  padding: 0 !important;
+
+  border: 0 !important;
+  border-radius: 50% !important;
+
+  background: transparent !important;
+
+  color: #aaa !important;
+
+  cursor: pointer !important;
+
+  box-shadow: none !important;
+
+  transition:
+    background 0.18s ease,
+    color 0.18s ease,
+    transform 0.15s ease !important;
+}
+
+#playerScreen .player-controls button:hover {
+  color: #fff !important;
+
+  background: rgba(255, 255, 255, 0.05) !important;
+}
+
+#playerScreen .player-controls button svg {
+  width: 18px !important;
+  height: 18px !important;
+
+  flex: 0 0 auto !important;
+}
+
+/* ============================================================
+   SHUFFLE / REPEAT
+   ============================================================ */
+
+#playerScreen .player-text-control {
+  width: auto !important;
+
+  min-width: 58px !important;
+
+  flex: 0 0 auto !important;
+
+  padding: 0 8px !important;
+
+  border-radius: 9px !important;
+
+  color: #999 !important;
+
+  font-size: 11px !important;
+
+  white-space: nowrap !important;
+}
+
+#playerScreen .player-text-control:hover,
+#playerScreen .player-text-control.active {
+  color: #fff !important;
+
+  background: rgba(255, 255, 255, 0.05) !important;
+}
+
+/* ============================================================
+   PLAY BUTTON
+   ============================================================ */
+
+#playerScreen #playPause,
+#playerScreen .play-main {
+  width: 52px !important;
+  height: 52px !important;
+
+  min-width: 52px !important;
+
+  flex: 0 0 52px !important;
+
+  margin: 0 4px !important;
+  padding: 0 !important;
+
+  display: inline-flex !important;
+
+  align-items: center !important;
+  justify-content: center !important;
+
+  border: 0 !important;
+  border-radius: 50% !important;
+
+  background: #f2f0ea !important;
+
+  color: #111 !important;
+
+  box-shadow: 0 7px 24px rgba(255, 255, 255, 0.08) !important;
+}
+
+#playerScreen #playPause:hover,
+#playerScreen .play-main:hover {
+  background: #fff !important;
+  color: #000 !important;
+
+  transform: scale(1.04) !important;
+}
+
+#playerScreen #playPause svg,
+#playerScreen .play-main svg {
+  width: 21px !important;
+  height: 21px !important;
+}
+
+/* ============================================================
+   TAGS PANEL
+   ============================================================ */
+
+#playerScreen .player-panel {
+  width: 100% !important;
+
+  height: var(--player-tags-height) !important;
+  min-height: var(--player-tags-height) !important;
+
+  flex: 0 0 var(--player-tags-height) !important;
+
+  margin: 0 !important;
+  padding: 0 28px !important;
+
+  box-sizing: border-box !important;
+
+  background: var(--player-panel-bg) !important;
+
+  border: 0 !important;
+
+  border-top: 1px solid rgba(255, 255, 255, 0.07) !important;
+
+  overflow: hidden !important;
+}
+
+/* Expanded panel */
+
+#playerScreen.tags-expanded .player-panel {
+  height: var(--player-expanded-tags-height) !important;
+  min-height: var(--player-expanded-tags-height) !important;
+
+  flex-basis: var(--player-expanded-tags-height) !important;
+}
+
+/* ============================================================
+   TAG PANEL CONTENT
+   ============================================================ */
+
+#playerScreen .player-tab {
+  width: 100% !important;
+  height: 100% !important;
+
+  min-width: 0 !important;
+  min-height: 0 !important;
+
+  margin: 0 !important;
+  padding: 0 !important;
+
+  box-sizing: border-box !important;
+}
+
+#playerScreen #tagsPanel {
+  display: flex !important;
+
+  flex-direction: column !important;
+
+  align-items: stretch !important;
+  justify-content: flex-start !important;
+
+  gap: 0 !important;
+
+  background: transparent !important;
+}
+
+/* ============================================================
+   TAG HEADER
+   ============================================================ */
+
+#playerScreen #tagsPanel .panel-header {
+  width: 100% !important;
+
+  height: 48px !important;
+  min-height: 48px !important;
+
+  flex: 0 0 48px !important;
+
+  display: flex !important;
+
+  align-items: center !important;
+
+  justify-content: space-between !important;
+
+  gap: 12px !important;
+
+  margin: 0 !important;
+  padding: 0 !important;
+
+  box-sizing: border-box !important;
+}
+
+/* Tags heading */
+
+#playerScreen #tagsPanel .panel-header h3 {
+  margin: 0 !important;
+  padding: 0 !important;
+
+  color: #e6e6e6 !important;
+
+  font-size: 16px !important;
+
+  font-weight: 500 !important;
+
+  line-height: 1 !important;
+
+  white-space: nowrap !important;
+}
+
+/* ============================================================
+   ADD TAG BUTTON
+   ============================================================ */
+
+#playerScreen #addPlayerTag {
+  width: auto !important;
+
+  min-width: 82px !important;
+
+  height: 32px !important;
+
+  flex: 0 0 auto !important;
+
+  display: inline-flex !important;
+
+  align-items: center !important;
+  justify-content: center !important;
+
+  gap: 6px !important;
+
+  margin: 0 !important;
+  padding: 0 11px !important;
+
+  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+
+  border-radius: 10px !important;
+
+  background: transparent !important;
+
+  color: #cfcfcf !important;
+
+  font-family: inherit !important;
+
+  font-size: 11px !important;
+
+  font-weight: 500 !important;
+
+  white-space: nowrap !important;
+
+  cursor: pointer !important;
+
+  box-sizing: border-box !important;
+}
+
+#playerScreen #addPlayerTag:hover {
+  color: #fff !important;
+
+  background: rgba(255, 255, 255, 0.05) !important;
+
+  border-color: rgba(255, 255, 255, 0.17) !important;
+}
+
+#playerScreen #addPlayerTag svg {
+  width: 15px !important;
+  height: 15px !important;
+}
+
+/* ============================================================
+   SELECTED TAGS
+   ============================================================ */
+
+#playerScreen .player-selected-tags {
+  width: 100% !important;
+
+  height: 78px !important;
+  min-height: 78px !important;
+
+  flex: 0 0 78px !important;
+
+  min-width: 0 !important;
+
+  display: none !important;
+
+  align-items: center !important;
+
+  gap: 8px !important;
+
+  margin: 0 !important;
+  padding: 0 !important;
+
+  overflow-x: auto !important;
+  overflow-y: hidden !important;
+
+  scrollbar-width: none !important;
+
+  box-sizing: border-box !important;
+}
+
+#playerScreen .player-selected-tags::-webkit-scrollbar {
   display: none !important;
 }
 
-#tagsPanel {
+/* Show tags when expanded */
+
+#playerScreen.tags-expanded .player-selected-tags {
   display: flex !important;
 }
 
-/* ==========================================================
-   TAGS PANEL HEADER
-========================================================== */
+/* ============================================================
+   TAG CHIPS
+   ============================================================ */
 
-#tagsPanel .panel-header {
-  display: flex;
+#playerScreen .player-selected-tag {
+  height: 32px !important;
 
-  align-items: center;
-  justify-content: space-between;
+  min-width: max-content !important;
 
-  width: 100%;
+  flex: 0 0 auto !important;
 
-  margin: 0 0 24px 0;
+  display: inline-flex !important;
 
-  padding: 0;
+  align-items: center !important;
+  justify-content: center !important;
+
+  gap: 6px !important;
+
+  margin: 0 !important;
+  padding: 0 11px !important;
+
+  border: 1px solid rgba(255, 255, 255, 0.09) !important;
+
+  border-radius: 999px !important;
+
+  background: rgba(255, 255, 255, 0.025) !important;
+
+  color: #d0d0d0 !important;
+
+  font-family: inherit !important;
+
+  font-size: 11px !important;
+
+  white-space: nowrap !important;
+
+  box-sizing: border-box !important;
 }
 
-#tagsPanel .panel-header h3 {
-  margin: 0;
-
-  color: #ffffff;
-
-  font-family: var(--font-main);
-
-  font-size: 25px;
-
-  line-height: 1.2;
-
-  font-weight: 500;
-
-  letter-spacing: -0.2px;
+#playerScreen .player-selected-tag svg {
+  width: 13px !important;
+  height: 13px !important;
 }
 
-/* ==========================================================
-   ADD TAG BUTTON
-========================================================== */
-
-#tagsPanel .panel-header button {
-  height: 38px;
-
-  padding: 0 14px;
-
-  display: inline-flex;
-
-  align-items: center;
-  justify-content: center;
-
-  gap: 7px;
-
-  border: 1px solid rgba(255, 255, 255, 0.09);
-
-  border-radius: 999px;
-
-  background: transparent;
-
-  color: #b5b5b5;
-
-  font-family: var(--font-main);
-
-  font-size: 13px;
-
-  font-weight: 400;
-
-  cursor: pointer;
-
-  transition:
-    color 0.2s ease,
-    background 0.2s ease,
-    border-color 0.2s ease;
+#playerScreen .mandatory-player-tag {
+  opacity: 0.72 !important;
 }
 
-#tagsPanel .panel-header button svg {
-  width: 15px;
-  height: 15px;
+#playerScreen .remove-player-tag {
+  width: 14px !important;
+  height: 14px !important;
 
-  stroke-width: 1.8;
+  opacity: 0.45 !important;
+
+  cursor: pointer !important;
 }
 
-#tagsPanel .panel-header button:hover {
-  color: #ffffff;
-
-  background: rgba(255, 255, 255, 0.05);
-
-  border-color: rgba(255, 255, 255, 0.14);
-
-  box-shadow: none;
-
-  transform: none;
+#playerScreen .remove-player-tag:hover {
+  opacity: 1 !important;
 }
 
-/* ==========================================================
-   SELECTED TAGS
-========================================================== */
+/* ============================================================
+   HIDDEN COMPATIBILITY ELEMENTS
+   ============================================================ */
 
-.player-selected-tags {
-  display: flex;
-
-  flex-wrap: wrap;
-
-  align-content: flex-start;
-
-  gap: 12px;
-
-  width: 100%;
-
-  min-height: 0;
-
-  overflow-y: auto;
-
-  scrollbar-width: none;
+#playerScreen #playerCompatibility {
+  display: none !important;
 }
 
-.player-selected-tags::-webkit-scrollbar {
-  display: none;
-}
-
-/* ==========================================================
-   TAG CHIP
-========================================================== */
-
-.player-selected-tag {
-  height: 38px;
-
-  padding: 0 13px;
-
-  display: inline-flex;
-
-  align-items: center;
-  justify-content: center;
-
-  gap: 8px;
-
-  border: 1px solid rgba(255, 255, 255, 0.07);
-
-  border-radius: 999px;
-
-  background: rgba(255, 255, 255, 0.015);
-
-  color: #d0d0d0;
-
-  font-family: var(--font-main);
-
-  font-size: 13px;
-
-  font-weight: 400;
-
-  cursor: default;
-
-  transition:
-    background 0.2s ease,
-    border-color 0.2s ease,
-    color 0.2s ease;
-}
-
-.player-selected-tag svg {
-  width: 15px;
-  height: 15px;
-
-  stroke-width: 1.8;
-}
-
-.player-selected-tag:hover {
-  background: rgba(255, 255, 255, 0.04);
-
-  border-color: rgba(255, 255, 255, 0.11);
-
-  color: #ffffff;
-}
-
-/* ==========================================================
-   REMOVE TAG
-========================================================== */
-
-.remove-player-tag {
-  width: 14px;
-  height: 14px;
-
-  opacity: 0.45;
-
-  cursor: pointer;
-
-  transition:
-    opacity 0.2s ease,
-    transform 0.2s ease;
-}
-
-.remove-player-tag:hover {
-  opacity: 1;
-
-  transform: scale(1.1);
-}
-
-/* ==========================================================
+/* ============================================================
    TAG PICKER OVERLAY
-========================================================== */
+   ============================================================ */
 
 .player-tag-picker-overlay {
-  position: fixed;
+  position: fixed !important;
 
-  inset: 0;
+  inset: 0 !important;
 
-  z-index: 9999;
+  z-index: 99999 !important;
 
-  display: none;
+  display: none !important;
 
-  align-items: center;
-  justify-content: center;
+  align-items: center !important;
+  justify-content: center !important;
 
-  padding: 20px;
+  width: 100vw !important;
+  height: 100vh !important;
 
-  box-sizing: border-box;
+  padding: 20px !important;
 
-  background: rgba(0, 0, 0, 0.65);
+  box-sizing: border-box !important;
 
-  backdrop-filter: blur(12px);
+  background: rgba(0, 0, 0, 0.68) !important;
+
+  backdrop-filter: blur(10px) !important;
+  -webkit-backdrop-filter: blur(10px) !important;
 }
 
 .player-tag-picker-overlay.open {
-  display: flex;
+  display: flex !important;
 }
 
-/* ==========================================================
-   TAG PICKER WINDOW
-========================================================== */
+/* ============================================================
+   PICKER WINDOW
+   ============================================================ */
 
 .player-tag-picker-window {
-  width: min(520px, 100%);
+  width: min(520px, 100%) !important;
 
-  max-height: min(650px, 90vh);
+  max-width: 100% !important;
 
-  display: flex;
+  max-height: min(650px, 90vh) !important;
 
-  flex-direction: column;
+  min-height: 0 !important;
 
-  overflow: hidden;
+  display: flex !important;
 
-  background: #151515;
+  flex-direction: column !important;
 
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  overflow: hidden !important;
 
-  border-radius: 24px;
+  box-sizing: border-box !important;
 
-  box-shadow: 0 30px 80px rgba(0, 0, 0, 0.7);
+  background: #151515 !important;
+
+  border: 1px solid rgba(255, 255, 255, 0.08) !important;
+
+  border-radius: 22px !important;
+
+  box-shadow: 0 30px 80px rgba(0, 0, 0, 0.72) !important;
 }
 
-/* ==========================================================
-   TAG PICKER HEADER
-========================================================== */
+/* ============================================================
+   PICKER HEADER
+   ============================================================ */
 
 .player-tag-picker-header {
-  display: flex;
+  flex: 0 0 auto !important;
 
-  align-items: center;
-  justify-content: space-between;
+  display: flex !important;
 
-  padding: 22px 24px;
+  align-items: center !important;
+  justify-content: space-between !important;
 
-  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+  gap: 12px !important;
+
+  padding: 18px 20px !important;
+
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06) !important;
 }
 
 .player-tag-picker-header h3 {
-  margin: 0;
+  margin: 0 !important;
 
-  color: #ffffff;
+  color: #fff !important;
 
-  font-family: var(--font-main);
+  font-size: 18px !important;
 
-  font-size: 20px;
-
-  font-weight: 500;
+  font-weight: 500 !important;
 }
 
 .player-tag-picker-header span {
-  display: block;
+  display: block !important;
 
-  margin-top: 4px;
+  margin-top: 4px !important;
 
-  color: #777777;
+  color: #777 !important;
 
-  font-size: 12px;
+  font-size: 11px !important;
 }
 
-/* ==========================================================
-   TAG PICKER CLOSE
-========================================================== */
+/* ============================================================
+   PICKER CLOSE
+   ============================================================ */
 
 .player-tag-picker-close {
-  width: 36px;
-  height: 36px;
+  width: 36px !important;
+  height: 36px !important;
 
-  display: flex;
+  min-width: 36px !important;
 
-  align-items: center;
-  justify-content: center;
+  display: inline-flex !important;
 
-  padding: 0;
+  align-items: center !important;
+  justify-content: center !important;
 
-  border-radius: 12px;
+  margin: 0 !important;
+  padding: 0 !important;
 
-  border: 1px solid rgba(255, 255, 255, 0.07);
+  border: 1px solid rgba(255, 255, 255, 0.08) !important;
 
-  background: rgba(255, 255, 255, 0.04);
+  border-radius: 11px !important;
 
-  color: #999999;
+  background: rgba(255, 255, 255, 0.04) !important;
 
-  cursor: pointer;
+  color: #999 !important;
+
+  cursor: pointer !important;
 }
 
 .player-tag-picker-close:hover {
-  color: #ffffff;
+  color: #fff !important;
 
-  background: rgba(255, 255, 255, 0.07);
-
-  border-color: rgba(255, 255, 255, 0.12);
+  background: rgba(255, 255, 255, 0.07) !important;
 }
 
 .player-tag-picker-close svg {
-  width: 17px;
-  height: 17px;
+  width: 17px !important;
+  height: 17px !important;
 }
 
-/* ==========================================================
-   TAG SEARCH
-========================================================== */
+/* ============================================================
+   PICKER SEARCH
+   ============================================================ */
 
 .player-tag-search {
-  height: 44px;
+  flex: 0 0 auto !important;
 
-  margin: 18px 22px;
+  height: 44px !important;
 
-  padding: 0 14px;
+  display: flex !important;
 
-  display: flex;
+  align-items: center !important;
 
-  align-items: center;
+  gap: 8px !important;
 
-  gap: 10px;
+  margin: 14px 18px !important;
+  padding: 0 12px !important;
 
-  box-sizing: border-box;
+  box-sizing: border-box !important;
 
-  border-radius: 14px;
+  border: 1px solid rgba(255, 255, 255, 0.07) !important;
 
-  background: #1b1b1b;
+  border-radius: 13px !important;
 
-  border: 1px solid rgba(255, 255, 255, 0.06);
+  background: #1b1b1b !important;
 }
 
 .player-tag-search svg {
-  width: 17px;
-  height: 17px;
+  width: 16px !important;
+  height: 16px !important;
 
-  color: #777777;
+  flex: 0 0 16px !important;
 
-  flex-shrink: 0;
+  color: #777 !important;
 }
 
 .player-tag-search input {
-  flex: 1;
+  width: 100% !important;
 
-  width: 100%;
+  min-width: 0 !important;
 
-  border: none;
+  flex: 1 1 auto !important;
 
-  outline: none;
+  margin: 0 !important;
+  padding: 0 !important;
 
-  background: transparent;
+  border: 0 !important;
+  outline: none !important;
 
-  color: #ffffff;
+  background: transparent !important;
 
-  font-family: var(--font-main);
+  color: #fff !important;
 
-  font-size: 14px;
+  font: inherit !important;
+  font-size: 14px !important;
 }
 
 .player-tag-search input::placeholder {
-  color: #666666;
+  color: #666 !important;
 }
 
-/* ==========================================================
-   TAG PICKER LIST
-========================================================== */
+/* ============================================================
+   PICKER LIST
+   ============================================================ */
 
 .player-tag-picker-list {
-  flex: 1;
+  flex: 1 1 auto !important;
 
-  min-height: 0;
+  min-width: 0 !important;
+  min-height: 0 !important;
 
-  overflow-y: auto;
+  display: grid !important;
 
-  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
 
-  grid-template-columns: repeat(2, 1fr);
+  gap: 8px !important;
 
-  gap: 10px;
+  overflow-x: hidden !important;
+  overflow-y: auto !important;
 
-  padding: 0 22px 22px;
+  margin: 0 !important;
 
-  scrollbar-width: thin;
+  padding: 0 18px 18px !important;
 
-  scrollbar-color: #333 transparent;
+  box-sizing: border-box !important;
 }
 
-/* ==========================================================
-   TAG PICKER OPTION
-========================================================== */
+/* ============================================================
+   PICKER OPTION
+   ============================================================ */
 
 .player-tag-picker-option {
-  min-height: 52px;
+  min-width: 0 !important;
+  min-height: 48px !important;
 
-  display: flex;
+  display: flex !important;
 
-  align-items: center;
+  align-items: center !important;
 
-  gap: 10px;
+  gap: 8px !important;
 
-  padding: 0 14px;
+  margin: 0 !important;
+  padding: 0 12px !important;
 
-  border-radius: 14px;
+  border: 1px solid rgba(255, 255, 255, 0.06) !important;
 
-  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 12px !important;
 
-  background: #1a1a1a;
+  background: #1a1a1a !important;
 
-  color: #999999;
+  color: #999 !important;
 
-  font-family: var(--font-main);
+  font: inherit !important;
+  font-size: 13px !important;
 
-  font-size: 14px;
+  text-align: left !important;
 
-  cursor: pointer;
-
-  text-align: left;
-
-  transition:
-    background 0.2s ease,
-    color 0.2s ease,
-    border-color 0.2s ease,
-    transform 0.2s ease;
-}
-
-.player-tag-picker-option svg {
-  width: 18px;
-  height: 18px;
-
-  flex-shrink: 0;
+  cursor: pointer !important;
 }
 
 .player-tag-picker-option:hover {
-  color: #ffffff;
+  color: #fff !important;
 
-  background: #202020;
+  background: #202020 !important;
 
-  border-color: rgba(255, 255, 255, 0.12);
-
-  transform: translateY(-1px);
+  border-color: rgba(255, 255, 255, 0.12) !important;
 }
 
 .player-tag-picker-option.selected {
-  color: #000000;
+  color: #000 !important;
 
-  background: #f1efe9;
+  background: #f1efe9 !important;
 
-  border-color: #ffffff;
+  border-color: #fff !important;
+}
 
-  box-shadow: none;
+.player-tag-picker-option svg {
+  width: 18px !important;
+  height: 18px !important;
+
+  flex: 0 0 18px !important;
+}
+
+.player-tag-picker-option span:not(.player-tag-check) {
+  min-width: 0 !important;
+
+  overflow: hidden !important;
+
+  text-overflow: ellipsis !important;
+
+  white-space: nowrap !important;
 }
 
 .player-tag-check {
-  margin-left: auto;
+  margin-left: auto !important;
 
   color: inherit !important;
 
-  font-weight: 700;
+  font-weight: 700 !important;
 }
 
-/* ==========================================================
-   TAG PICKER FOOTER
-========================================================== */
+/* ============================================================
+   PICKER FOOTER
+   ============================================================ */
 
 .player-tag-picker-footer {
-  display: flex;
+  flex: 0 0 auto !important;
 
-  align-items: center;
-  justify-content: space-between;
+  display: flex !important;
 
-  padding: 16px 22px;
+  align-items: center !important;
 
-  border-top: 1px solid rgba(255, 255, 255, 0.06);
+  justify-content: space-between !important;
+
+  gap: 12px !important;
+
+  padding: 13px 18px !important;
+
+  border-top: 1px solid rgba(255, 255, 255, 0.06) !important;
 }
 
 .player-tag-picker-footer span {
-  color: #777777;
+  min-width: 0 !important;
 
-  font-size: 12px;
+  color: #777 !important;
+
+  font-size: 11px !important;
 }
 
 .player-tag-picker-footer button {
-  height: 38px;
+  height: 38px !important;
 
-  padding: 0 18px;
+  min-width: 70px !important;
 
-  border-radius: 999px;
+  padding: 0 17px !important;
 
-  border: 1px solid rgba(255, 255, 255, 0.15);
+  border: 1px solid rgba(255, 255, 255, 0.15) !important;
 
-  background: #f1efe9;
+  border-radius: 999px !important;
 
-  color: #000000;
+  background: #f1efe9 !important;
 
-  font-family: var(--font-main);
+  color: #000 !important;
 
-  font-size: 13px;
+  font: inherit !important;
 
-  font-weight: 600;
+  font-size: 12px !important;
 
-  cursor: pointer;
+  font-weight: 600 !important;
 
-  transition:
-    transform 0.2s ease,
-    background 0.2s ease;
+  cursor: pointer !important;
 }
 
 .player-tag-picker-footer button:hover {
-  background: #ffffff;
-
-  transform: translateY(-1px);
+  background: #fff !important;
 }
 
-/* ==========================================================
-   FOCUS STATES
-========================================================== */
+/* ============================================================
+   TABLET
+   ============================================================ */
 
-.player-controls button:focus-visible,
-#tagsPanel .panel-header button:focus-visible,
-.player-tag-picker-close:focus-visible,
-.player-tag-picker-option:focus-visible,
-.player-tag-picker-footer button:focus-visible {
-  outline: none;
+@media (max-width: 1000px) {
+  #playerScreen .player-top {
+    padding-left: 20px !important;
+    padding-right: 20px !important;
+  }
 
-  box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.15);
+  #playerScreen .player-controls {
+    gap: 6px !important;
+  }
+
+  #playerScreen .player-text-control {
+    min-width: 52px !important;
+
+    padding-left: 5px !important;
+    padding-right: 5px !important;
+  }
 }
 
-/* ==========================================================
-   REMOVE OLD PLAYER ANIMATIONS
-========================================================== */
+/* ============================================================
+   MOBILE
+   ============================================================ */
 
-.player-top,
-.player-panel {
-  transition:
-    border-color 0.25s ease,
-    box-shadow 0.25s ease;
-}
+@media (max-width: 768px) {
+  :root {
+    --player-main-height: 126px;
+    --player-tags-height: 76px;
+    --player-expanded-tags-height: 116px;
+  }
 
-/* ==========================================================
-   PREVENT OLD CARD EFFECTS
-========================================================== */
+  /* Main player */
 
-.player-top,
-.player-top *,
-.player-top:hover,
-.player-top:hover * {
-  --player-card-shadow: none;
-}
+  #playerScreen .player-top {
+    height: var(--player-main-height) !important;
+    min-height: var(--player-main-height) !important;
 
-/* ==========================================================
-   DESKTOP WIDTH TUNING
-========================================================== */
+    padding: 8px 12px !important;
+  }
 
-/* Large desktop */
+  /* Three rows */
 
-@media (min-width: 1400px) {
-  .player-layout {
+  #playerScreen .player-info {
+    grid-template-rows:
+      38px
+      28px
+      48px !important;
+  }
+
+  /* Song row */
+
+  #playerScreen .player-song-row {
+    gap: 10px !important;
+  }
+
+  /* Title */
+
+  #playerScreen #playerTitle {
+    font-size: 14px !important;
+    line-height: 17px !important;
+  }
+
+  /* Folder */
+
+  #playerScreen #playerArtist {
+    font-size: 9px !important;
+    line-height: 11px !important;
+  }
+
+  /* Tags toggle */
+
+  #playerScreen .player-tags-toggle {
+    width: 30px !important;
+    height: 30px !important;
+
+    min-width: 30px !important;
+
+    flex-basis: 30px !important;
+
+    border-radius: 8px !important;
+  }
+
+  #playerScreen .player-tags-toggle svg {
+    width: 14px !important;
+    height: 14px !important;
+  }
+
+  /* Progress */
+
+  #playerScreen .player-progress {
     grid-template-columns:
-      minmax(700px, 2.3fr)
-      minmax(320px, 0.9fr);
+      34px
+      minmax(0, 1fr)
+      34px !important;
 
-    gap: 42px;
+    gap: 6px !important;
   }
 
-  .player-top {
-    grid-template-columns: 320px minmax(0, 1fr);
-
-    gap: 68px;
+  #playerScreen .player-progress span {
+    font-size: 8px !important;
   }
 
-  .album-cover {
-    width: 260px;
-    height: 260px;
+  /* Controls */
+
+  #playerScreen .player-controls {
+    height: 48px !important;
+
+    gap: 7px !important;
   }
 
-  .player-album {
-    width: 320px;
-    height: 320px;
+  #playerScreen .player-controls button {
+    width: 32px !important;
+    height: 32px !important;
+
+    min-width: 32px !important;
+
+    flex-basis: 32px !important;
   }
 
-  .song-meta h2 {
-    font-size: 36px;
-  }
-}
-
-/* ==========================================================
-   END OF DESKTOP PLAYER.CSS
-========================================================== */
-
-/* ==========================================================
-   MOONBOX PLAYER — MOBILE
-   Player first, Tags underneath
-========================================================== */
-
-@media (max-width: 700px) {
-  /* ========================================================
-     PLAYER SCREEN
-  ======================================================== */
-
-  #playerScreen {
-    height: calc(100vh - 88px);
-
-    min-height: 0;
-
-    padding: 14px 14px 20px;
-
-    box-sizing: border-box;
-
-    overflow-y: auto;
-    overflow-x: hidden;
+  #playerScreen .player-controls button svg {
+    width: 16px !important;
+    height: 16px !important;
   }
 
-  /* ========================================================
-     MAIN LAYOUT
-     
-     IMPORTANT:
-     Player first
-     Tags second
-  ======================================================== */
+  /* Shuffle / Repeat */
 
-  .player-layout {
-    display: flex;
+  #playerScreen .player-text-control {
+    min-width: 52px !important;
 
-    flex-direction: column;
+    height: 32px !important;
 
-    align-items: stretch;
+    padding: 0 5px !important;
 
-    gap: 18px;
-
-    width: 100%;
-
-    height: auto;
-
-    min-height: 100%;
-
-    box-sizing: border-box;
+    font-size: 9px !important;
   }
 
-  /* ========================================================
-     PLAYER
-     
-     No card / no border
-  ======================================================== */
+  /* Play */
 
-  .player-top {
-    display: flex;
+  #playerScreen #playPause,
+  #playerScreen .play-main {
+    width: 42px !important;
+    height: 42px !important;
 
-    flex-direction: column;
+    min-width: 42px !important;
 
-    align-items: center;
+    flex-basis: 42px !important;
 
-    justify-content: center;
-
-    width: 100%;
-
-    height: auto;
-
-    min-height: 0;
-
-    padding: 8px 4px 4px;
-
-    gap: 18px;
-
-    box-sizing: border-box;
-
-    background: transparent;
-
-    border: none;
-
-    border-radius: 0;
-
-    box-shadow: none;
-
-    overflow: visible;
+    margin: 0 2px !important;
   }
 
-  /* ========================================================
-     ALBUM AREA
-  ======================================================== */
-
-  .player-album {
-    position: relative;
-
-    width: min(62vw, 270px);
-    height: min(62vw, 270px);
-
-    display: flex;
-
-    align-items: center;
-    justify-content: center;
-
-    flex-shrink: 0;
-
-    margin: 0 auto;
+  #playerScreen #playPause svg,
+  #playerScreen .play-main svg {
+    width: 18px !important;
+    height: 18px !important;
   }
 
-  /* ========================================================
-     ALBUM COVER
-  ======================================================== */
+  /* Tags panel */
 
-  .album-cover {
-    position: absolute;
+  #playerScreen .player-panel {
+    height: var(--player-tags-height) !important;
+    min-height: var(--player-tags-height) !important;
 
-    left: 50%;
-    top: 50%;
+    flex-basis: var(--player-tags-height) !important;
 
-    width: min(62vw, 270px);
-    height: min(62vw, 270px);
-
-    transform: translate(-50%, -50%);
-
-    border-radius: 16px;
-
-    box-shadow: 0 20px 45px rgba(0, 0, 0, 0.48);
-
-    cursor: pointer;
+    padding: 0 12px !important;
   }
 
-  .album-cover:hover {
-    transform: translate(-50%, -50%);
+  #playerScreen.tags-expanded .player-panel {
+    height: var(--player-expanded-tags-height) !important;
+    min-height: var(--player-expanded-tags-height) !important;
+
+    flex-basis: var(--player-expanded-tags-height) !important;
   }
 
-  /* ========================================================
-     PLAYER INFORMATION
-  ======================================================== */
+  /* Tags header */
 
-  .player-info {
-    display: flex;
+  #playerScreen #tagsPanel .panel-header {
+    height: 44px !important;
+    min-height: 44px !important;
 
-    flex-direction: column;
-
-    align-items: center;
-
-    justify-content: flex-start;
-
-    width: 100%;
-
-    min-width: 0;
-
-    gap: 18px;
-
-    margin: 0;
-
-    box-sizing: border-box;
+    flex-basis: 44px !important;
   }
 
-  /* ========================================================
-     SONG TITLE
-  ======================================================== */
-
-  .song-meta {
-    width: 100%;
-
-    display: flex;
-
-    flex-direction: column;
-
-    align-items: center;
-
-    gap: 5px;
-
-    margin: 0;
-
-    text-align: center;
+  #playerScreen #tagsPanel .panel-header h3 {
+    font-size: 15px !important;
   }
 
-  .song-meta h2 {
-    width: 100%;
+  /* Add Tag */
 
-    margin: 0;
+  #playerScreen #addPlayerTag {
+    min-width: 76px !important;
 
-    color: #ffffff;
+    height: 31px !important;
 
-    font-size: clamp(20px, 6vw, 28px);
+    padding: 0 9px !important;
 
-    line-height: 1.15;
-
-    font-weight: 600;
-
-    letter-spacing: -0.3px;
-
-    white-space: nowrap;
-
-    overflow: hidden;
-
-    text-overflow: ellipsis;
+    font-size: 10px !important;
   }
 
-  .song-meta span {
-    max-width: 90%;
-
-    margin: 0;
-
-    color: #888888;
-
-    font-size: clamp(12px, 3.5vw, 15px);
-
-    line-height: 1.3;
-
-    white-space: nowrap;
-
-    overflow: hidden;
-
-    text-overflow: ellipsis;
+  #playerScreen #addPlayerTag svg {
+    width: 14px !important;
+    height: 14px !important;
   }
 
-  /* ========================================================
-     PROGRESS
-  ======================================================== */
+  /* Selected tags */
 
-  .player-progress {
-    display: grid;
+  #playerScreen .player-selected-tags {
+    height: 72px !important;
+    min-height: 72px !important;
 
-    grid-template-columns: 34px minmax(0, 1fr) 34px;
+    flex-basis: 72px !important;
 
-    align-items: center;
-
-    width: 100%;
-
-    max-width: 520px;
-
-    margin: 0;
-
-    gap: 8px;
-
-    box-sizing: border-box;
+    gap: 6px !important;
   }
 
-  .player-progress span {
-    font-size: 10px;
+  #playerScreen .player-selected-tag {
+    height: 30px !important;
 
-    color: #777777;
+    padding: 0 9px !important;
 
-    text-align: center;
+    font-size: 10px !important;
   }
 
-  /* ========================================================
-     PROGRESS BAR
-  ======================================================== */
-
-  #progressBar {
-    width: 100%;
-
-    height: 4px;
-
-    min-width: 0;
+  #playerScreen .player-selected-tag svg {
+    width: 12px !important;
+    height: 12px !important;
   }
 
-  /* ========================================================
-     CONTROLS
-     
-     ALWAYS ONE LINE
-     
-     Shuffle  Prev  Play  Next  Repeat
-  ======================================================== */
-
-  .player-controls {
-    display: flex;
-
-    align-items: center;
-
-    justify-content: center;
-
-    flex-wrap: nowrap;
-
-    width: 100%;
-
-    gap: clamp(8px, 3vw, 18px);
-
-    margin: 0;
-
-    padding: 0;
-
-    box-sizing: border-box;
-  }
-
-  /* ========================================================
-     CONTROL BUTTONS
-  ======================================================== */
-
-  .player-controls button {
-    width: clamp(32px, 10vw, 42px);
-    height: clamp(32px, 10vw, 42px);
-
-    flex: 0 0 auto;
-
-    padding: 0;
-
-    box-sizing: border-box;
-  }
-
-  .player-controls button svg {
-    width: clamp(17px, 5vw, 20px);
-    height: clamp(17px, 5vw, 20px);
-  }
-
-  /* ========================================================
-     SHUFFLE / REPEAT
-  ======================================================== */
-
-  .player-text-control {
-    width: auto !important;
-
-    min-width: 0 !important;
-
-    height: 36px;
-
-    padding: 0 2px !important;
-
-    font-size: clamp(11px, 3.2vw, 14px);
-
-    flex-shrink: 1 !important;
-  }
-
-  /* ========================================================
-     MAIN PLAY BUTTON
-  ======================================================== */
-
-  .play-main {
-    width: clamp(48px, 14vw, 60px) !important;
-    height: clamp(48px, 14vw, 60px) !important;
-
-    margin: 0 !important;
-
-    flex-shrink: 0 !important;
-  }
-
-  .play-main svg {
-    width: clamp(21px, 6vw, 25px) !important;
-    height: clamp(21px, 6vw, 25px) !important;
-  }
-
-  /* ========================================================
-     TAGS PANEL
-     
-     Comes AFTER player.
-  ======================================================== */
-
-  .player-panel {
-    display: flex;
-    flex-direction: column;
-
-    width: 100%;
-    height: auto;
-
-    min-height: 0;
-    max-height: none;
-
-    flex-shrink: 0;
-
-    box-sizing: border-box;
-
-    background: rgba(16, 16, 16, 0.72);
-
-    border: 1px solid rgba(255, 255, 255, 0.08);
-    border-radius: 20px;
-
-    overflow: visible;
-
-    box-shadow: 0 15px 40px rgba(0, 0, 0, 0.28);
-  }
-
-  /* ========================================================
-     TAG PANEL
-  ======================================================== */
-
-  .player-tab {
-    display: none;
-
-    width: 100%;
-
-    height: auto;
-
-    min-height: 0;
-
-    padding: 18px;
-
-    box-sizing: border-box;
-  }
-
-  #tagsPanel {
-    display: flex !important;
-
-    flex-direction: column;
-
-    min-height: 0;
-  }
-
-  /* ========================================================
-     TAG HEADER
-  ======================================================== */
-
-  #tagsPanel .panel-header {
-    display: flex;
-
-    align-items: center;
-    justify-content: space-between;
-
-    width: 100%;
-
-    margin: 0 0 14px;
-
-    flex-shrink: 0;
-  }
-
-  #tagsPanel .panel-header h3 {
-    margin: 0;
-
-    font-size: 20px;
-  }
-
-  /* ========================================================
-     ADD TAG
-  ======================================================== */
-
-  #tagsPanel .panel-header button {
-    height: 34px;
-
-    padding: 0 11px;
-
-    gap: 5px;
-
-    font-size: 11px;
-  }
-
-  #tagsPanel .panel-header button svg {
-    width: 14px;
-    height: 14px;
-  }
-
-  /* ========================================================
-     TAGS
-  ======================================================== */
-
-  .player-selected-tags {
-    display: flex;
-
-    flex-wrap: wrap;
-    align-content: flex-start;
-
-    gap: 7px;
-
-    width: 100%;
-
-    min-height: 0;
-    max-height: none;
-
-    overflow: visible;
-
-    scrollbar-width: none;
-  }
-
-  .player-selected-tags::-webkit-scrollbar {
-    display: none;
-  }
-
-  /* ========================================================
-     TAG CHIP
-  ======================================================== */
-
-  .player-selected-tag {
-    height: 32px;
-
-    padding: 0 10px;
-
-    gap: 6px;
-
-    font-size: 11px;
-
-    border-radius: 999px;
-  }
-
-  .player-selected-tag svg {
-    width: 13px;
-    height: 13px;
-  }
-
-  .remove-player-tag {
-    width: 12px;
-    height: 12px;
-  }
-
-  /* ========================================================
-     TAG PICKER
-  ======================================================== */
+  /* Picker becomes bottom sheet */
 
   .player-tag-picker-overlay {
-    padding: 12px;
+    align-items: flex-end !important;
+
+    padding: 0 !important;
   }
 
   .player-tag-picker-window {
-    width: 100%;
+    width: 100% !important;
+    max-width: 100% !important;
 
-    max-height: 92vh;
+    max-height: 88vh !important;
 
-    border-radius: 20px;
-  }
-
-  .player-tag-picker-header {
-    padding: 18px;
-  }
-
-  .player-tag-picker-header h3 {
-    font-size: 18px;
-  }
-
-  .player-tag-search {
-    margin: 12px 14px;
-
-    height: 42px;
+    border-radius: 20px 20px 0 0 !important;
   }
 
   .player-tag-picker-list {
-    grid-template-columns: 1fr;
+    grid-template-columns: 1fr !important;
 
-    gap: 7px;
-
-    padding: 0 14px 14px;
+    padding-left: 14px !important;
+    padding-right: 14px !important;
   }
 
-  .player-tag-picker-option {
-    min-height: 46px;
+  .player-tag-picker-header {
+    padding: 15px 16px !important;
+  }
 
-    padding: 0 12px;
-
-    border-radius: 12px;
-
-    font-size: 13px;
+  .player-tag-search {
+    margin: 12px 14px !important;
   }
 
   .player-tag-picker-footer {
-    padding: 12px 14px;
-  }
-
-  /* ========================================================
-     REMOVE DESKTOP EFFECTS
-  ======================================================== */
-
-  .player-top:hover {
-    background: transparent;
-
-    border: none;
-
-    box-shadow: none;
-
-    transform: none;
+    padding: 12px 14px !important;
   }
 }
 
-/* ==========================================================
-   VERY SMALL PHONES
-   ~320px width / short screens
-========================================================== */
+/* ============================================================
+   SMALL PHONE
+   ============================================================ */
 
-@media (max-width: 380px) {
-  #playerScreen {
-    padding: 10px 10px 14px;
+@media (max-width: 430px) {
+  :root {
+    --player-main-height: 122px;
+    --player-tags-height: 72px;
+    --player-expanded-tags-height: 108px;
   }
 
-  .player-layout {
-    gap: 12px;
+  #playerScreen .player-top {
+    padding-left: 8px !important;
+    padding-right: 8px !important;
   }
 
-  .player-top {
-    gap: 13px;
-
-    padding: 4px 2px;
+  #playerScreen .player-info {
+    grid-template-rows:
+      36px
+      27px
+      45px !important;
   }
 
-  .player-album {
-    width: min(52vw, 210px);
-    height: min(52vw, 210px);
+  #playerScreen .player-song-row {
+    gap: 7px !important;
   }
 
-  .album-cover {
-    width: min(52vw, 210px);
-    height: min(52vw, 210px);
-
-    border-radius: 13px;
+  #playerScreen #playerTitle {
+    font-size: 13px !important;
   }
 
-  .player-info {
-    gap: 12px;
+  #playerScreen #playerArtist {
+    font-size: 8px !important;
   }
 
-  .song-meta h2 {
-    font-size: 19px;
+  #playerScreen .player-tags-toggle {
+    width: 28px !important;
+    height: 28px !important;
+
+    min-width: 28px !important;
+
+    flex-basis: 28px !important;
   }
 
-  .song-meta span {
-    font-size: 11px;
+  #playerScreen .player-tags-toggle svg {
+    width: 13px !important;
+    height: 13px !important;
   }
 
-  .player-progress {
-    grid-template-columns: 30px minmax(0, 1fr) 30px;
-
-    gap: 5px;
+  #playerScreen .player-controls {
+    gap: 5px !important;
   }
 
-  .player-progress span {
-    font-size: 9px;
+  #playerScreen .player-controls button {
+    width: 29px !important;
+    height: 29px !important;
+
+    min-width: 29px !important;
+
+    flex-basis: 29px !important;
   }
 
-  .player-controls {
-    gap: 5px;
+  #playerScreen .player-controls button svg {
+    width: 14px !important;
+    height: 14px !important;
   }
 
-  .player-controls button {
-    width: 31px;
-    height: 31px;
+  #playerScreen .player-text-control {
+    min-width: 46px !important;
+
+    padding: 0 3px !important;
+
+    font-size: 8px !important;
   }
 
-  .player-controls button svg {
-    width: 16px;
-    height: 16px;
+  #playerScreen #playPause,
+  #playerScreen .play-main {
+    width: 39px !important;
+    height: 39px !important;
+
+    min-width: 39px !important;
+
+    flex-basis: 39px !important;
   }
 
-  .player-text-control {
-    font-size: 10px;
-
-    padding: 0 1px !important;
+  #playerScreen #playPause svg,
+  #playerScreen .play-main svg {
+    width: 17px !important;
+    height: 17px !important;
   }
 
-  .play-main {
-    width: 46px !important;
-    height: 46px !important;
+  #playerScreen #tagsPanel .panel-header {
+    height: 42px !important;
+    min-height: 42px !important;
+
+    flex-basis: 42px !important;
   }
 
-  .play-main svg {
-    width: 20px !important;
-    height: 20px !important;
+  #playerScreen #tagsPanel .panel-header h3 {
+    font-size: 14px !important;
   }
 
-  .player-panel {
-    max-height: 28vh;
+  #playerScreen #addPlayerTag {
+    min-width: 70px !important;
 
-    border-radius: 17px;
+    height: 29px !important;
+
+    padding: 0 7px !important;
+
+    font-size: 9px !important;
   }
 
-  .player-tab {
-    padding: 14px;
+  #playerScreen .player-selected-tags {
+    height: 66px !important;
+    min-height: 66px !important;
+
+    flex-basis: 66px !important;
   }
 
-  #tagsPanel .panel-header {
-    margin-bottom: 10px;
-  }
+  #playerScreen .player-selected-tag {
+    height: 28px !important;
 
-  #tagsPanel .panel-header h3 {
-    font-size: 18px;
-  }
+    padding: 0 8px !important;
 
-  #tagsPanel .panel-header button {
-    height: 30px;
-
-    padding: 0 9px;
-
-    font-size: 10px;
-  }
-
-  .player-selected-tags {
-    gap: 5px;
-
-    max-height: none;
-    overflow: visible;
-  }
-
-  .player-selected-tag {
-    height: 29px;
-
-    padding: 0 8px;
-
-    font-size: 10px;
-  }
-}
-
-/* ==========================================================
-   VERY SHORT PHONES
-   Prioritize keeping the entire player visible.
-========================================================== */
-
-@media (max-height: 650px) and (max-width: 700px) {
-  #playerScreen {
-    padding-top: 7px;
-  }
-
-  .player-layout {
-    gap: 10px;
-  }
-
-  .player-top {
-    gap: 9px;
-
-    padding-top: 2px;
-  }
-
-  .player-album {
-    width: min(42vh, 220px);
-    height: min(42vh, 220px);
-  }
-
-  .album-cover {
-    width: min(42vh, 220px);
-    height: min(42vh, 220px);
-  }
-
-  .player-info {
-    gap: 9px;
-  }
-
-  .song-meta {
-    gap: 3px;
-  }
-
-  .song-meta h2 {
-    font-size: 19px;
-  }
-
-  .song-meta span {
-    font-size: 11px;
-  }
-
-  .player-progress {
-    max-width: 100%;
-  }
-
-  .player-controls {
-    gap: 4px;
-  }
-
-  .player-panel {
-    max-height: 25vh;
+    font-size: 9px !important;
   }
 }
 
-/* ==========================================================
-   SONG TITLE EDITOR
-========================================================== */
+/* ============================================================
+   VERY SMALL PHONE
+   ============================================================ */
 
-.player-title-editor {
-  width: 100%;
+@media (max-width: 350px) {
+  :root {
+    --player-main-height: 120px;
+    --player-tags-height: 68px;
+    --player-expanded-tags-height: 102px;
+  }
+
+  #playerScreen .player-top {
+    padding-left: 6px !important;
+    padding-right: 6px !important;
+  }
+
+  #playerScreen .player-info {
+    grid-template-rows:
+      34px
+      26px
+      44px !important;
+  }
+
+  #playerScreen #playerTitle {
+    font-size: 12px !important;
+  }
+
+  #playerScreen #playerArtist {
+    font-size: 8px !important;
+  }
+
+  #playerScreen .player-tags-toggle {
+    width: 26px !important;
+    height: 26px !important;
+
+    min-width: 26px !important;
+
+    flex-basis: 26px !important;
+
+    border-radius: 7px !important;
+  }
+
+  #playerScreen .player-tags-toggle svg {
+    width: 12px !important;
+    height: 12px !important;
+  }
+
+  #playerScreen .player-progress {
+    grid-template-columns:
+      30px
+      minmax(0, 1fr)
+      30px !important;
+
+    gap: 4px !important;
+  }
+
+  #playerScreen .player-controls {
+    gap: 3px !important;
+  }
+
+  #playerScreen .player-controls button {
+    width: 27px !important;
+    height: 27px !important;
+
+    min-width: 27px !important;
+
+    flex-basis: 27px !important;
+  }
+
+  #playerScreen .player-controls button svg {
+    width: 13px !important;
+    height: 13px !important;
+  }
+
+  #playerScreen .player-text-control {
+    min-width: 40px !important;
+
+    padding: 0 2px !important;
+
+    font-size: 7px !important;
+  }
+
+  #playerScreen #playPause,
+  #playerScreen .play-main {
+    width: 36px !important;
+    height: 36px !important;
+
+    min-width: 36px !important;
+
+    flex-basis: 36px !important;
+  }
+
+  #playerScreen #playPause svg,
+  #playerScreen .play-main svg {
+    width: 16px !important;
+    height: 16px !important;
+  }
+
+  #playerScreen #tagsPanel .panel-header {
+    height: 40px !important;
+    min-height: 40px !important;
+
+    flex-basis: 40px !important;
+  }
+
+  #playerScreen #tagsPanel .panel-header h3 {
+    font-size: 13px !important;
+  }
+
+  #playerScreen #addPlayerTag {
+    min-width: 64px !important;
+
+    height: 27px !important;
+
+    padding: 0 6px !important;
+
+    font-size: 8px !important;
+  }
+
+  #playerScreen #addPlayerTag svg {
+    width: 12px !important;
+    height: 12px !important;
+  }
+
+  #playerScreen .player-selected-tags {
+    height: 62px !important;
+    min-height: 62px !important;
+
+    flex-basis: 62px !important;
+  }
+
+  #playerScreen .player-selected-tag {
+    height: 26px !important;
+
+    padding: 0 7px !important;
+
+    font-size: 8px !important;
+  }
 }
 
-.player-title-row {
-  display: flex;
+/* ============================================================
+   REDUCED MOTION
+   ============================================================ */
 
-  align-items: center;
-
-  gap: 8px;
+@media (prefers-reduced-motion: reduce) {
+  #playerScreen *,
+  .player-tag-picker-overlay * {
+    transition: none !important;
+    animation: none !important;
+  }
 }
 
-.player-title-row h2 {
-  margin: 0;
+/* ============================================================
+   MOBILE PLAYER — FIX VERTICAL LAYOUT
+   ============================================================ */
 
-  min-width: 0;
-}
-
-.player-title-edit {
-  width: 28px;
-  height: 28px;
-
-  display: flex;
-  align-items: center;
-  justify-content: center;
-
-  padding: 0;
-
-  border: none;
-  border-radius: 50%;
-
-  background: transparent;
-
-  color: #666;
-
-  opacity: 0;
-
-  cursor: pointer;
-
-  transition:
-    opacity 0.2s ease,
-    color 0.2s ease,
-    background 0.2s ease;
-}
-
-.player-title-row:hover .player-title-edit {
-  opacity: 1;
-}
-
-.player-title-edit:hover {
-  color: #fff;
-
-  background: rgba(255, 255, 255, 0.06);
-}
-
-.player-title-edit svg {
-  width: 14px;
-  height: 14px;
-}
-
-/* ==========================================================
-   EDITING
-========================================================== */
-
-.player-title-editing {
-  display: none;
-
-  align-items: center;
-
-  gap: 6px;
-
-  width: 100%;
-}
-
-.player-title-editor.editing .player-title-row {
-  display: none;
-}
-
-.player-title-editor.editing .player-title-editing {
-  display: flex;
-}
-
-.player-title-editing input {
-  flex: 1;
-
-  min-width: 0;
-
-  height: 44px;
-
-  padding: 0 12px;
-
-  box-sizing: border-box;
-
-  border: 1px solid rgba(255, 255, 255, 0.12);
-
-  border-radius: 10px;
-
-  outline: none;
-
-  background: #151515;
-
-  color: #fff;
-
-  font-family: var(--font-main);
-
-  font-size: 26px;
-
-  font-weight: 600;
-}
-
-.player-title-editing input:focus {
-  border-color: rgba(255, 255, 255, 0.25);
-}
-
-/* Restore original */
-
-.player-title-restore {
-  width: 38px;
-  height: 38px;
-
-  flex-shrink: 0;
-
-  display: flex;
-  align-items: center;
-  justify-content: center;
-
-  padding: 0;
-
-  border: 1px solid rgba(255, 255, 255, 0.08);
-
-  border-radius: 10px;
-
-  background: transparent;
-
-  color: #777;
-
-  cursor: pointer;
-}
-
-.player-title-restore:hover {
-  color: #fff;
-
-  background: rgba(255, 255, 255, 0.05);
-}
-
-.player-title-restore svg {
-  width: 16px;
-  height: 16px;
-}
-
-/* ==========================================================
-   MOONBOX PLAYER — MOBILE
-========================================================== */
-
-@media (max-width: 1200px) {
-  #playerScreen {
-    height: calc(100vh - 88px);
-    min-height: 0;
-
-    padding: 14px 14px 24px;
-
-    box-sizing: border-box;
-
-    overflow-y: auto;
-    overflow-x: hidden;
+@media (max-width: 768px) {
+  /* Give the player content a little more usable height */
+  #playerScreen .player-top {
+    padding: 12px 12px 8px !important;
   }
 
-  /* ========================================================
-     MAIN LAYOUT
-  ======================================================== */
+  /* One full-width column on mobile */
+  #playerScreen .player-info {
+    width: 100% !important;
+    height: 100% !important;
 
-  .player-layout {
-    display: flex;
-    flex-direction: column;
+    grid-template-columns: 1fr !important;
 
-    align-items: stretch;
+    grid-template-rows:
+      32px
+      28px
+      48px !important;
 
-    gap: 22px;
+    row-gap: 2px !important;
 
-    width: 100%;
-    height: auto;
-    min-height: 100%;
-
-    box-sizing: border-box;
+    align-items: center !important;
   }
 
-  /* ========================================================
-     PLAYER AREA
-  ======================================================== */
+  /* Song */
+  #playerScreen .player-song-row {
+    grid-column: 1 !important;
+    grid-row: 1 !important;
 
-  .player-top {
-    display: flex;
-    flex-direction: column;
-
-    align-items: center;
-    justify-content: flex-start;
-
-    width: 100%;
-    height: auto;
-
-    padding: 12px 4px 0;
-
-    gap: 22px;
-
-    box-sizing: border-box;
-
-    background: transparent;
-    border: none;
-    box-shadow: none;
-
-    overflow: visible;
+    width: 100% !important;
   }
 
-  /* ========================================================
-     ALBUM
-  ======================================================== */
+  /* Progress — full width */
+  #playerScreen .player-progress {
+    grid-column: 1 !important;
+    grid-row: 2 !important;
 
-  .player-album {
-    position: relative;
+    width: 100% !important;
 
-    width: min(72vw, 280px);
-    height: min(72vw, 280px);
-
-    display: flex;
-
-    align-items: center;
-    justify-content: center;
-
-    margin: 0 auto;
-
-    flex-shrink: 0;
-  }
-
-  .album-cover {
-    position: absolute;
-
-    left: 50%;
-    top: 50%;
-
-    width: min(72vw, 280px);
-    height: min(72vw, 280px);
-
-    transform: translate(-50%, -50%);
-
-    border-radius: 18px;
-
-    box-shadow: 0 25px 55px rgba(0, 0, 0, 0.5);
-
-    cursor: pointer;
-  }
-
-  .album-cover:hover {
-    transform: translate(-50%, -50%);
-  }
-
-  /* ========================================================
-     PLAYER INFORMATION
-  ======================================================== */
-
-  .player-info {
-    display: flex;
-    flex-direction: column;
-
-    align-items: center;
-
-    width: 100%;
-
-    gap: 18px;
-
-    margin: 0;
-
-    box-sizing: border-box;
-  }
-
-  /* ========================================================
-     TITLE / ARTIST
-  ======================================================== */
-
-  .song-meta {
-    display: flex;
-    flex-direction: column;
-
-    align-items: center;
-
-    width: 100%;
-
-    gap: 5px;
-
-    text-align: center;
-  }
-
-  .song-meta h2 {
-    width: 100%;
-
-    margin: 0;
-
-    font-size: clamp(21px, 6vw, 28px);
-
-    line-height: 1.15;
-
-    font-weight: 600;
-
-    letter-spacing: -0.3px;
-
-    white-space: nowrap;
-
-    overflow: hidden;
-
-    text-overflow: ellipsis;
-  }
-
-  .song-meta span {
-    max-width: 90%;
-
-    font-size: 13px;
-
-    color: #888;
-
-    white-space: nowrap;
-
-    overflow: hidden;
-
-    text-overflow: ellipsis;
-  }
-
-  /* ========================================================
-     TITLE EDITOR
-  ======================================================== */
-
-  .player-title-editor {
-    width: 100%;
-  }
-
-  .player-title-row {
-    justify-content: center;
-  }
-
-  .player-title-edit {
-    width: 26px;
-    height: 26px;
-
-    opacity: 0.45;
-  }
-
-  .player-title-edit svg {
-    width: 13px;
-    height: 13px;
-  }
-
-  .player-title-editing {
-    width: 100%;
-
-    justify-content: center;
-  }
-
-  .player-title-editing input {
-    height: 42px;
-
-    font-size: 20px;
-
-    text-align: center;
-  }
-
-  .player-title-restore {
-    width: 38px;
-    height: 38px;
-  }
-
-  /* ========================================================
-     PROGRESS
-  ======================================================== */
-
-  .player-progress {
-    display: grid;
+    display: grid !important;
 
     grid-template-columns:
       34px
       minmax(0, 1fr)
-      34px;
+      34px !important;
 
-    width: 100%;
-    max-width: 520px;
+    gap: 6px !important;
 
-    gap: 8px;
+    margin: 0 !important;
+    padding: 0 !important;
 
-    align-items: center;
+    align-self: center !important;
   }
 
-  .player-progress span {
-    font-size: 10px;
-    color: #777;
+  /* Controls — below progress */
+  #playerScreen .player-controls {
+    grid-column: 1 !important;
+    grid-row: 3 !important;
+
+    width: 100% !important;
+
+    height: 48px !important;
+
+    margin: 0 !important;
+    padding: 0 !important;
+
+    align-self: center !important;
+
+    justify-content: center !important;
+  }
+}
+
+/* ============================================================
+   MOBILE — COMPACT PROGRESS BAR
+   ============================================================ */
+
+@media (max-width: 768px) {
+  #playerScreen .player-progress {
+    grid-column: 1 !important;
+    grid-row: 2 !important;
+
+    /* Don't stretch across the whole phone */
+    width: min(360px, 82vw) !important;
+    max-width: 360px !important;
+
+    display: grid !important;
+
+    grid-template-columns:
+      32px
+      minmax(70px, 1fr)
+      32px !important;
+
+    gap: 5px !important;
+
+    margin: 0 auto !important;
+    padding: 0 !important;
+
+    align-self: center !important;
+    justify-self: center !important;
   }
 
-  #progressBar {
-    width: 100%;
-    height: 4px;
+  #playerScreen .player-progress span {
+    font-size: 8px !important;
+  }
+}
+
+/* ================================================================
+   MOONBOX — FINAL PLAYER COLUMN SYSTEM
+   ================================================================
+
+   YOUR COLUMN NUMBERS:
+
+   COLUMN 1 = SONG
+   COLUMN 2 = MAIN PLAYER
+   COLUMN 3 = TAG TOGGLE
+
+   DESKTOP:
+   ┌────────────┬────────────────────┬───────────┐
+   │ COLUMN 1   │ COLUMN 2           │ COLUMN 3  │
+   │ Song       │ Progress           │ Tag       │
+   │            │ Controls           │           │
+   └────────────┴────────────────────┴───────────┘
+
+   MOBILE:
+   ROW 1:
+   ┌────────────────────┬────────────────────┐
+   │ COLUMN 1           │ COLUMN 3           │
+   │ Song               │ Tag                │
+   └────────────────────┴────────────────────┘
+
+   ROW 2:
+   ┌───────────────────────────────────────────┐
+   │ COLUMN 2                                 │
+   │ Progress + Controls                      │
+   └───────────────────────────────────────────┘
+   ================================================================ */
+
+/* ================================================================
+   DESKTOP
+   ================================================================ */
+
+@media (min-width: 769px) {
+  /* --------------------------------------------------------------
+     MAIN 3-COLUMN GRID
+     -------------------------------------------------------------- */
+
+  #playerScreen .player-info {
+    position: relative !important;
+
+    width: 100% !important;
+    height: 100% !important;
+
+    min-width: 0 !important;
+    min-height: 0 !important;
+
+    display: grid !important;
+
+    grid-template-columns:
+      30%
+      50%
+      20% !important;
+
+    grid-template-rows: 1fr !important;
+
+    column-gap: 0 !important;
+    row-gap: 0 !important;
+
+    align-items: center !important;
+
+    margin: 0 !important;
+    padding: 0 !important;
+
+    box-sizing: border-box !important;
   }
 
-  /* ========================================================
-     CONTROLS
-  ======================================================== */
+  /* --------------------------------------------------------------
+     SONG ROW BECOMES A TRANSPARENT GRID WRAPPER
+     -------------------------------------------------------------- */
 
-  .player-controls {
-    display: flex;
-
-    align-items: center;
-    justify-content: center;
-
-    flex-wrap: nowrap;
-
-    width: 100%;
-
-    gap: clamp(7px, 3vw, 18px);
-
-    padding: 0;
+  #playerScreen .player-song-row {
+    display: contents !important;
   }
 
-  .player-controls button {
-    width: clamp(32px, 10vw, 42px);
-    height: clamp(32px, 10vw, 42px);
+  /* --------------------------------------------------------------
+     COLUMN 1 — SONG
+     -------------------------------------------------------------- */
 
-    flex: 0 0 auto;
+  #playerScreen .song-meta {
+    grid-column: 1 !important;
+    grid-row: 1 !important;
+
+    width: 100% !important;
+    min-width: 0 !important;
+
+    align-self: center !important;
+    justify-self: stretch !important;
+
+    display: flex !important;
+    flex-direction: column !important;
+
+    align-items: flex-start !important;
+    justify-content: center !important;
+
+    gap: 2px !important;
+
+    margin: 0 !important;
+    padding: 0 10px 0 0 !important;
+
+    box-sizing: border-box !important;
+
+    overflow: hidden !important;
   }
 
-  .player-controls button svg {
-    width: 18px;
-    height: 18px;
+  #playerScreen .player-title-editor {
+    width: 100% !important;
+    min-width: 0 !important;
+
+    overflow: hidden !important;
   }
 
-  .player-text-control {
-    height: 36px;
+  #playerScreen .player-title-row {
+    width: 100% !important;
+    min-width: 0 !important;
 
-    padding: 0 2px !important;
-
-    font-size: clamp(10px, 3.2vw, 14px);
-
-    flex-shrink: 1 !important;
-  }
-
-  .play-main {
-    width: clamp(50px, 15vw, 60px) !important;
-    height: clamp(50px, 15vw, 60px) !important;
-
-    flex-shrink: 0 !important;
-  }
-
-  .play-main svg {
-    width: 24px !important;
-    height: 24px !important;
-  }
-
-  /* ========================================================
-     TAGS CARD
-     
-     IMPORTANT:
-     It grows naturally.
-     No internal scroll.
-  ======================================================== */
-
-  .player-panel {
-    display: flex;
-    flex-direction: column;
-
-    width: 100%;
-    height: auto;
-
-    min-height: 0;
-
-    max-height: none;
-
-    flex-shrink: 0;
-
-    box-sizing: border-box;
-
-    background: rgba(16, 16, 16, 0.72);
-
-    border: 1px solid rgba(255, 255, 255, 0.08);
-
-    border-radius: 20px;
-
-    overflow: visible;
-
-    box-shadow: 0 15px 40px rgba(0, 0, 0, 0.28);
-  }
-
-  /* ========================================================
-     TAG PANEL
-  ======================================================== */
-
-  .player-tab {
-    display: none;
-
-    width: 100%;
-    height: auto;
-
-    min-height: 0;
-
-    padding: 18px;
-
-    box-sizing: border-box;
-  }
-
-  #tagsPanel {
     display: flex !important;
 
-    flex-direction: column;
+    align-items: center !important;
 
-    height: auto;
+    gap: 7px !important;
 
-    min-height: 0;
+    overflow: hidden !important;
   }
 
-  /* ========================================================
-     TAG HEADER
-  ======================================================== */
+  #playerScreen #playerTitle {
+    max-width: 100% !important;
+    min-width: 0 !important;
 
-  #tagsPanel .panel-header {
-    display: flex;
+    white-space: nowrap !important;
 
-    align-items: center;
-    justify-content: space-between;
-
-    width: 100%;
-
-    margin: 0 0 14px;
-
-    flex-shrink: 0;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
   }
 
-  #tagsPanel .panel-header h3 {
-    margin: 0;
+  #playerScreen #playerArtist {
+    width: 100% !important;
+    max-width: 100% !important;
 
-    font-size: 20px;
+    min-width: 0 !important;
+
+    white-space: nowrap !important;
+
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
   }
 
-  #tagsPanel .panel-header button {
-    height: 34px;
+  /* --------------------------------------------------------------
+     COLUMN 2 — PROGRESS
+     -------------------------------------------------------------- */
 
-    padding: 0 11px;
+  #playerScreen .player-progress {
+    grid-column: 2 !important;
+    grid-row: 1 !important;
 
-    font-size: 11px;
+    width: 100% !important;
+
+    min-width: 0 !important;
+    max-width: none !important;
+
+    align-self: center !important;
+    justify-self: stretch !important;
+
+    margin: 0 !important;
+    padding: 0 12px !important;
+
+    box-sizing: border-box !important;
   }
 
-  /* ========================================================
-     TAGS
-  ======================================================== */
+  /* --------------------------------------------------------------
+     COLUMN 2 — CONTROLS
+     -------------------------------------------------------------- */
 
-  .player-selected-tags {
-    display: flex;
+  #playerScreen .player-controls {
+    grid-column: 2 !important;
+    grid-row: 1 !important;
 
-    flex-wrap: wrap;
+    width: 100% !important;
 
-    align-content: flex-start;
+    min-width: 0 !important;
 
-    gap: 7px;
+    align-self: end !important;
+    justify-self: center !important;
 
-    width: 100%;
+    display: flex !important;
 
-    height: auto;
+    align-items: center !important;
+    justify-content: center !important;
 
-    min-height: 0;
+    gap: 6px !important;
 
-    max-height: none;
+    margin: 0 0 4px 0 !important;
+    padding: 0 !important;
 
-    overflow: visible;
+    box-sizing: border-box !important;
   }
 
-  /* ========================================================
-     TAG CHIP
-  ======================================================== */
+  /* --------------------------------------------------------------
+     COLUMN 3 — TAG TOGGLE
+     -------------------------------------------------------------- */
 
-  .player-selected-tag {
-    height: 32px;
+  #playerScreen .player-tags-toggle {
+    grid-column: 3 !important;
+    grid-row: 1 !important;
 
-    padding: 0 10px;
+    justify-self: end !important;
+    align-self: center !important;
 
-    gap: 6px;
+    width: 34px !important;
+    height: 34px !important;
 
-    font-size: 11px;
+    min-width: 34px !important;
+
+    margin: 0 4px 0 0 !important;
+    padding: 0 !important;
+
+    display: inline-flex !important;
+
+    align-items: center !important;
+    justify-content: center !important;
+
+    box-sizing: border-box !important;
+  }
+}
+
+/* ================================================================
+   MOBILE
+   ================================================================ */
+
+@media (max-width: 768px) {
+  /* --------------------------------------------------------------
+     MOBILE GRID
+
+     Physical grid:
+       left  = COLUMN 1
+       right = COLUMN 3
+
+     Second row spans both:
+       COLUMN 2
+     -------------------------------------------------------------- */
+
+  #playerScreen .player-info {
+    position: relative !important;
+
+    width: 100% !important;
+    height: 100% !important;
+
+    min-width: 0 !important;
+    min-height: 0 !important;
+
+    display: grid !important;
+
+    grid-template-columns:
+      minmax(0, 1fr)
+      minmax(0, 1fr) !important;
+
+    grid-template-rows:
+      50%
+      50% !important;
+
+    column-gap: 0 !important;
+    row-gap: 0 !important;
+
+    align-items: center !important;
+
+    margin: 0 !important;
+    padding: 0 !important;
+
+    box-sizing: border-box !important;
   }
 
-  .player-selected-tag svg {
-    width: 13px;
-    height: 13px;
+  /* --------------------------------------------------------------
+     IMPORTANT:
+     Remove player-song-row from the grid itself.
+
+     Its children become grid items:
+       .song-meta
+       .player-tags-toggle
+     -------------------------------------------------------------- */
+
+  #playerScreen .player-song-row {
+    display: contents !important;
+  }
+
+  /* ==============================================================
+     ROW 1 — COLUMN 1 — SONG
+     ============================================================== */
+
+  #playerScreen .song-meta {
+    grid-column: 1 !important;
+    grid-row: 1 !important;
+
+    width: 100% !important;
+    min-width: 0 !important;
+
+    align-self: center !important;
+    justify-self: stretch !important;
+
+    display: flex !important;
+
+    flex-direction: column !important;
+
+    align-items: flex-start !important;
+    justify-content: center !important;
+
+    gap: 1px !important;
+
+    margin: 0 !important;
+    padding: 0 6px 0 0 !important;
+
+    box-sizing: border-box !important;
+
+    overflow: hidden !important;
+  }
+
+  #playerScreen .player-title-editor {
+    width: 100% !important;
+    min-width: 0 !important;
+
+    overflow: hidden !important;
+  }
+
+  #playerScreen .player-title-row {
+    width: 100% !important;
+    min-width: 0 !important;
+
+    display: flex !important;
+
+    align-items: center !important;
+
+    gap: 5px !important;
+
+    overflow: hidden !important;
+  }
+
+  #playerScreen #playerTitle {
+    max-width: 100% !important;
+    min-width: 0 !important;
+
+    font-size: 14px !important;
+    line-height: 17px !important;
+
+    white-space: nowrap !important;
+
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+  }
+
+  #playerScreen #playerArtist {
+    width: 100% !important;
+    max-width: 100% !important;
+
+    min-width: 0 !important;
+
+    font-size: 9px !important;
+    line-height: 11px !important;
+
+    white-space: nowrap !important;
+
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+  }
+
+  /* ==============================================================
+     ROW 1 — COLUMN 3 — TAG BUTTON
+     ============================================================== */
+
+  #playerScreen .player-tags-toggle {
+    grid-column: 2 !important;
+    grid-row: 1 !important;
+
+    justify-self: end !important;
+    align-self: center !important;
+
+    width: 30px !important;
+    height: 30px !important;
+
+    min-width: 30px !important;
+
+    margin: 0 5px 0 0 !important;
+    padding: 0 !important;
+
+    display: inline-flex !important;
+
+    align-items: center !important;
+    justify-content: center !important;
+
+    border-radius: 8px !important;
+
+    box-sizing: border-box !important;
+  }
+
+  #playerScreen .player-tags-toggle svg {
+    width: 14px !important;
+    height: 14px !important;
+  }
+
+  /* ==============================================================
+     ROW 2 — COLUMN 2 — PROGRESS
+     ============================================================== */
+
+  #playerScreen .player-progress {
+    grid-column: 1 / -1 !important;
+    grid-row: 2 !important;
+
+    width: 100% !important;
+
+    min-width: 0 !important;
+    max-width: none !important;
+
+    align-self: start !important;
+    justify-self: stretch !important;
+
+    display: grid !important;
+
+    grid-template-columns:
+      34px
+      minmax(0, 1fr)
+      34px !important;
+
+    gap: 6px !important;
+
+    margin: 7px 0 0 0 !important;
+    padding: 0 8px !important;
+
+    box-sizing: border-box !important;
+  }
+
+  #playerScreen .player-progress span {
+    font-size: 8px !important;
+
+    line-height: 1 !important;
+  }
+
+  /* ==============================================================
+     ROW 2 — COLUMN 2 — CONTROLS
+     ============================================================== */
+
+  #playerScreen .player-controls {
+    grid-column: 1 / -1 !important;
+    grid-row: 2 !important;
+
+    width: 100% !important;
+    height: auto !important;
+
+    min-width: 0 !important;
+
+    align-self: end !important;
+    justify-self: stretch !important;
+
+    display: flex !important;
+
+    align-items: center !important;
+    justify-content: center !important;
+
+    gap: 4px !important;
+
+    margin: 0 0 3px 0 !important;
+    padding: 0 6px !important;
+
+    flex-wrap: nowrap !important;
+
+    box-sizing: border-box !important;
+  }
+
+  /* --------------------------------------------------------------
+     MOBILE CONTROL BUTTONS
+     -------------------------------------------------------------- */
+
+  #playerScreen .player-controls button {
+    width: 30px !important;
+    height: 30px !important;
+
+    min-width: 30px !important;
+
+    flex: 0 0 30px !important;
+  }
+
+  #playerScreen .player-controls button svg {
+    width: 15px !important;
+    height: 15px !important;
+  }
+
+  #playerScreen .player-text-control {
+    min-width: 42px !important;
+
+    height: 30px !important;
+
+    padding: 0 3px !important;
+
+    font-size: 8px !important;
+  }
+
+  /* --------------------------------------------------------------
+     MOBILE MAIN PLAY BUTTON
+     -------------------------------------------------------------- */
+
+  #playerScreen #playPause,
+  #playerScreen .play-main {
+    width: 40px !important;
+    height: 40px !important;
+
+    min-width: 40px !important;
+
+    flex: 0 0 40px !important;
+
+    margin: 0 1px !important;
+  }
+
+  #playerScreen #playPause svg,
+  #playerScreen .play-main svg {
+    width: 17px !important;
+    height: 17px !important;
+  }
+}
+
+/* ================================================================
+   SMALL PHONES
+   ================================================================ */
+
+@media (max-width: 420px) {
+  #playerScreen #playerTitle {
+    font-size: 13px !important;
+    line-height: 16px !important;
+  }
+
+  #playerScreen #playerArtist {
+    font-size: 8px !important;
+    line-height: 10px !important;
+  }
+
+  #playerScreen .player-tags-toggle {
+    width: 28px !important;
+    height: 28px !important;
+
+    min-width: 28px !important;
+
+    margin-right: 4px !important;
+  }
+
+  #playerScreen .player-controls {
+    gap: 2px !important;
+
+    padding-left: 3px !important;
+    padding-right: 3px !important;
+  }
+
+  #playerScreen .player-controls button {
+    width: 28px !important;
+    height: 28px !important;
+
+    min-width: 28px !important;
+
+    flex-basis: 28px !important;
+  }
+
+  #playerScreen #playPause,
+  #playerScreen .play-main {
+    width: 36px !important;
+    height: 36px !important;
+
+    min-width: 36px !important;
+
+    flex-basis: 36px !important;
+  }
+
+  #playerScreen .player-progress {
+    grid-template-columns:
+      30px
+      minmax(0, 1fr)
+      30px !important;
+
+    gap: 4px !important;
+
+    padding-left: 4px !important;
+    padding-right: 4px !important;
+  }
+}
+
+/* ================================================================
+   VERY SMALL PHONES
+   ================================================================ */
+
+@media (max-width: 300px) {
+  #playerScreen #playerTitle {
+    font-size: 12px !important;
+    line-height: 15px !important;
+  }
+
+  #playerScreen #playerArtist {
+    font-size: 7px !important;
+    line-height: 9px !important;
+  }
+
+  #playerScreen .player-tags-toggle {
+    width: 26px !important;
+    height: 26px !important;
+
+    min-width: 26px !important;
+
+    margin-right: 3px !important;
+  }
+
+  #playerScreen .player-controls {
+    gap: 1px !important;
+
+    padding-left: 2px !important;
+    padding-right: 2px !important;
+  }
+
+  #playerScreen .player-controls button {
+    width: 26px !important;
+    height: 26px !important;
+
+    min-width: 26px !important;
+
+    flex-basis: 26px !important;
+  }
+
+  #playerScreen #playPause,
+  #playerScreen .play-main {
+    width: 32px !important;
+    height: 32px !important;
+
+    min-width: 32px !important;
+
+    flex-basis: 32px !important;
+  }
+
+  #playerScreen .player-progress {
+    grid-template-columns:
+      27px
+      minmax(0, 1fr)
+      27px !important;
+
+    gap: 3px !important;
+  }
+}
+
+/* ================================================================
+   MOONBOX PLAYER — MOBILE FINAL LAYOUT
+   ================================================================
+
+   COLUMN 1 = SONG       → ROW 1 LEFT 50%
+   COLUMN 3 = TAG        → ROW 1 RIGHT 50%
+   COLUMN 2 = PLAYER     → ROW 2 FULL WIDTH
+
+   This version intentionally uses absolute positioning so that
+   previous grid/flex rules cannot interfere.
+   ================================================================ */
+
+@media (max-width: 768px) {
+  /* ==============================================================
+     PLAYER INFO — THE 2 ROW AREA
+     ============================================================== */
+
+  #playerScreen .player-info {
+    position: relative !important;
+
+    width: 100% !important;
+    height: 100% !important;
+
+    min-width: 0 !important;
+    min-height: 0 !important;
+
+    display: block !important;
+
+    margin: 0 !important;
+    padding: 0 !important;
+
+    box-sizing: border-box !important;
+
+    overflow: visible !important;
+  }
+
+  /* ==============================================================
+     COLUMN 1 — SONG
+     ROW 1 LEFT 50%
+     ============================================================== */
+
+  #playerScreen .player-song-row {
+    position: static !important;
+
+    width: 100% !important;
+    height: auto !important;
+
+    min-width: 0 !important;
+    min-height: 0 !important;
+
+    display: contents !important;
+
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+
+  #playerScreen .song-meta {
+    position: absolute !important;
+
+    left: 0 !important;
+    top: 0 !important;
+
+    width: 50% !important;
+    height: 50% !important;
+
+    min-width: 0 !important;
+
+    display: flex !important;
+
+    flex-direction: column !important;
+
+    align-items: flex-start !important;
+    justify-content: center !important;
+
+    gap: 1px !important;
+
+    margin: 0 !important;
+    padding: 0 8px 0 16px !important;
+
+    box-sizing: border-box !important;
+
+    overflow: hidden !important;
+
+    text-align: left !important;
+
+    z-index: 10 !important;
+  }
+
+  #playerScreen .player-title-editor {
+    width: 100% !important;
+
+    min-width: 0 !important;
+
+    overflow: hidden !important;
+  }
+
+  #playerScreen .player-title-row {
+    width: 100% !important;
+
+    min-width: 0 !important;
+
+    display: flex !important;
+
+    align-items: center !important;
+
+    gap: 5px !important;
+
+    overflow: hidden !important;
+  }
+
+  #playerScreen #playerTitle {
+    width: 100% !important;
+
+    max-width: 100% !important;
+    min-width: 0 !important;
+
+    margin: 0 !important;
+    padding: 0 !important;
+
+    font-size: 14px !important;
+    line-height: 17px !important;
+
+    white-space: nowrap !important;
+
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+  }
+
+  #playerScreen #playerArtist {
+    width: 100% !important;
+
+    max-width: 100% !important;
+    min-width: 0 !important;
+
+    margin: 0 !important;
+    padding: 0 !important;
+
+    font-size: 9px !important;
+    line-height: 11px !important;
+
+    white-space: nowrap !important;
+
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+  }
+
+  /* ==============================================================
+     COLUMN 3 — TAG BUTTON
+     ROW 1 RIGHT 50%
+     ============================================================== */
+
+  #playerScreen .player-tags-toggle {
+    position: absolute !important;
+
+    right: 8px !important;
+    top: 25% !important;
+
+    transform: translateY(-50%) !important;
+
+    width: 36px !important;
+    height: 36px !important;
+
+    min-width: 36px !important;
+
+    display: inline-flex !important;
+
+    align-items: center !important;
+    justify-content: center !important;
+
+    margin: 0 !important;
+    padding: 0 !important;
+
+    box-sizing: border-box !important;
+
+    z-index: 20 !important;
+  }
+
+  #playerScreen .player-tags-toggle:hover {
+    transform: translateY(-50%) !important;
+  }
+
+  #playerScreen .player-tags-toggle:active {
+    transform: translateY(-50%) scale(0.94) !important;
+  }
+
+  #playerScreen .player-tags-toggle svg {
+    width: 16px !important;
+    height: 16px !important;
+  }
+
+  /* ==============================================================
+     COLUMN 2 — PROGRESS
+     ROW 2 — 100%
+     ============================================================== */
+
+  #playerScreen .player-progress {
+    position: absolute !important;
+
+    left: 0 !important;
+    top: 50% !important;
+
+    width: 100% !important;
+    height: auto !important;
+
+    min-width: 0 !important;
+    max-width: none !important;
+
+    display: grid !important;
+
+    grid-template-columns:
+      34px
+      minmax(0, 1fr)
+      34px !important;
+
+    align-items: center !important;
+
+    gap: 6px !important;
+
+    margin: 0 !important;
+    padding: 0 8px !important;
+
+    transform: translateY(-10px) !important;
+
+    box-sizing: border-box !important;
+
+    z-index: 5 !important;
+  }
+
+  #playerScreen .player-progress span {
+    font-size: 8px !important;
+
+    line-height: 1 !important;
+
+    text-align: center !important;
+  }
+
+  #playerScreen #progressBar {
+    width: 100% !important;
+
+    min-width: 0 !important;
+
+    height: 5px !important;
+  }
+
+  /* ==============================================================
+     COLUMN 2 — CONTROLS
+     ROW 2 — 100%
+     ============================================================== */
+
+  #playerScreen .player-controls {
+    position: absolute !important;
+
+    left: 0 !important;
+    bottom: 0 !important;
+
+    width: 100% !important;
+    height: 50% !important;
+
+    min-width: 0 !important;
+
+    display: flex !important;
+
+    align-items: flex-end !important;
+    justify-content: center !important;
+
+    gap: 4px !important;
+
+    margin: 0 !important;
+    padding: 0 8px 4px !important;
+
+    box-sizing: border-box !important;
+
+    z-index: 5 !important;
+  }
+
+  /* ==============================================================
+     CONTROL BUTTONS
+     ============================================================== */
+
+  #playerScreen .player-controls button {
+    width: 30px !important;
+    height: 30px !important;
+
+    min-width: 30px !important;
+
+    flex: 0 0 30px !important;
+
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+
+  #playerScreen .player-controls button svg {
+    width: 15px !important;
+    height: 15px !important;
+  }
+
+  /* ==============================================================
+     SHUFFLE / REPEAT
+     ============================================================== */
+
+  #playerScreen .player-text-control {
+    min-width: 42px !important;
+
+    height: 30px !important;
+
+    padding: 0 3px !important;
+
+    font-size: 8px !important;
+  }
+
+  /* ==============================================================
+     MAIN PLAY BUTTON
+     ============================================================== */
+
+  #playerScreen #playPause,
+  #playerScreen .play-main {
+    width: 40px !important;
+    height: 40px !important;
+
+    min-width: 40px !important;
+
+    flex: 0 0 40px !important;
+
+    margin: 0 1px !important;
+  }
+
+  #playerScreen #playPause svg,
+  #playerScreen .play-main svg {
+    width: 17px !important;
+    height: 17px !important;
+  }
+}
+
+/* ================================================================
+   SMALL PHONE
+   ================================================================ */
+
+@media (max-width: 420px) {
+  #playerScreen .song-meta {
+    padding-left: 12px !important;
+  }
+
+  #playerScreen #playerTitle {
+    font-size: 13px !important;
+    line-height: 16px !important;
+  }
+
+  #playerScreen #playerArtist {
+    font-size: 8px !important;
+    line-height: 10px !important;
+  }
+
+  #playerScreen .player-tags-toggle {
+    right: 6px !important;
+
+    width: 32px !important;
+    height: 32px !important;
+
+    min-width: 32px !important;
+  }
+
+  #playerScreen .player-progress {
+    grid-template-columns:
+      30px
+      minmax(0, 1fr)
+      30px !important;
+
+    gap: 4px !important;
+
+    padding-left: 5px !important;
+    padding-right: 5px !important;
+  }
+
+  #playerScreen .player-controls {
+    gap: 2px !important;
+
+    padding-left: 4px !important;
+    padding-right: 4px !important;
+  }
+
+  #playerScreen .player-controls button {
+    width: 28px !important;
+    height: 28px !important;
+
+    min-width: 28px !important;
+
+    flex-basis: 28px !important;
+  }
+
+  #playerScreen #playPause,
+  #playerScreen .play-main {
+    width: 36px !important;
+    height: 36px !important;
+
+    min-width: 36px !important;
+
+    flex-basis: 36px !important;
+  }
+}
+
+/* ================================================================
+   VERY SMALL PHONE
+   ================================================================ */
+
+@media (max-width: 300px) {
+  #playerScreen .song-meta {
+    padding-left: 9px !important;
+  }
+
+  #playerScreen #playerTitle {
+    font-size: 12px !important;
+    line-height: 15px !important;
+  }
+
+  #playerScreen #playerArtist {
+    font-size: 7px !important;
+    line-height: 9px !important;
+  }
+
+  #playerScreen .player-tags-toggle {
+    right: 4px !important;
+
+    width: 28px !important;
+    height: 28px !important;
+
+    min-width: 28px !important;
+  }
+
+  #playerScreen .player-progress {
+    grid-template-columns:
+      27px
+      minmax(0, 1fr)
+      27px !important;
+
+    gap: 3px !important;
+  }
+
+  #playerScreen .player-controls {
+    gap: 1px !important;
+
+    padding-left: 2px !important;
+    padding-right: 2px !important;
+  }
+
+  #playerScreen .player-controls button {
+    width: 26px !important;
+    height: 26px !important;
+
+    min-width: 26px !important;
+
+    flex-basis: 26px !important;
+  }
+
+  #playerScreen #playPause,
+  #playerScreen .play-main {
+    width: 32px !important;
+    height: 32px !important;
+
+    min-width: 32px !important;
+
+    flex-basis: 32px !important;
+  }
+}
+
+@media (max-width: 768px) {
+  /* Add space between Row 1 and Row 2 */
+  #playerScreen .player-progress {
+    top: calc(50% + 12px) !important;
+  }
+
+  #playerScreen .player-controls {
+    bottom: -8px !important;
+  }
+}
+
+@media (max-width: 768px) {
+  #playerScreen .player-progress {
+    width: 75% !important;
+    left: 12.5% !important;
+    padding: 0 !important;
   }
 }
