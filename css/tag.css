@@ -323,7 +323,7 @@
 
 .tag-song-count {
   max-width: 100%;
-  margin-top: -8px;
+  margin-top: -6px !important;
   color: #666;
   font-size: 10px;
   font-weight: 400;
@@ -404,8 +404,12 @@
 }
 
 @keyframes tagModalFadeIn {
-  from { opacity: 0; }
-  to { opacity: 1; }
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
 }
 
 /* ==========================================================
@@ -1175,8 +1179,12 @@
 }
 
 @keyframes moonboxPopupFade {
-  from { opacity: 0; }
-  to { opacity: 1; }
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
 }
 
 .moonbox-navigation-popup {
@@ -1640,7 +1648,7 @@
   }
 
   .tag-song-count {
-    margin-top: -3px;
+    margin-top: -25px !important;
     font-size: 8px;
   }
 
