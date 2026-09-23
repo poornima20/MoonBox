@@ -538,6 +538,43 @@ function createTagElement(tag) {
     </small>
   `;
 
+  /* ==========================================================
+     DRAG TAG → LIBRARY SONG
+  ========================================================== */
+
+  if (tag.id !== "all") {
+    button.draggable = true;
+
+    button.addEventListener("dragstart", (event) => {
+      const dragData = {
+        type: "tag",
+        tagId: String(tag.id),
+        tagName: String(tag.name),
+      };
+
+      event.dataTransfer.effectAllowed = "copy";
+      event.dataTransfer.setData("application/json", JSON.stringify(dragData));
+
+      document.dispatchEvent(
+        new CustomEvent("moonbox:dragStart", {
+          detail: dragData,
+        }),
+      );
+
+      button.classList.add("moonbox-dragging");
+    });
+
+    button.addEventListener("dragend", () => {
+      button.classList.remove("moonbox-dragging");
+
+      document.dispatchEvent(new CustomEvent("moonbox:dragEnd"));
+    });
+  }
+
+  /* ==========================================================
+     NORMAL TAG SELECTION
+  ========================================================== */
+
   button.addEventListener("click", () => {
     toggleTagSelection(tag.id);
   });
@@ -3030,6 +3067,200 @@ document.addEventListener("moonbox:cloudTagsReady", (event) => {
   );
 
   console.log("MoonBox: cloud + folder tags merged", tags);
+});
+
+/* ==========================================================
+   MOONBOX TAG ↔ LIBRARY DRAG/DROP
+========================================================== */
+
+let moonboxDragLabel = null;
+let moonboxDragData = null;
+
+function createMoonBoxDragLabel() {
+  if (moonboxDragLabel) {
+    return moonboxDragLabel;
+  }
+
+  moonboxDragLabel = document.createElement("div");
+
+  moonboxDragLabel.className = "moonbox-drag-label";
+
+  document.body.appendChild(moonboxDragLabel);
+
+  return moonboxDragLabel;
+}
+
+function updateMoonBoxDragLabel(text, x = 0, y = 0) {
+  const label = createMoonBoxDragLabel();
+
+  label.textContent = text;
+
+  label.style.left = `${x + 14}px`;
+  label.style.top = `${y + 14}px`;
+
+  label.classList.add("show");
+}
+
+function hideMoonBoxDragLabel() {
+  if (!moonboxDragLabel) {
+    return;
+  }
+
+  moonboxDragLabel.classList.remove("show");
+}
+
+document.addEventListener("moonbox:dragStart", (event) => {
+  moonboxDragData = event.detail || null;
+
+  if (!moonboxDragData) {
+    return;
+  }
+
+  if (moonboxDragData.type === "tag") {
+    updateMoonBoxDragLabel(`Tag "${moonboxDragData.tagName}" → drop on a song`);
+  }
+});
+
+document.addEventListener("moonbox:dragEnd", () => {
+  moonboxDragData = null;
+
+  hideMoonBoxDragLabel();
+
+  document.querySelectorAll(".moonbox-drop-target").forEach((element) => {
+    element.classList.remove("moonbox-drop-target");
+  });
+});
+
+document.addEventListener("dragover", (event) => {
+  if (!moonboxDragData) {
+    return;
+  }
+
+  if (moonboxDragData.type === "tag") {
+    const song = event.target.closest(".library-song");
+
+    if (song) {
+      const songName =
+        song.querySelector(".song-info h3")?.textContent?.trim() || "Song";
+
+      updateMoonBoxDragLabel(
+        `Tag "${moonboxDragData.tagName}" → Song "${songName}"`,
+        event.clientX,
+        event.clientY,
+      );
+    }
+  }
+
+  if (moonboxDragData.type === "song") {
+    const tag = event.target.closest(".tag");
+
+    if (tag && tag.dataset.tagId !== "all") {
+      const tagName =
+        tag.querySelector(".tag-name")?.textContent?.trim() || "Tag";
+
+      updateMoonBoxDragLabel(
+        `Song "${moonboxDragData.songName}" → Tag "${tagName}"`,
+        event.clientX,
+        event.clientY,
+      );
+    }
+  }
+});
+
+document.addEventListener("drop", () => {
+  hideMoonBoxDragLabel();
+});
+
+/* ==========================================================
+   DROP LIBRARY SONG ON TAG
+========================================================== */
+
+document.addEventListener("dragover", (event) => {
+  const tagElement = event.target.closest(".tag");
+
+  if (!tagElement) {
+    return;
+  }
+
+  if (tagElement.dataset.tagId === "all") {
+    return;
+  }
+
+  event.preventDefault();
+
+  tagElement.classList.add("moonbox-drop-target");
+
+  event.dataTransfer.dropEffect = "copy";
+});
+
+document.addEventListener("dragleave", (event) => {
+  const tagElement = event.target.closest(".tag");
+
+  if (!tagElement) {
+    return;
+  }
+
+  if (event.relatedTarget && tagElement.contains(event.relatedTarget)) {
+    return;
+  }
+
+  tagElement.classList.remove("moonbox-drop-target");
+});
+
+document.addEventListener("drop", (event) => {
+  const tagElement = event.target.closest(".tag");
+
+  if (!tagElement) {
+    return;
+  }
+
+  event.preventDefault();
+
+  tagElement.classList.remove("moonbox-drop-target");
+
+  if (tagElement.dataset.tagId === "all") {
+    return;
+  }
+
+  const raw = event.dataTransfer.getData("application/json");
+
+  if (!raw) {
+    return;
+  }
+
+  let data;
+
+  try {
+    data = JSON.parse(raw);
+  } catch {
+    return;
+  }
+
+  if (data.type !== "song") {
+    return;
+  }
+
+  const tagId = tagElement.dataset.tagId;
+
+  if (!tagId || !data.songId) {
+    return;
+  }
+
+  const tag = tags.find((item) => String(item.id) === String(tagId));
+
+  if (!tag) {
+    return;
+  }
+
+  document.dispatchEvent(
+    new CustomEvent("moonbox:assignTagToSong", {
+      detail: {
+        songId: String(data.songId),
+        tagId: String(tagId),
+        tagName: String(tag.name || ""),
+      },
+    }),
+  );
 });
 
 /* ==========================================================
