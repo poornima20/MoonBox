@@ -1649,10 +1649,21 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   /* ==========================================================
-   INITIALIZE
-========================================================== */
+     INITIALIZE
+     Player opens with Tags section CLOSED
+  ========================================================== */
+
+  if (playerScreen) {
+    playerScreen.classList.add("tags-collapsed");
+    playerScreen.classList.remove("tags-expanded");
+  }
+
+  if (togglePlayerTags) {
+    togglePlayerTags.setAttribute("aria-expanded", "false");
+    togglePlayerTags.setAttribute("aria-label", "Expand tags");
+    togglePlayerTags.setAttribute("title", "Expand tags");
+  }
 
   loadSong(currentSong);
-
   lucide.createIcons();
 });
