@@ -72,8 +72,8 @@ document.addEventListener("DOMContentLoaded", () => {
    STATE
 ========================================================== */
 
-  let currentSong = 0;
-
+  let currentSong = -1;
+  let hasActiveSong = false;
   let playing = false;
 
   // 0 = Off
@@ -229,6 +229,11 @@ document.addEventListener("DOMContentLoaded", () => {
     if (!playerSelectedTags) return;
 
     playerSelectedTags.innerHTML = "";
+
+    /* No song has been selected yet */
+    if (!hasActiveSong) {
+      return;
+    }
 
     const song = songs[currentSong];
 
@@ -743,10 +748,23 @@ document.addEventListener("DOMContentLoaded", () => {
     });
 
     currentSong = index;
+    hasActiveSong = true;
 
     loadSong(currentSong);
 
     playSong();
+  });
+
+  /* ==========================================================
+   PAUSE PLAYER FROM LIBRARY
+========================================================== */
+
+  document.addEventListener("moonbox:pausePlayer", () => {
+    if (!playing) {
+      return;
+    }
+
+    pauseSong();
   });
 
   /* ==========================================================
@@ -1195,6 +1213,18 @@ document.addEventListener("DOMContentLoaded", () => {
     } else {
       playSong();
     }
+  });
+
+  /* ==========================================================
+   PAUSE PLAYER FROM LIBRARY
+========================================================== */
+
+  document.addEventListener("moonbox:pausePlayer", () => {
+    if (!playing) {
+      return;
+    }
+
+    pauseSong();
   });
 
   nextButton.addEventListener("click", next);
@@ -1649,21 +1679,56 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   /* ==========================================================
-     INITIALIZE
-     Player opens with Tags section CLOSED
-  ========================================================== */
+   INITIALIZE
+   Player starts EMPTY.
+   No song or song tags are selected until the user
+   chooses a song from the Library.
+========================================================== */
 
+  hasActiveSong = false;
+  currentSong = -1;
+
+  /* Keep Tags section closed */
   if (playerScreen) {
     playerScreen.classList.add("tags-collapsed");
     playerScreen.classList.remove("tags-expanded");
   }
 
+  /* Update toggle state */
   if (togglePlayerTags) {
     togglePlayerTags.setAttribute("aria-expanded", "false");
     togglePlayerTags.setAttribute("aria-label", "Expand tags");
     togglePlayerTags.setAttribute("title", "Expand tags");
   }
 
-  loadSong(currentSong);
+  /* Make sure no song tags are displayed */
+  if (playerSelectedTags) {
+    playerSelectedTags.innerHTML = "";
+  }
+
+  /* Initial empty player state */
+  if (title) {
+    title.textContent = "Your Music";
+  }
+
+  if (artist) {
+    artist.textContent = "MoonBox";
+  }
+
+  if (currentTime) {
+    currentTime.textContent = "0:00";
+  }
+
+  if (totalTime) {
+    totalTime.textContent = "0:00";
+  }
+
+  if (progress) {
+    progress.value = 0;
+    progress.max = 0;
+    progress.style.setProperty("--progress", "0%");
+  }
+
+  /* Do NOT call loadSong() here */
   lucide.createIcons();
 });
