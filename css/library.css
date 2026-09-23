@@ -18,7 +18,6 @@
    when the Tags / Library divider is moved.
    ========================================================== */
 
-
 /* ==========================================================
    1. LIBRARY PANEL / RESPONSIVE CONTAINER
    ========================================================== */
@@ -38,7 +37,6 @@
 .library-screen * {
   box-sizing: border-box;
 }
-
 
 /* ==========================================================
    2. LIBRARY HEADER
@@ -94,7 +92,6 @@
 
   flex-shrink: 0;
 }
-
 
 /* ==========================================================
    3. FILTER BUTTON
@@ -158,7 +155,6 @@
   font-weight: 600;
   white-space: nowrap;
 }
-
 
 /* ==========================================================
    4. FILTER POPUP
@@ -304,7 +300,6 @@
   color: #8d8d8d;
 }
 
-
 /* ==========================================================
    5. SELECTED TAGS
    ========================================================== */
@@ -441,7 +436,6 @@
   white-space: nowrap;
 }
 
-
 /* ==========================================================
    6. SEARCH
    ========================================================== */
@@ -495,7 +489,6 @@
 .library-search input::placeholder {
   color: #777;
 }
-
 
 /* ==========================================================
    7. META ROW
@@ -589,7 +582,6 @@
 .library-sort-button:hover {
   color: #bdbdbd;
 }
-
 
 /* ==========================================================
    8. SORT MENU
@@ -686,7 +678,6 @@
   cursor: default;
 }
 
-
 /* ==========================================================
    9. SONG LIST
    ========================================================== */
@@ -704,7 +695,6 @@
 
   overflow: visible;
 }
-
 
 /* ==========================================================
    10. SONG ROW — NORMAL
@@ -746,7 +736,6 @@
 
   box-shadow: var(--shadow-moon-strong);
 }
-
 
 /* ==========================================================
    11. PLAY BUTTON
@@ -829,7 +818,6 @@
   stroke-width: 2.4;
 }
 
-
 /* ==========================================================
    12. SONG INFO
    ========================================================== */
@@ -884,7 +872,6 @@
   color: var(--text-active);
 }
 
-
 /* ==========================================================
    13. SONG RIGHT SIDE
    ========================================================== */
@@ -927,7 +914,6 @@
   color: #999;
 }
 
-
 /* ==========================================================
    14. FOOTER
    ========================================================== */
@@ -949,7 +935,6 @@
 
   font-size: 14px;
 }
-
 
 /* ==========================================================
    15. CONTAINER RESPONSIVE — 600px+
@@ -1104,7 +1089,6 @@
   }
 }
 
-
 /* ==========================================================
    16. CONTAINER RESPONSIVE — 450px
    ========================================================== */
@@ -1203,7 +1187,6 @@
     font-size: 10px;
   }
 }
-
 
 /* ==========================================================
    17. CONTAINER RESPONSIVE — 340px
@@ -1312,7 +1295,6 @@
   }
 }
 
-
 /* ==========================================================
    18. CONTAINER RESPONSIVE — 260px
    ==========================================================
@@ -1417,7 +1399,6 @@
     font-size: 9px;
   }
 }
-
 
 /* ==========================================================
    19. CONTAINER RESPONSIVE — 190px
@@ -1528,7 +1509,6 @@
   }
 }
 
-
 /* ==========================================================
    20. CONTAINER RESPONSIVE — 150px
    ==========================================================
@@ -1614,8 +1594,6 @@
     font-size: 7px;
   }
 }
-
-
 
 /* ==========================================================
    20A. MOBILE COMPACT LIBRARY
@@ -2241,7 +2219,6 @@
   }
 }
 
-
 /* ==========================================================
    22. SMALL PHONE FALLBACK
    ========================================================== */
@@ -2284,7 +2261,6 @@
   }
 }
 
-
 /* ==========================================================
    23. TOUCH / ACCESSIBILITY
    ========================================================== */
@@ -2310,7 +2286,6 @@
   }
 }
 
-
 /* ==========================================================
    24. FINAL WIDTH SAFETY
    ========================================================== */
@@ -2331,4 +2306,78 @@
 
 .library-song {
   contain: layout paint;
+}
+
+/* ==========================================================
+   VERY SMALL LIBRARY PANEL
+   Keep song name + duration on ONE LINE
+   Make play button smaller
+   ========================================================== */
+
+@container library (max-width: 260px) {
+  .library-song {
+    height: 44px !important;
+    display: flex !important;
+    align-items: center !important;
+    gap: 6px !important;
+    padding: 3px 5px !important;
+  }
+
+  /* Smaller play circle */
+  .song-action {
+    width: 24px !important;
+    height: 24px !important;
+    min-width: 24px !important;
+    min-height: 24px !important;
+
+    border-radius: 50% !important;
+    box-shadow: none !important;
+  }
+
+  .song-action svg {
+    width: 12px !important;
+    height: 12px !important;
+  }
+
+  /* Song name + duration stay on the same row */
+  .song-info {
+    flex: 1 1 auto !important;
+    min-width: 0 !important;
+    padding: 0 !important;
+    margin: 0 !important;
+  }
+
+  .song-info h3 {
+    font-size: 11px !important;
+    line-height: 1.2 !important;
+    margin: 0 !important;
+
+    white-space: nowrap !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+  }
+
+  /* Remove the old "duration underneath" positioning */
+  .song-right {
+    position: static !important;
+    width: auto !important;
+    min-width: auto !important;
+
+    display: flex !important;
+    align-items: center !important;
+    justify-content: flex-end !important;
+
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+
+  .song-duration {
+    padding: 0 !important;
+    margin: 0 !important;
+
+    font-size: 8px !important;
+    line-height: 1 !important;
+    white-space: nowrap !important;
+    flex-shrink: 0 !important;
+  }
 }
