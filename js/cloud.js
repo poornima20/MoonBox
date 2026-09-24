@@ -965,7 +965,7 @@ document.addEventListener("moonbox:songTagsChanged", async (event) => {
       "MoonBox Cloud: tag membership synced",
       String(tagId),
       getCloudSongId(song),
-      added ? "ADD" : "REMOVE",
+      added ? "ADD" : "REMOVE",git 
     );
   } catch (error) {
     console.error(
