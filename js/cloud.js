@@ -1234,24 +1234,6 @@ document.addEventListener("moonbox:tagGroupsChanged", async (event) => {
   }
 });
 
-async function addSongToCloudTag(tagId, song) {
-  const user = requireCloudUser();
-  const cloudSongId = getCloudSongId(song);
-
-  const tagRef = doc(db, "users", user.uid, "tags", String(tagId));
-
-  await setDoc(
-    tagRef,
-    {
-      songIds: arrayUnion(cloudSongId),
-      updatedAt: serverTimestamp(),
-    },
-    { merge: true },
-  );
-
-  console.log("MoonBox Cloud: song added to tag", cloudSongId, tagId);
-}
-
 async function removeSongFromCloudTag(tagId, song) {
   const user = requireCloudUser();
   const cloudSongId = getCloudSongId(song);
