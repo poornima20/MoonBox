@@ -116,16 +116,45 @@ const DEFAULT_GROUP = {
 
 let tagGroups = loadTagGroups();
 
-/*
-   Cloud tag membership
+/* ==========================================================
+   LOCAL SONG ↔ TAG MEMBERSHIP
+========================================================== */
 
+/*
    Key:
-      tagId
+      songId
 
    Value:
-      Set of cloud song IDs belonging to that tag
+      Array of tag IDs belonging to that song
+
+   Example:
+
+   {
+     "song-123": ["chill", "night"],
+     "song-456": ["study"]
+   }
+
+   This is the local source of truth for user-created
+   tag membership.
+
+   Firebase will be synchronized separately.
 */
-let cloudTagSongIds = new Map();
+
+let localTagMembership = loadTagMembership();
+
+/* ==========================================================
+   PENDING CLOUD TAG SYNC
+========================================================== */
+
+/*
+   Changes are saved locally first.
+
+   Firebase synchronization happens afterwards.
+
+   This means the UI does not have to wait for Firebase.
+*/
+
+let pendingTagSync = loadPendingTagSync();
 
 /* ==========================================================
    ELEMENTS
@@ -258,6 +287,171 @@ function saveTagGroups() {
   } catch (error) {
     console.warn("MoonBox: Could not save tag groups.", error);
   }
+}
+
+/* ==========================================================
+   LOAD SONG ↔ TAG MEMBERSHIP
+========================================================== */
+
+function loadTagMembership() {
+  try {
+    const saved = localStorage.getItem("moonboxTagMembership");
+
+    if (!saved) {
+      return {};
+    }
+
+    const parsed = JSON.parse(saved);
+
+    if (!parsed || typeof parsed !== "object" || Array.isArray(parsed)) {
+      return {};
+    }
+
+    return parsed;
+  } catch (error) {
+    console.warn("MoonBox: Could not load tag membership.", error);
+
+    return {};
+  }
+}
+
+/* ==========================================================
+   SAVE SONG ↔ TAG MEMBERSHIP
+========================================================== */
+
+function saveTagMembership() {
+  try {
+    localStorage.setItem(
+      "moonboxTagMembership",
+      JSON.stringify(localTagMembership),
+    );
+  } catch (error) {
+    console.warn("MoonBox: Could not save tag membership.", error);
+  }
+}
+
+/* ==========================================================
+   LOAD PENDING TAG SYNC
+========================================================== */
+
+function loadPendingTagSync() {
+  try {
+    const saved = localStorage.getItem("moonboxPendingTagSync");
+
+    if (!saved) {
+      return [];
+    }
+
+    const parsed = JSON.parse(saved);
+
+    return Array.isArray(parsed) ? parsed : [];
+  } catch (error) {
+    console.warn("MoonBox: Could not load pending tag sync.", error);
+
+    return [];
+  }
+}
+
+/* ==========================================================
+   SAVE PENDING TAG SYNC
+========================================================== */
+
+function savePendingTagSync() {
+  try {
+    localStorage.setItem(
+      "moonboxPendingTagSync",
+      JSON.stringify(pendingTagSync),
+    );
+  } catch (error) {
+    console.warn("MoonBox: Could not save pending tag sync.", error);
+  }
+}
+
+/* ==========================================================
+   ADD SONG TO TAG LOCALLY
+========================================================== */
+
+function addSongToLocalTag(songId, tagId) {
+  songId = String(songId);
+  tagId = String(tagId);
+
+  if (!songId || !tagId || tagId === "all") {
+    return false;
+  }
+
+  if (!Array.isArray(localTagMembership[songId])) {
+    localTagMembership[songId] = [];
+  }
+
+  if (localTagMembership[songId].includes(tagId)) {
+    return false;
+  }
+
+  localTagMembership[songId].push(tagId);
+
+  saveTagMembership();
+
+  return true;
+}
+
+/* ==========================================================
+   REMOVE SONG FROM TAG LOCALLY
+========================================================== */
+
+function removeSongFromLocalTag(songId, tagId) {
+  songId = String(songId);
+  tagId = String(tagId);
+
+  if (!songId || !tagId) {
+    return false;
+  }
+
+  if (!Array.isArray(localTagMembership[songId])) {
+    return false;
+  }
+
+  const previousLength = localTagMembership[songId].length;
+
+  localTagMembership[songId] = localTagMembership[songId].filter(
+    (id) => String(id) !== tagId,
+  );
+
+  if (localTagMembership[songId].length === 0) {
+    delete localTagMembership[songId];
+  }
+
+  if (localTagMembership[songId]?.length !== previousLength) {
+    saveTagMembership();
+    return true;
+  }
+
+  return false;
+}
+
+/* ==========================================================
+   CHECK SONG ↔ TAG MEMBERSHIP
+========================================================== */
+
+function songHasLocalTag(songId, tagId) {
+  songId = String(songId);
+  tagId = String(tagId);
+
+  return (
+    Array.isArray(localTagMembership[songId]) &&
+    localTagMembership[songId].includes(tagId)
+  );
+}
+
+/* ==========================================================
+   GET SONG TAGS
+========================================================== */
+
+function getLocalSongTagIds(songId) {
+  songId = String(songId);
+
+  return Array.isArray(localTagMembership[songId])
+    ? [...localTagMembership[songId]]
+    : [];
 }
 
 /* ==========================================================
@@ -752,37 +946,37 @@ function getLocalCloudSongId(song) {
 function getTagSongCount(tagId) {
   const allSongs = getAllMoonBoxSongs();
 
-  /* -----------------------------------------------
-     ALL is always local
-  ------------------------------------------------ */
-
+  /* ALL */
   if (tagId === "all") {
     return allSongs.length;
   }
 
   /* -----------------------------------------------
-     Cloud tag
+     Folder tags
 
-     Use Firebase tag.songIds.
-
-     This means the count works even when the
-     local song.tags array has not been updated yet.
+     Folder membership is still owned by folders.js.
   ------------------------------------------------ */
 
-  if (cloudTagSongIds.has(tagId)) {
-    return cloudTagSongIds.get(tagId).size;
+  const tag = tags.find((item) => String(item.id) === String(tagId));
+
+  if (tag?.folderTag) {
+    return allSongs.filter((song) => {
+      const songTags = Array.isArray(song.tags) ? song.tags : [];
+
+      return songTags.includes(tagId);
+    }).length;
   }
 
   /* -----------------------------------------------
-     Folder/local tag
+     User-created tags
 
-     Folder tags remain completely local.
+     Use persistent local membership.
   ------------------------------------------------ */
 
   return allSongs.filter((song) => {
-    const songTags = Array.isArray(song.tags) ? song.tags : [];
+    const songId = getLocalCloudSongId(song);
 
-    return songTags.includes(tagId);
+    return songId && songHasLocalTag(songId, tagId);
   }).length;
 }
 
@@ -798,38 +992,28 @@ function getSelectedSongCount() {
     return 0;
   }
 
-  /* -----------------------------------------------
-     ALL = every local song
-  ------------------------------------------------ */
-
+  /* ALL */
   if (selectedTagIds.has("all")) {
     return allSongs.length;
   }
 
   const selected = [...selectedTagIds];
 
-  /* -----------------------------------------------
-     UNION
-     
-     Song needs ANY selected tag.
-     
-     Cloud tags are matched using the same
-     cloud song ID used by cloud.js.
-  ------------------------------------------------ */
-
   const matchingSongs = allSongs.filter((song) => {
-    const localTags = Array.isArray(song.tags) ? song.tags : [];
+    const songId = getLocalCloudSongId(song);
 
-    const cloudSongId = getLocalCloudSongId(song);
+    const localFolderTags = Array.isArray(song.tags) ? song.tags : [];
 
     return selected.some((tagId) => {
-      /* Cloud tag */
-      if (cloudTagSongIds.has(tagId)) {
-        return cloudSongId && cloudTagSongIds.get(tagId).has(cloudSongId);
+      const tag = tags.find((item) => String(item.id) === String(tagId));
+
+      /* Folder tag */
+      if (tag?.folderTag) {
+        return localFolderTags.includes(tagId);
       }
 
-      /* Local/folder tag */
-      return localTags.includes(tagId);
+      /* User-created tag */
+      return songId && songHasLocalTag(songId, tagId);
     });
   });
 
@@ -1890,6 +2074,12 @@ function deleteTag(tagId) {
 
   if (!confirmed) return;
 
+  /* Remove this tag from every local song */
+
+  Object.keys(localTagMembership).forEach((songId) => {
+    removeSongFromLocalTag(songId, tagId);
+  });
+
   tags = tags.filter((item) => item.id !== tagId);
 
   selectedTagIds.delete(tagId);
@@ -2825,30 +3015,17 @@ document.addEventListener("moonbox:songTagsChanged", (event) => {
     return;
   }
 
-  /* --------------------------------------------------------
-   Synchronize cloud tag membership in memory.
+  const songId = getLocalCloudSongId(song);
+  const changedTagId = event.detail?.tagId;
+  const added = event.detail?.added;
 
-   This keeps the Tag page immediately updated when
-   a tag is added/removed from the Player.
--------------------------------------------------------- */
-
-  const cloudSongId = getLocalCloudSongId(song);
-
-  if (cloudSongId) {
-    const changedTagId = event.detail?.tagId;
-    const added = event.detail?.added;
-
-    if (changedTagId && cloudTagSongIds.has(changedTagId)) {
-      const songIds = cloudTagSongIds.get(changedTagId);
-
-      if (added) {
-        songIds.add(cloudSongId);
-      } else {
-        songIds.delete(cloudSongId);
-      }
+  if (songId && changedTagId) {
+    if (added) {
+      addSongToLocalTag(songId, changedTagId);
+    } else {
+      removeSongFromLocalTag(songId, changedTagId);
     }
   }
-
   /* --------------------------------------------------------
      Update the matching local song inside currentFolders
   -------------------------------------------------------- */
@@ -3261,6 +3438,20 @@ document.addEventListener("drop", (event) => {
       },
     }),
   );
+});
+
+/* ==========================================================
+   PUBLIC TAG DATA
+========================================================== */
+
+document.addEventListener("moonbox:requestTagMembership", (event) => {
+  if (typeof event.detail?.setMembership !== "function") {
+    return;
+  }
+
+  event.detail.setMembership({
+    ...localTagMembership,
+  });
 });
 
 /* ==========================================================

@@ -659,23 +659,55 @@ RENDER SONGS
       return;
     }
 
-    if (!Array.isArray(song.tags)) {
-      song.tags = [];
+    const availableTags = getAvailableTags();
+
+    const tag = availableTags.find((item) => String(item.id) === String(tagId));
+
+    if (!tag) {
+      return;
     }
 
-    /* Already assigned */
-    if (song.tags.includes(tagId)) {
-      showMoonBoxDragMessage(
-        `Song "${song.name}" already has tag "${tagName}"`,
+    /*
+     * Folder tags are owned by the folder/song data.
+     */
+    if (tag.folderTag) {
+      if (!Array.isArray(song.tags)) {
+        song.tags = [];
+      }
+
+      if (song.tags.includes(tagId)) {
+        showMoonBoxDragMessage(
+          `Song "${song.name}" already has tag "${tagName}"`,
+        );
+
+        return;
+      }
+
+      song.tags.push(tagId);
+
+      document.dispatchEvent(
+        new CustomEvent("moonbox:songTagsChanged", {
+          detail: {
+            song,
+            tagId,
+            added: true,
+          },
+        }),
       );
+
+      renderSongs();
+
+      showMoonBoxDragMessage(`Tag "${tagName}" added to "${song.name}"`);
 
       return;
     }
 
-    /* Add tag */
-    song.tags.push(tagId);
-
-    /* Tell the rest of MoonBox */
+    /*
+     * User-created tag.
+     *
+     * Do NOT modify song.tags.
+     * Tell tag.js instead.
+     */
     document.dispatchEvent(
       new CustomEvent("moonbox:songTagsChanged", {
         detail: {
@@ -686,7 +718,6 @@ RENDER SONGS
       }),
     );
 
-    /* Refresh Library */
     renderSongs();
 
     showMoonBoxDragMessage(`Tag "${tagName}" added to "${song.name}"`);
@@ -860,6 +891,11 @@ RENDER SONGS
     renderSongs();
   });
 
+  document.addEventListener("moonbox:songTagsChanged", () => {
+    renderTags();
+    renderSongs();
+  });
+
   function getAvailableTags() {
     let availableTags = [];
 
@@ -876,6 +912,22 @@ RENDER SONGS
     return availableTags;
   }
 
+  function getLocalTagMembership() {
+    let membership = {};
+
+    document.dispatchEvent(
+      new CustomEvent("moonbox:requestTagMembership", {
+        detail: {
+          setMembership(value) {
+            membership = value && typeof value === "object" ? value : {};
+          },
+        },
+      }),
+    );
+
+    return membership;
+  }
+
   /* ======================================================
    CHECK SONG MEMBERSHIP IN A TAG
 
@@ -888,38 +940,46 @@ RENDER SONGS
    No Firebase read happens here.
 ====================================================== */
 
+  function getSongMembershipId(song) {
+    return String(
+      String(song?.name || "")
+        .normalize("NFKC")
+        .trim()
+        .toLowerCase()
+        .replace(/\.[^/.]+$/, "")
+        .replace(/[^a-z0-9]+/g, "-")
+        .replace(/^-+|-+$/g, ""),
+    );
+  }
+
   function songHasTag(song, tagId, tagMap) {
     if (!song) {
       return false;
     }
 
-    const tag = tagMap.get(tagId);
+    const tag = tagMap.get(String(tagId));
 
-    /* ----------------------------------------------------
-     Cloud tag
-  ---------------------------------------------------- */
+    /*
+     * Folder tags remain owned by the song/folder data.
+     */
+    if (tag?.folderTag) {
+      const songTags = Array.isArray(song.tags) ? song.tags : [];
 
-    if (tag && Array.isArray(tag.songIds)) {
-      const cloudSongId = String(
-        String(song.name || "")
-          .normalize("NFKC")
-          .trim()
-          .toLowerCase()
-          .replace(/\.[^/.]+$/, "")
-          .replace(/[^a-z0-9]+/g, "-")
-          .replace(/^-+|-+$/g, ""),
-      );
-
-      return tag.songIds.map(String).includes(cloudSongId);
+      return songTags.includes(tagId);
     }
 
-    /* ----------------------------------------------------
-     Local/folder tag
-  ---------------------------------------------------- */
+    /*
+     * User-created tags come from tag.js local membership.
+     */
+    const membership = getLocalTagMembership();
+    const songId = getSongMembershipId(song);
 
-    const songTags = Array.isArray(song.tags) ? song.tags : [];
+    const songTags = Array.isArray(membership[songId])
+      ? membership[songId]
+      : [];
 
-    return songTags.includes(tagId);
+    return songTags.includes(String(tagId));
   }
+
   lucide.createIcons();
 });
