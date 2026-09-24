@@ -32,11 +32,13 @@ import {
   arrayRemove,
   query,
   orderBy,
+  onSnapshot,
 } from "https://www.gstatic.com/firebasejs/12.18.0/firebase-firestore.js";
-
 /* ==========================================================
    CLOUD STATE
 ========================================================== */
+
+let unsubscribeCloudTags = null;
 
 let cloudUser = null;
 
@@ -75,9 +77,7 @@ onAuthStateChanged(auth, async (user) => {
 
     await syncCloudTagsToLocal();
 
-    /*
-       Tell the rest of MoonBox that cloud is ready.
-    */
+    listenToCloudTags();
 
     document.dispatchEvent(
       new CustomEvent("moonbox:cloudReady", {
@@ -88,6 +88,11 @@ onAuthStateChanged(auth, async (user) => {
     );
   } else {
     console.log("MoonBox Cloud: signed out");
+
+    if (unsubscribeCloudTags) {
+      unsubscribeCloudTags();
+      unsubscribeCloudTags = null;
+    }
 
     syncCache.clear();
 
@@ -395,6 +400,55 @@ function createSongSignature(song) {
 
     notes: typeof song.notes === "string" ? song.notes : "",
   });
+}
+
+/*==========================================================
+   Listen to cloud 
+========================================================== */
+function listenToCloudTags() {
+  if (!cloudReady || !cloudUser) {
+    return;
+  }
+
+  /* Stop previous listener */
+  if (unsubscribeCloudTags) {
+    unsubscribeCloudTags();
+    unsubscribeCloudTags = null;
+  }
+
+  const tagsRef = getTagsCollection();
+
+  unsubscribeCloudTags = onSnapshot(
+    tagsRef,
+    (snapshot) => {
+      const cloudTags = [];
+
+      snapshot.forEach((document) => {
+        /* _groups is not a tag */
+        if (document.id === "_groups") {
+          return;
+        }
+
+        cloudTags.push({
+          id: document.id,
+          ...document.data(),
+        });
+      });
+
+      console.log("MoonBox Cloud: realtime tags received", cloudTags);
+
+      document.dispatchEvent(
+        new CustomEvent("moonbox:cloudTagsReady", {
+          detail: {
+            tags: cloudTags,
+          },
+        }),
+      );
+    },
+    (error) => {
+      console.error("MoonBox Cloud: realtime tag listener failed", error);
+    },
+  );
 }
 
 /* ==========================================================
@@ -965,7 +1019,8 @@ document.addEventListener("moonbox:songTagsChanged", async (event) => {
       "MoonBox Cloud: tag membership synced",
       String(tagId),
       getCloudSongId(song),
-      added ? "ADD" : "REMOVE",git 
+      added ? "ADD" : "REMOVE",
+      git,
     );
   } catch (error) {
     console.error(
