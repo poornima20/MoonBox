@@ -1234,24 +1234,6 @@ document.addEventListener("moonbox:tagGroupsChanged", async (event) => {
   }
 });
 
-async function removeSongFromCloudTag(tagId, song) {
-  const user = requireCloudUser();
-  const cloudSongId = getCloudSongId(song);
-
-  const tagRef = doc(db, "users", user.uid, "tags", String(tagId));
-
-  await setDoc(
-    tagRef,
-    {
-      songIds: arrayRemove(cloudSongId),
-      updatedAt: serverTimestamp(),
-    },
-    { merge: true },
-  );
-
-  console.log("MoonBox Cloud: song removed from tag", cloudSongId, tagId);
-}
-
 /* ==========================================================
    EXPORT API
 ========================================================== */
