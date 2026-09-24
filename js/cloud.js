@@ -946,29 +946,15 @@ function applyCloudSongDataToLocalSong(song, cloudSong) {
 ========================================================== */
 
 document.addEventListener("moonbox:songTagsChanged", async (event) => {
-  if (!cloudReady) {
-    return;
-  }
-
   const song = event.detail?.song;
-
   const tagId = event.detail?.tagId;
-
   const added = event.detail?.added;
 
-  if (!song || !tagId) {
+  if (!cloudReady || !song || !tagId || tagId === "all") {
     return;
   }
 
   try {
-    /*
-     * Save the complete song metadata.
-     */
-    await saveCloudSong(song);
-
-    /*
-     * Update tag → songIds index.
-     */
     if (added) {
       await addSongToCloudTag(tagId, song);
     } else {
@@ -977,11 +963,17 @@ document.addEventListener("moonbox:songTagsChanged", async (event) => {
 
     console.log(
       "MoonBox Cloud: tag membership synced",
-      tagId,
+      String(tagId),
       getCloudSongId(song),
+      added ? "ADD" : "REMOVE",
     );
   } catch (error) {
-    console.error("MoonBox Cloud: tag membership sync failed", error);
+    console.error(
+      "MoonBox Cloud: tag membership sync failed",
+      String(tagId),
+      getCloudSongId(song),
+      error,
+    );
   }
 });
 
@@ -1186,6 +1178,42 @@ document.addEventListener("moonbox:tagGroupsChanged", async (event) => {
     console.error("MoonBox Cloud: failed to save tag group state", error);
   }
 });
+
+async function addSongToCloudTag(tagId, song) {
+  const user = requireCloudUser();
+  const cloudSongId = getCloudSongId(song);
+
+  const tagRef = doc(db, "users", user.uid, "tags", String(tagId));
+
+  await setDoc(
+    tagRef,
+    {
+      songIds: arrayUnion(cloudSongId),
+      updatedAt: serverTimestamp(),
+    },
+    { merge: true },
+  );
+
+  console.log("MoonBox Cloud: song added to tag", cloudSongId, tagId);
+}
+
+async function removeSongFromCloudTag(tagId, song) {
+  const user = requireCloudUser();
+  const cloudSongId = getCloudSongId(song);
+
+  const tagRef = doc(db, "users", user.uid, "tags", String(tagId));
+
+  await setDoc(
+    tagRef,
+    {
+      songIds: arrayRemove(cloudSongId),
+      updatedAt: serverTimestamp(),
+    },
+    { merge: true },
+  );
+
+  console.log("MoonBox Cloud: song removed from tag", cloudSongId, tagId);
+}
 
 /* ==========================================================
    EXPORT API

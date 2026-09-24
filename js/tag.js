@@ -3183,20 +3183,34 @@ document.addEventListener("moonbox:cloudTagsReady", (event) => {
     }));
 
   /* --------------------------------------------------------
-   Store cloud tag → song IDs in memory
+   Merge cloud song membership into local membership
 
-   This does NOT perform another Firebase read.
-   The songIds already came with cloudTagsReady.
+   Firestore gives us:
+      tag → songIds
+
+   Local UI uses:
+      songId → tagIds
+
+   Convert the cloud structure into our local structure.
 -------------------------------------------------------- */
 
-  cloudTagSongIds.clear();
-
   normalizedCloudTags.forEach((tag) => {
-    cloudTagSongIds.set(
-      String(tag.id),
-      new Set(Array.isArray(tag.songIds) ? tag.songIds.map(String) : []),
-    );
+    const tagId = String(tag.id);
+
+    const songIds = Array.isArray(tag.songIds) ? tag.songIds.map(String) : [];
+
+    songIds.forEach((songId) => {
+      if (!Array.isArray(localTagMembership[songId])) {
+        localTagMembership[songId] = [];
+      }
+
+      if (!localTagMembership[songId].includes(tagId)) {
+        localTagMembership[songId].push(tagId);
+      }
+    });
   });
+
+  saveTagMembership();
 
   /* --------------------------------------------------------
      Merge everything by ID
