@@ -383,13 +383,29 @@ function addSongToLocalTag(songId, tagId) {
     localTagMembership[songId] = [];
   }
 
+  /* Already exists — nothing changed */
   if (localTagMembership[songId].includes(tagId)) {
     return false;
   }
 
+  /* Update local state immediately */
   localTagMembership[songId].push(tagId);
 
   saveTagMembership();
+
+  /* Remember this change for cloud synchronization */
+  pendingTagSync = pendingTagSync.filter(
+    (item) => !(String(item.songId) === songId && String(item.tagId) === tagId),
+  );
+
+  pendingTagSync.push({
+    songId,
+    tagId,
+    added: true,
+    changedAt: Date.now(),
+  });
+
+  savePendingTagSync();
 
   return true;
 }
@@ -402,7 +418,7 @@ function removeSongFromLocalTag(songId, tagId) {
   songId = String(songId);
   tagId = String(tagId);
 
-  if (!songId || !tagId) {
+  if (!songId || !tagId || tagId === "all") {
     return false;
   }
 
@@ -420,12 +436,31 @@ function removeSongFromLocalTag(songId, tagId) {
     delete localTagMembership[songId];
   }
 
-  if (localTagMembership[songId]?.length !== previousLength) {
-    saveTagMembership();
-    return true;
+  const changed = !Array.isArray(localTagMembership[songId])
+    ? previousLength > 0
+    : localTagMembership[songId].length !== previousLength;
+
+  if (!changed) {
+    return false;
   }
 
-  return false;
+  saveTagMembership();
+
+  /* Remember this change for cloud synchronization */
+  pendingTagSync = pendingTagSync.filter(
+    (item) => !(String(item.songId) === songId && String(item.tagId) === tagId),
+  );
+
+  pendingTagSync.push({
+    songId,
+    tagId,
+    added: false,
+    changedAt: Date.now(),
+  });
+
+  savePendingTagSync();
+
+  return true;
 }
 
 /* ==========================================================
@@ -3020,10 +3055,26 @@ document.addEventListener("moonbox:songTagsChanged", (event) => {
   const added = event.detail?.added;
 
   if (songId && changedTagId) {
+    let changed = false;
+
     if (added) {
-      addSongToLocalTag(songId, changedTagId);
+      changed = addSongToLocalTag(songId, changedTagId);
     } else {
-      removeSongFromLocalTag(songId, changedTagId);
+      changed = removeSongFromLocalTag(songId, changedTagId);
+    }
+
+    /* Tell Cloud.js that an actual membership change happened */
+    if (changed) {
+      document.dispatchEvent(
+        new CustomEvent("moonbox:tagMembershipChanged", {
+          detail: {
+            songId,
+            tagId: String(changedTagId),
+            added: !!added,
+            changedAt: Date.now(),
+          },
+        }),
+      );
     }
   }
   /* --------------------------------------------------------
