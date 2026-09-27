@@ -715,6 +715,7 @@ document.addEventListener("DOMContentLoaded", () => {
     renderPlayerTags();
 
     renderPlayerTagPicker();
+    renderPlayerYouTube();
 
     lucide.createIcons();
 
@@ -921,6 +922,7 @@ document.addEventListener("DOMContentLoaded", () => {
     requestPlayerTags();
 
     renderPlayerTags();
+    renderPlayerYouTube();
 
     /* 10. Update Player top */
     updatePlayerTop(song);
@@ -1636,6 +1638,10 @@ document.addEventListener("DOMContentLoaded", () => {
    TOGGLE TAG SECTION
 ========================================================== */
 
+  /* ==========================================================
+   TOGGLE TAG SECTION
+========================================================== */
+
   const togglePlayerTags = document.getElementById("togglePlayerTags");
 
   if (togglePlayerTags) {
@@ -1644,35 +1650,329 @@ document.addEventListener("DOMContentLoaded", () => {
 
       if (!playerScreen) return;
 
-      const isCollapsed = playerScreen.classList.toggle("tags-collapsed");
+      const isOpen = playerScreen.classList.toggle("tags-expanded");
 
-      /*
-       * Opening the Tags section:
-       * show the tags already assigned to the song.
-       */
-      if (!isCollapsed) {
-        playerScreen.classList.add("tags-expanded");
+      if (isOpen) {
+        playerScreen.classList.remove("tags-collapsed");
 
         requestPlayerTags();
         renderPlayerTags();
       } else {
-        /*
-         * Closing the Tags section.
-         */
-        playerScreen.classList.remove("tags-expanded");
+        playerScreen.classList.add("tags-collapsed");
       }
 
-      togglePlayerTags.setAttribute("aria-expanded", String(!isCollapsed));
+      togglePlayerTags.setAttribute("aria-expanded", String(isOpen));
 
       togglePlayerTags.setAttribute(
         "aria-label",
-        isCollapsed ? "Expand tags" : "Collapse tags",
+        isOpen ? "Collapse tags" : "Expand tags",
       );
 
       togglePlayerTags.setAttribute(
         "title",
-        isCollapsed ? "Expand tags" : "Collapse tags",
+        isOpen ? "Hide tags" : "Show tags",
       );
+
+      lucide.createIcons();
+    });
+  }
+  /* ==========================================================
+   YOUTUBE VIDEO
+   Independent large media section
+========================================================== */
+
+  const togglePlayerYouTube = document.getElementById("togglePlayerYouTube");
+
+  const youtubePanelWrapper = document.getElementById("youtubePanelWrapper");
+
+  const youtubeContent = document.getElementById("playerYouTubeContent");
+
+  const editPlayerYouTube = document.getElementById("editPlayerYouTube");
+
+  function getYouTubeVideoId(url) {
+    if (!url) return null;
+
+    try {
+      const parsed = new URL(url);
+
+      const hostname = parsed.hostname.toLowerCase().replace(/^www\./, "");
+
+      /* youtube.com */
+      if (hostname === "youtube.com" || hostname.endsWith(".youtube.com")) {
+        const watchId = parsed.searchParams.get("v");
+
+        if (watchId) {
+          return watchId;
+        }
+
+        const shortsMatch = parsed.pathname.match(/\/shorts\/([^/?]+)/);
+
+        if (shortsMatch) {
+          return shortsMatch[1];
+        }
+
+        const embedMatch = parsed.pathname.match(/\/embed\/([^/?]+)/);
+
+        if (embedMatch) {
+          return embedMatch[1];
+        }
+      }
+
+      /* youtu.be */
+      if (hostname === "youtu.be") {
+        return parsed.pathname.substring(1).split("/")[0] || null;
+      }
+    } catch (error) {
+      return null;
+    }
+
+    return null;
+  }
+
+  function getYouTubeEmbedUrl(url) {
+    const videoId = getYouTubeVideoId(url);
+
+    if (!videoId) {
+      return null;
+    }
+
+    return `https://www.youtube.com/embed/${videoId}`;
+  }
+
+  /* ==========================================================
+   SAVE YOUTUBE URL
+========================================================== */
+
+  function setPlayerYouTubeUrl(song, value) {
+    if (!song) return false;
+
+    const url = value.trim();
+
+    /* Remove video */
+    if (!url) {
+      song.youtubeUrl = "";
+
+      renderPlayerYouTube();
+
+      document.dispatchEvent(
+        new CustomEvent("moonbox:songMetadataChanged", {
+          detail: {
+            songId: song.id || null,
+            song: song,
+          },
+        }),
+      );
+
+      return true;
+    }
+
+    /* Validate */
+    if (!getYouTubeVideoId(url)) {
+      alert("Please enter a valid YouTube video link.");
+      return false;
+    }
+
+    song.youtubeUrl = url;
+
+    renderPlayerYouTube();
+
+    document.dispatchEvent(
+      new CustomEvent("moonbox:songMetadataChanged", {
+        detail: {
+          songId: song.id || null,
+          song: song,
+        },
+      }),
+    );
+
+    return true;
+  }
+
+  /* ==========================================================
+   ASK FOR YOUTUBE LINK
+========================================================== */
+
+  function askForYouTubeUrl() {
+    const song = songs[currentSong];
+
+    if (!song) {
+      return false;
+    }
+
+    const currentUrl = song.youtubeUrl || "";
+
+    const url = window.prompt("Enter YouTube video link:", currentUrl);
+
+    /* Cancel */
+    if (url === null) {
+      return false;
+    }
+
+    return setPlayerYouTubeUrl(song, url);
+  }
+
+  /* ==========================================================
+   RENDER YOUTUBE
+========================================================== */
+
+  function renderPlayerYouTube() {
+    if (!youtubeContent) return;
+
+    youtubeContent.innerHTML = "";
+
+    const song = songs[currentSong];
+
+    if (!song) {
+      youtubeContent.innerHTML = `
+      <div class="youtube-empty">
+        <i data-lucide="monitor-play"></i>
+        <span>No song selected</span>
+      </div>
+    `;
+
+      lucide.createIcons();
+      return;
+    }
+
+    const url = song.youtubeUrl || "";
+    const embedUrl = getYouTubeEmbedUrl(url);
+
+    /* No video yet */
+    if (!embedUrl) {
+      youtubeContent.innerHTML = `
+      <div class="youtube-empty">
+        <div class="youtube-empty-icon">
+          <i data-lucide="monitor-play"></i>
+        </div>
+
+        <h3>No YouTube video</h3>
+
+        <p>Add a YouTube video for this song.</p>
+
+        <button
+          type="button"
+          class="youtube-add-video-button"
+          id="youtubeEmptyAddButton"
+        >
+          <i data-lucide="plus"></i>
+          <span>Add Video</span>
+        </button>
+      </div>
+    `;
+
+      lucide.createIcons();
+
+      document
+        .getElementById("youtubeEmptyAddButton")
+        ?.addEventListener("click", () => {
+          askForYouTubeUrl();
+        });
+
+      return;
+    }
+
+    /* Video */
+    const iframe = document.createElement("iframe");
+
+    iframe.width = "100%";
+    iframe.height = "100%";
+
+    iframe.src = embedUrl;
+
+    iframe.title = "YouTube video player";
+
+    iframe.frameBorder = "0";
+
+    iframe.allow =
+      "accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share";
+
+    iframe.referrerPolicy = "strict-origin-when-cross-origin";
+
+    iframe.allowFullscreen = true;
+
+    iframe.loading = "lazy";
+
+    youtubeContent.appendChild(iframe);
+
+    lucide.createIcons();
+  }
+
+  /* ==========================================================
+   EDIT / ADD VIDEO BUTTON
+========================================================== */
+
+  if (editPlayerYouTube) {
+    editPlayerYouTube.addEventListener("click", () => {
+      askForYouTubeUrl();
+    });
+  }
+
+  /* ==========================================================
+   YOUTUBE TOGGLE
+========================================================== */
+  if (togglePlayerYouTube) {
+    togglePlayerYouTube.addEventListener("click", () => {
+      const playerScreen = document.getElementById("playerScreen");
+      const song = songs[currentSong];
+
+      if (!playerScreen || !song) return;
+
+      // If there is no YouTube video yet,
+      // ask for the link first.
+      if (!song.youtubeUrl) {
+        const url = window.prompt("Enter YouTube video link:");
+
+        if (url === null) {
+          return;
+        }
+
+        const value = url.trim();
+
+        if (!value) {
+          return;
+        }
+
+        if (!getYouTubeVideoId(value)) {
+          alert("Please enter a valid YouTube video link.");
+          return;
+        }
+
+        // Save the YouTube URL
+        song.youtubeUrl = value;
+
+        // Save to cloud
+        document.dispatchEvent(
+          new CustomEvent("moonbox:songMetadataChanged", {
+            detail: {
+              songId: song.id || null,
+              song: song,
+            },
+          }),
+        );
+      }
+
+      // Toggle YouTube panel
+      const isOpen = playerScreen.classList.toggle("youtube-expanded");
+
+      if (isOpen) {
+        youtubePanelWrapper?.classList.add("youtube-active");
+
+        renderPlayerYouTube();
+
+        togglePlayerYouTube.setAttribute("aria-expanded", "true");
+
+        togglePlayerYouTube.setAttribute("aria-label", "Collapse YouTube");
+
+        togglePlayerYouTube.setAttribute("title", "Hide YouTube");
+      } else {
+        youtubePanelWrapper?.classList.remove("youtube-active");
+
+        togglePlayerYouTube.setAttribute("aria-expanded", "false");
+
+        togglePlayerYouTube.setAttribute("aria-label", "Show YouTube video");
+
+        togglePlayerYouTube.setAttribute("title", "Show YouTube video");
+      }
 
       lucide.createIcons();
     });

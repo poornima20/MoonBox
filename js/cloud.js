@@ -340,6 +340,8 @@ function createCloudSongData(song) {
 
     notes: typeof song.notes === "string" ? song.notes : "",
 
+    youtubeUrl: typeof song.youtubeUrl === "string" ? song.youtubeUrl : "",
+
     updatedAt: serverTimestamp(),
   };
 }
@@ -399,6 +401,8 @@ function createSongSignature(song) {
     lyrics: typeof song.lyrics === "string" ? song.lyrics : "",
 
     notes: typeof song.notes === "string" ? song.notes : "",
+
+    youtubeUrl: typeof song.youtubeUrl === "string" ? song.youtubeUrl : "",
   });
 }
 
@@ -988,8 +992,9 @@ function applyCloudSongDataToLocalSong(song, cloudSong) {
     song.lyrics = cloudSong.lyrics;
   }
 
-  if (cloudSong.notes !== undefined) {
-    song.notes = cloudSong.notes;
+  if (cloudSong.youtubeUrl !== undefined) {
+    song.youtubeUrl =
+      typeof cloudSong.youtubeUrl === "string" ? cloudSong.youtubeUrl : "";
   }
 
   return song;

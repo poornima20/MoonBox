@@ -3252,3 +3252,443 @@
     padding: 0 !important;
   }
 }
+
+/* ==========================================================
+   MOONBOX — INDEPENDENT YOUTUBE PANEL
+   ========================================================== */
+
+/* YouTube is hidden normally */
+#playerScreen #youtubePanelWrapper {
+  display: none !important;
+}
+
+/* ==========================================================
+   YOUTUBE OPEN
+   ========================================================== */
+
+#playerScreen.youtube-expanded {
+  /*
+       The player itself becomes the full viewport.
+       The normal player remains at the top.
+       YouTube occupies everything underneath.
+    */
+  height: 100vh !important;
+  min-height: 100vh !important;
+  max-height: 100vh !important;
+
+  overflow: hidden !important;
+}
+
+/* Keep the normal player at the top */
+#playerScreen.youtube-expanded .player-top {
+  flex: 0 0 var(--player-main-height) !important;
+
+  width: 100% !important;
+  height: var(--player-main-height) !important;
+  min-height: var(--player-main-height) !important;
+  max-height: var(--player-main-height) !important;
+}
+
+/* ==========================================================
+   TAGS MUST NOT PARTICIPATE IN YOUTUBE LAYOUT
+   ========================================================== */
+
+#playerScreen.youtube-expanded
+  > .player-layout
+  > .player-panel:not(.player-youtube-panel) {
+  display: none !important;
+}
+
+/* ==========================================================
+   YOUTUBE WRAPPER
+   ========================================================== */
+
+#playerScreen.youtube-expanded #youtubePanelWrapper {
+  display: flex !important;
+
+  position: relative !important;
+
+  width: 100% !important;
+  height: calc(100vh - var(--player-main-height)) !important;
+
+  min-width: 0 !important;
+  min-height: 0 !important;
+
+  max-height: none !important;
+
+  flex: 1 1 auto !important;
+
+  margin: 0 !important;
+  padding: 12px 16px 16px !important;
+
+  box-sizing: border-box !important;
+
+  background: var(--player-panel-bg) !important;
+
+  border: 0 !important;
+  border-top: 1px solid rgba(255, 255, 255, 0.07) !important;
+
+  overflow: hidden !important;
+}
+
+/* ==========================================================
+   YOUTUBE PANEL
+   ========================================================== */
+
+#playerScreen.youtube-expanded #youtubePanel {
+  display: flex !important;
+
+  flex-direction: column !important;
+
+  width: 100% !important;
+  height: 100% !important;
+
+  min-width: 0 !important;
+  min-height: 0 !important;
+
+  margin: 0 !important;
+  padding: 0 !important;
+
+  background: transparent !important;
+
+  border: 0 !important;
+}
+
+/* ==========================================================
+   YOUTUBE HEADER
+   ========================================================== */
+
+#playerScreen.youtube-expanded .youtube-panel-header {
+  flex: 0 0 44px !important;
+
+  width: 100% !important;
+  height: 44px !important;
+  min-height: 44px !important;
+
+  display: flex !important;
+
+  align-items: center !important;
+  justify-content: space-between !important;
+
+  margin: 0 !important;
+  padding: 0 4px 10px !important;
+
+  box-sizing: border-box !important;
+}
+
+#playerScreen.youtube-expanded .youtube-panel-header h3 {
+  margin: 0 !important;
+
+  color: #e6e6e6 !important;
+
+  font-size: 16px !important;
+  font-weight: 600 !important;
+}
+
+/* ==========================================================
+   VIDEO AREA
+   ========================================================== */
+
+#playerScreen.youtube-expanded .youtube-content {
+  flex: 1 1 auto !important;
+
+  width: 100% !important;
+  height: auto !important;
+
+  min-width: 0 !important;
+  min-height: 0 !important;
+
+  display: flex !important;
+
+  align-items: center !important;
+  justify-content: center !important;
+
+  padding: 0 !important;
+
+  overflow: hidden !important;
+
+  background: #000 !important;
+
+  border-radius: 14px !important;
+
+  box-sizing: border-box !important;
+}
+
+/* ==========================================================
+   YOUTUBE IFRAME
+   ========================================================== */
+
+#playerScreen.youtube-expanded .youtube-content iframe {
+  display: block !important;
+
+  width: 100% !important;
+  height: 100% !important;
+
+  min-width: 0 !important;
+  min-height: 0 !important;
+
+  margin: 0 !important;
+  padding: 0 !important;
+
+  border: 0 !important;
+
+  border-radius: 14px !important;
+
+  background: #000 !important;
+}
+
+/* ==========================================================
+   EMPTY STATE
+   ========================================================== */
+
+#playerScreen.youtube-expanded .youtube-empty {
+  width: 100% !important;
+  height: 100% !important;
+
+  min-height: 0 !important;
+
+  display: flex !important;
+
+  flex-direction: column !important;
+
+  align-items: center !important;
+  justify-content: center !important;
+
+  gap: 8px !important;
+
+  margin: 0 !important;
+
+  color: rgba(255, 255, 255, 0.55) !important;
+
+  background: #000 !important;
+
+  border-radius: 14px !important;
+
+  text-align: center !important;
+}
+
+/* ==========================================================
+   YOUTUBE BUTTON
+   ========================================================== */
+
+#playerScreen .player-youtube-toggle {
+  display: inline-flex !important;
+
+  align-items: center !important;
+  justify-content: center !important;
+}
+
+#playerScreen .player-youtube-toggle svg {
+  width: 18px !important;
+  height: 18px !important;
+}
+
+#playerScreen.youtube-expanded .player-youtube-toggle {
+  color: #fff !important;
+  background: rgba(255, 255, 255, 0.1) !important;
+  border-color: rgba(255, 255, 255, 0.2) !important;
+}
+
+/* ==========================================================
+   MOBILE
+   ========================================================== */
+
+@media (max-width: 768px) {
+  #playerScreen.youtube-expanded {
+    height: 100vh !important;
+    min-height: 100vh !important;
+    max-height: 100vh !important;
+  }
+
+  #playerScreen.youtube-expanded .player-top {
+    flex-basis: var(--player-main-height) !important;
+
+    height: var(--player-main-height) !important;
+    min-height: var(--player-main-height) !important;
+  }
+
+  #playerScreen.youtube-expanded #youtubePanelWrapper {
+    height: calc(100vh - var(--player-main-height)) !important;
+
+    min-height: 0 !important;
+
+    padding: 8px !important;
+  }
+
+  #playerScreen.youtube-expanded .youtube-panel-header {
+    flex-basis: 38px !important;
+
+    height: 38px !important;
+    min-height: 38px !important;
+
+    padding: 0 2px 8px !important;
+  }
+
+  #playerScreen.youtube-expanded .youtube-panel-header h3 {
+    font-size: 13px !important;
+  }
+
+  #playerScreen.youtube-expanded .youtube-content {
+    border-radius: 10px !important;
+  }
+
+  #playerScreen.youtube-expanded .youtube-content iframe {
+    border-radius: 10px !important;
+  }
+}
+/* ================================================================
+   MOONBOX — MOBILE TAG + YOUTUBE BUTTON FIX
+   Keep both buttons visible without overlapping
+   ================================================================ */
+
+@media (max-width: 768px) {
+  /* ------------------------------------------------
+     TAG BUTTON
+     Move it slightly left
+     ------------------------------------------------ */
+
+  #playerScreen .player-tags-toggle {
+    position: absolute !important;
+
+    right: 54px !important;
+    top: 25% !important;
+
+    width: 34px !important;
+    height: 34px !important;
+    min-width: 34px !important;
+
+    margin: 0 !important;
+    padding: 0 !important;
+
+    transform: translateY(-50%) !important;
+
+    z-index: 30 !important;
+  }
+
+  /* ------------------------------------------------
+     YOUTUBE / ACTION BUTTON AREA
+     Pin it to the far right
+     ------------------------------------------------ */
+
+  #playerScreen .player-actions {
+    position: absolute !important;
+
+    top: 25% !important;
+    right: 8px !important;
+
+    width: auto !important;
+    height: 34px !important;
+
+    margin: 0 !important;
+    padding: 0 !important;
+
+    display: flex !important;
+    align-items: center !important;
+    justify-content: flex-end !important;
+
+    gap: 6px !important;
+
+    z-index: 30 !important;
+  }
+
+  /* ------------------------------------------------
+     YouTube button
+     ------------------------------------------------ */
+
+  #playerScreen .player-youtube-toggle {
+    position: relative !important;
+
+    width: 34px !important;
+    height: 34px !important;
+    min-width: 34px !important;
+
+    flex: 0 0 34px !important;
+
+    margin: 0 !important;
+    padding: 0 !important;
+
+    transform: translateY(-50%) !important;
+  }
+
+  #playerScreen .player-youtube-toggle svg {
+    width: 17px !important;
+    height: 17px !important;
+  }
+
+  /* Don't let hover/active transforms move the buttons */
+  #playerScreen .player-tags-toggle:hover,
+  #playerScreen .player-youtube-toggle:hover {
+    transform: translateY(-50%) !important;
+  }
+
+  #playerScreen .player-tags-toggle:active,
+  #playerScreen .player-youtube-toggle:active {
+    transform: translateY(-50%) scale(0.94) !important;
+  }
+}
+
+/* ================================================================
+   SMALL PHONE
+   ================================================================ */
+
+@media (max-width: 420px) {
+  #playerScreen .player-tags-toggle {
+    right: 48px !important;
+
+    width: 30px !important;
+    height: 30px !important;
+    min-width: 30px !important;
+  }
+
+  #playerScreen .player-actions {
+    right: 6px !important;
+    height: 30px !important;
+    gap: 5px !important;
+  }
+
+  #playerScreen .player-youtube-toggle {
+    width: 30px !important;
+    height: 30px !important;
+    min-width: 30px !important;
+
+    flex-basis: 30px !important;
+  }
+
+  #playerScreen .player-youtube-toggle svg {
+    width: 15px !important;
+    height: 15px !important;
+  }
+}
+
+/* ================================================================
+   VERY SMALL PHONE
+   ================================================================ */
+
+@media (max-width: 300px) {
+  #playerScreen .player-tags-toggle {
+    right: 42px !important;
+
+    width: 27px !important;
+    height: 27px !important;
+    min-width: 27px !important;
+  }
+
+  #playerScreen .player-actions {
+    right: 4px !important;
+    height: 27px !important;
+    gap: 4px !important;
+  }
+
+  #playerScreen .player-youtube-toggle {
+    width: 27px !important;
+    height: 27px !important;
+    min-width: 27px !important;
+
+    flex-basis: 27px !important;
+  }
+
+  #playerScreen .player-youtube-toggle svg {
+    width: 14px !important;
+    height: 14px !important;
+  }
+}
