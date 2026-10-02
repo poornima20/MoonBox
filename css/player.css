@@ -1,10 +1,6 @@
 /* ============================================================
    MOONBOX — PLAYER.CSS
-   Clean player layout for the current player HTML
-   ============================================================ */
-
-/* ============================================================
-   VARIABLES
+   Clean replacement for the current player HTML
    ============================================================ */
 
 :root {
@@ -22,41 +18,36 @@
 
   --player-bg: #080808;
   --player-panel-bg: #101010;
-
   --player-border: rgba(255, 255, 255, 0.08);
 
   --player-text: #f4f4f4;
   --player-soft: #c8c8c8;
   --player-muted: #858585;
-  --player-dim: #666666;
+  --player-dim: #666;
 }
 
 /* ============================================================
-   PLAYER SCREEN
+   PLAYER SHELL
    ============================================================ */
 
 #playerScreen {
   position: fixed !important;
-
   left: 0 !important;
   right: 0 !important;
   bottom: 0 !important;
 
   width: 100vw !important;
-
   height: var(--player-total-height) !important;
   min-height: var(--player-total-height) !important;
   max-height: var(--player-total-height) !important;
 
   margin: 0 !important;
   padding: 0 !important;
-
   box-sizing: border-box !important;
 
   z-index: 9000 !important;
 
   background: var(--player-bg) !important;
-
   border: 0 !important;
   border-top: 1px solid var(--player-border) !important;
   border-radius: 0 !important;
@@ -64,14 +55,9 @@
   box-shadow: 0 -16px 45px rgba(0, 0, 0, 0.45) !important;
 
   overflow: hidden !important;
-
   visibility: visible !important;
   transform: none !important;
 }
-
-/* ============================================================
-   COLLAPSED TAGS
-   ============================================================ */
 
 #playerScreen.tags-collapsed {
   height: var(--player-main-height) !important;
@@ -83,86 +69,66 @@
   display: none !important;
 }
 
-/* ============================================================
-   EXPANDED TAGS
-   ============================================================ */
-
 #playerScreen.tags-expanded {
   height: var(--player-expanded-height) !important;
   min-height: var(--player-expanded-height) !important;
   max-height: var(--player-expanded-height) !important;
 }
 
-/* ============================================================
-   WORKSPACE HEIGHT
-   ============================================================ */
-
-.workspace {
+/* Keep the application workspace above the fixed player. */
+.workspace,
+.music-workspace {
   min-height: 0 !important;
 }
 
 .music-workspace {
-  min-height: 0 !important;
-
   height: calc(100% - var(--player-total-height)) !important;
-}
-
-.workspace:has(#playerScreen.tags-expanded) .music-workspace {
-  height: calc(100% - var(--player-expanded-height)) !important;
 }
 
 .workspace:has(#playerScreen.tags-collapsed) .music-workspace {
   height: calc(100% - var(--player-main-height)) !important;
 }
 
+.workspace:has(#playerScreen.tags-expanded) .music-workspace {
+  height: calc(100% - var(--player-expanded-height)) !important;
+}
+
 /* ============================================================
-   MAIN PLAYER LAYOUT
+   PLAYER LAYOUT
    ============================================================ */
 
 #playerScreen .player-layout {
   width: 100% !important;
   height: 100% !important;
-
   min-width: 0 !important;
   min-height: 0 !important;
 
   display: flex !important;
   flex-direction: column !important;
+  gap: 0 !important;
 
   margin: 0 !important;
   padding: 0 !important;
-
-  gap: 0 !important;
-
   box-sizing: border-box !important;
 }
-
-/* ============================================================
-   MAIN PLAYER AREA
-   ============================================================ */
 
 #playerScreen .player-top {
   width: 100% !important;
   height: var(--player-main-height) !important;
   min-height: var(--player-main-height) !important;
 
+  flex: 0 0 var(--player-main-height) !important;
+
   margin: 0 !important;
   padding: 10px 28px !important;
-
   box-sizing: border-box !important;
 
-  display: block !important;
-
   background: var(--player-bg) !important;
-
-  border: 0 !important;
-
   overflow: hidden !important;
 }
 
 /* ============================================================
-   HIDE ALBUM ART
-   Kept in HTML for player.js compatibility.
+   UNUSED / COMPATIBILITY ALBUM ART
    ============================================================ */
 
 #playerScreen .player-album,
@@ -175,183 +141,205 @@
 #playerScreen #playerCover,
 #playerScreen #playerVinylCover {
   display: none !important;
-
   width: 0 !important;
   height: 0 !important;
-
   min-width: 0 !important;
   min-height: 0 !important;
-
   max-width: 0 !important;
   max-height: 0 !important;
 }
 
 /* ============================================================
-   PLAYER INFO — THREE COLUMN LAYOUT
-   30% = Song
-   50% = Main player
-   20% = Actions
+   DESKTOP PLAYER
    ============================================================ */
 
-#playerScreen .player-info {
-  position: relative !important;
+@media (min-width: 769px) {
+  #playerScreen .player-info {
+    position: relative !important;
 
-  width: 100% !important;
-  height: 100% !important;
+    width: 100% !important;
+    height: 100% !important;
+    min-width: 0 !important;
+    min-height: 0 !important;
 
-  min-width: 0 !important;
-  min-height: 0 !important;
+    display: grid !important;
+    grid-template-columns: 30% 50% 20% !important;
+    grid-template-rows: 1fr !important;
 
-  display: grid !important;
+    align-items: center !important;
 
-  grid-template-columns:
-    30%
-    50%
-    20% !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    box-sizing: border-box !important;
+  }
 
-  align-items: center !important;
+  /* The wrapper itself disappears from the grid. */
+  #playerScreen .player-song-row {
+    display: contents !important;
+  }
 
-  margin: 0 !important;
-  padding: 0 !important;
+  /* ----------------------------------------------------------
+     SONG
+     ---------------------------------------------------------- */
 
-  box-sizing: border-box !important;
+  #playerScreen .song-meta {
+    grid-column: 1 !important;
+    grid-row: 1 !important;
+
+    width: 100% !important;
+    min-width: 0 !important;
+
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: flex-start !important;
+    justify-content: center !important;
+    gap: 2px !important;
+
+    margin: 0 !important;
+    padding: 0 10px 0 0 !important;
+    box-sizing: border-box !important;
+
+    overflow: hidden !important;
+  }
+
+  #playerScreen .player-title-editor,
+  #playerScreen .player-title-row {
+    width: 100% !important;
+    min-width: 0 !important;
+    overflow: hidden !important;
+  }
+
+  #playerScreen .player-title-row {
+    display: flex !important;
+    align-items: center !important;
+    gap: 7px !important;
+  }
+
+  #playerScreen #playerTitle {
+    display: block !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    min-width: 0 !important;
+
+    margin: 0 !important;
+    padding: 0 !important;
+
+    color: var(--player-text) !important;
+    font-size: 17px !important;
+    line-height: 21px !important;
+    font-weight: 600 !important;
+
+    white-space: nowrap !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+  }
+
+  #playerScreen #playerArtist {
+    display: block !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    min-width: 0 !important;
+
+    margin: 0 !important;
+    padding: 0 !important;
+
+    color: var(--player-muted) !important;
+    font-size: 11px !important;
+    line-height: 14px !important;
+
+    white-space: nowrap !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+  }
+
+  /* ----------------------------------------------------------
+     CENTER PLAYER
+     ---------------------------------------------------------- */
+
+  #playerScreen .player-progress {
+    grid-column: 2 !important;
+    grid-row: 1 !important;
+
+    width: 100% !important;
+    min-width: 0 !important;
+
+    display: grid !important;
+    grid-template-columns: 36px minmax(0, 1fr) 36px !important;
+    align-items: center !important;
+    gap: 8px !important;
+
+    margin: 0 !important;
+    padding: 0 12px !important;
+    box-sizing: border-box !important;
+
+    transform: translateY(-12px) !important;
+  }
+
+  #playerScreen .player-controls {
+    grid-column: 2 !important;
+    grid-row: 1 !important;
+
+    width: 100% !important;
+    min-width: 0 !important;
+
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 6px !important;
+
+    margin: 0 0 4px !important;
+    padding: 0 !important;
+    box-sizing: border-box !important;
+
+    align-self: end !important;
+    transform: translateY(12px) !important;
+  }
+
+  /* ----------------------------------------------------------
+     TAG BUTTON
+     ---------------------------------------------------------- */
+
+  #playerScreen .player-tags-toggle {
+    grid-column: 3 !important;
+    grid-row: 1 !important;
+
+    justify-self: end !important;
+    align-self: center !important;
+
+    width: 34px !important;
+    height: 34px !important;
+    min-width: 34px !important;
+
+    margin: 0 4px 0 0 !important;
+    padding: 0 !important;
+  }
+
+  /* Desktop actions, including YouTube. */
+  #playerScreen .player-actions {
+    grid-column: 3 !important;
+    grid-row: 1 !important;
+
+    display: flex !important;
+    align-items: center !important;
+    justify-content: flex-end !important;
+    gap: 8px !important;
+
+    min-width: 0 !important;
+    max-width: 100% !important;
+  }
 }
 
 /* ============================================================
-   PLAYER INFO — THREE COLUMN LAYOUT
-   30% = Song
-   50% = Main player
-   20% = Actions
-   ============================================================ */
-
-#playerScreen .player-info {
-  position: relative !important;
-
-  width: 100% !important;
-  height: 100% !important;
-
-  min-width: 0 !important;
-  min-height: 0 !important;
-
-  display: grid !important;
-
-  grid-template-columns:
-    30%
-    50%
-    20% !important;
-
-  align-items: center !important;
-
-  margin: 0 !important;
-  padding: 0 !important;
-
-  box-sizing: border-box !important;
-}
-
-/* ============================================================
-   ROW 1 — SONG INFORMATION
-   ============================================================ */
-
-#playerScreen .player-song-row {
-  grid-column: 1 !important;
-  grid-row: 1 !important;
-
-  width: 100% !important;
-  min-width: 0 !important;
-
-  display: flex !important;
-
-  align-items: center !important;
-  justify-content: space-between !important;
-
-  gap: 16px !important;
-
-  margin: 0 !important;
-  padding: 0 !important;
-
-  box-sizing: border-box !important;
-}
-
-/* ============================================================
-   SONG META
+   SONG / TITLE
    ============================================================ */
 
 #playerScreen .song-meta {
-  width: 100% !important;
   min-width: 0 !important;
-
-  display: flex !important;
-  flex-direction: column !important;
-
-  align-items: flex-start !important;
-  justify-content: center !important;
-
-  gap: 2px !important;
-
-  margin: 0 !important;
-  padding: 0 !important;
-
-  text-align: left !important;
 }
-
-/* ============================================================
-   TITLE EDITOR
-   ============================================================ */
 
 #playerScreen .player-title-editor {
-  width: 100% !important;
   min-width: 0 !important;
 }
-
-/* ============================================================
-   TITLE ROW
-   ============================================================ */
-
-#playerScreen .player-title-row {
-  width: 100% !important;
-  min-width: 0 !important;
-
-  display: flex !important;
-  align-items: center !important;
-
-  gap: 7px !important;
-
-  margin: 0 !important;
-  padding: 0 !important;
-}
-
-/* ============================================================
-   TITLE
-   ============================================================ */
-
-#playerScreen #playerTitle {
-  display: block !important;
-
-  max-width: 100% !important;
-  min-width: 0 !important;
-
-  margin: 0 !important;
-  padding: 0 !important;
-
-  color: var(--player-text) !important;
-
-  font-size: 17px !important;
-  line-height: 21px !important;
-
-  font-weight: 600 !important;
-
-  white-space: nowrap !important;
-
-  overflow: hidden !important;
-  text-overflow: ellipsis !important;
-}
-
-/* ============================================================
-   TITLE EDIT BUTTON
-
-   Hidden visually, but kept in DOM because player.js
-   still expects it.
-   ============================================================ */
 
 #playerScreen .player-title-edit,
 #playerScreen .player-title-editing,
@@ -359,87 +347,34 @@
   display: none !important;
 }
 
-/* ============================================================
-   CENTER PROGRESS
-   ============================================================ */
-
-#playerScreen .player-progress {
-  width: min(620px, 92%) !important;
-
+#playerScreen .player-title-row {
   min-width: 0 !important;
-
-  display: grid !important;
-
-  grid-template-columns:
-    34px
-    minmax(0, 1fr)
-    34px !important;
-
-  align-items: center !important;
-
-  gap: 8px !important;
-
-  margin: 0 !important;
-  padding: 0 !important;
-
-  box-sizing: border-box !important;
 }
 
-/* ============================================================
-   FOLDER / ARTIST
-   ============================================================ */
+#playerScreen #playerTitle {
+  color: var(--player-text) !important;
+}
 
 #playerScreen #playerArtist {
-  display: block !important;
-
-  width: 100% !important;
-  min-width: 0 !important;
-
-  margin: 0 !important;
-  padding: 0 !important;
-
   color: var(--player-muted) !important;
-
-  font-size: 11px !important;
-  line-height: 14px !important;
-
-  white-space: nowrap !important;
-
-  overflow: hidden !important;
-  text-overflow: ellipsis !important;
 }
 
 /* ============================================================
-   TAG SECTION TOGGLE
-   Located on the far right of ROW 1.
+   TAG BUTTON
    ============================================================ */
 
 #playerScreen .player-tags-toggle {
-  flex: 0 0 34px !important;
-
-  width: 34px !important;
-  height: 34px !important;
-
-  min-width: 34px !important;
-
   display: inline-flex !important;
-
   align-items: center !important;
   justify-content: center !important;
 
-  margin: 0 !important;
-  padding: 0 !important;
-
   border: 1px solid rgba(255, 255, 255, 0.12) !important;
-
   border-radius: 9px !important;
 
   background: transparent !important;
-
   color: #999 !important;
 
   cursor: pointer !important;
-
   box-sizing: border-box !important;
 
   transition:
@@ -451,9 +386,7 @@
 
 #playerScreen .player-tags-toggle:hover {
   background: rgba(255, 255, 255, 0.06) !important;
-
   border-color: rgba(255, 255, 255, 0.2) !important;
-
   color: #fff !important;
 }
 
@@ -464,75 +397,28 @@
 #playerScreen .player-tags-toggle svg {
   width: 16px !important;
   height: 16px !important;
-
   flex: 0 0 16px !important;
-
   stroke-width: 1.8 !important;
 }
 
-/* Slight visual state when tags are collapsed */
-
-#playerScreen.tags-collapsed .player-tags-toggle {
-  color: #777 !important;
-}
-
-#playerScreen.tags-collapsed .player-tags-toggle:hover {
-  color: #fff !important;
-}
-
 /* ============================================================
-   ROW 2 — PROGRESS
-   ============================================================ */
-
-#playerScreen .player-progress {
-  grid-column: 1 !important;
-  grid-row: 2 !important;
-
-  width: 100% !important;
-  min-width: 0 !important;
-
-  display: grid !important;
-
-  grid-template-columns:
-    36px
-    minmax(0, 1fr)
-    36px !important;
-
-  align-items: center !important;
-
-  gap: 8px !important;
-
-  margin: 0 !important;
-  padding: 0 !important;
-
-  box-sizing: border-box !important;
-}
-
-/* ============================================================
-   TIME
+   PROGRESS
    ============================================================ */
 
 #playerScreen .player-progress span {
   display: block !important;
-
   width: 100% !important;
 
   margin: 0 !important;
   padding: 0 !important;
 
   color: var(--player-muted) !important;
-
   font-size: 10px !important;
   line-height: 1 !important;
-
   text-align: center !important;
 
   white-space: nowrap !important;
 }
-
-/* ============================================================
-   PROGRESS BAR
-   ============================================================ */
 
 #playerScreen #progressBar {
   appearance: none !important;
@@ -542,7 +428,6 @@
 
   width: 100% !important;
   min-width: 0 !important;
-
   height: 5px !important;
 
   margin: 0 !important;
@@ -550,15 +435,11 @@
 
   border: 0 !important;
   border-radius: 999px !important;
-
   outline: none !important;
 
   background: #292929 !important;
-
   cursor: pointer !important;
 }
-
-/* Chrome / Safari */
 
 #playerScreen #progressBar::-webkit-slider-runnable-track {
   width: 100% !important;
@@ -566,7 +447,6 @@
 
   border: 0 !important;
   border-radius: 999px !important;
-
   background: #292929 !important;
 }
 
@@ -576,20 +456,14 @@
 
   width: 11px !important;
   height: 11px !important;
-
   margin-top: -3px !important;
 
   border: 0 !important;
   border-radius: 50% !important;
 
   background: #fff !important;
-
-  box-shadow: none !important;
-
   cursor: pointer !important;
 }
-
-/* Firefox */
 
 #playerScreen #progressBar::-moz-range-track {
   width: 100% !important;
@@ -597,7 +471,6 @@
 
   border: 0 !important;
   border-radius: 999px !important;
-
   background: #292929 !important;
 }
 
@@ -606,7 +479,6 @@
 
   border: 0 !important;
   border-radius: 999px !important;
-
   background: #bdbdbd !important;
 }
 
@@ -616,65 +488,138 @@
 
   border: 0 !important;
   border-radius: 50% !important;
-
   background: #fff !important;
 
   cursor: pointer !important;
 }
 
 /* ============================================================
-   CENTER CONTROLS
-   Positioned below the progress bar
+   PLAYER CONTROLS
    ============================================================ */
 
-#playerScreen .player-controls {
-  width: auto !important;
+#playerScreen .player-controls button {
+  width: 36px !important;
+  height: 36px !important;
+  min-width: 36px !important;
+  flex: 0 0 36px !important;
 
-  height: 42px !important;
-
-  display: flex !important;
-
+  display: inline-flex !important;
   align-items: center !important;
   justify-content: center !important;
 
-  gap: 8px !important;
-
-  margin: 18px 0 0 0 !important;
+  margin: 0 !important;
   padding: 0 !important;
 
-  flex-wrap: nowrap !important;
+  border: 0 !important;
+  border-radius: 50% !important;
 
-  box-sizing: border-box !important;
+  background: transparent !important;
+  color: #aaa !important;
+
+  cursor: pointer !important;
+  box-shadow: none !important;
+
+  transition:
+    background 0.18s ease,
+    color 0.18s ease,
+    transform 0.15s ease !important;
+}
+
+#playerScreen .player-controls button:hover {
+  color: #fff !important;
+  background: rgba(255, 255, 255, 0.05) !important;
+}
+
+#playerScreen .player-controls button:active {
+  transform: scale(0.94) !important;
+}
+
+#playerScreen .player-controls button svg {
+  width: 18px !important;
+  height: 18px !important;
+  flex: 0 0 auto !important;
+}
+
+#playerScreen .player-text-control {
+  width: auto !important;
+  min-width: 58px !important;
+  height: 36px !important;
+
+  flex: 0 0 auto !important;
+
+  padding: 0 8px !important;
+  border-radius: 9px !important;
+
+  color: #999 !important;
+  font-size: 11px !important;
+
+  white-space: nowrap !important;
+}
+
+#playerScreen .player-text-control:hover,
+#playerScreen .player-text-control.active {
+  color: #fff !important;
+  background: rgba(255, 255, 255, 0.05) !important;
+}
+
+/* Main play button. */
+#playerScreen #playPause,
+#playerScreen .play-main {
+  width: 52px !important;
+  height: 52px !important;
+  min-width: 52px !important;
+  flex: 0 0 52px !important;
+
+  margin: 0 4px !important;
+  padding: 0 !important;
+
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+
+  border: 0 !important;
+  border-radius: 50% !important;
+
+  background: #f2f0ea !important;
+  color: #111 !important;
+
+  box-shadow: 0 7px 24px rgba(255, 255, 255, 0.08) !important;
+}
+
+#playerScreen #playPause:hover,
+#playerScreen .play-main:hover {
+  background: #fff !important;
+  color: #000 !important;
+  transform: scale(1.04) !important;
+}
+
+#playerScreen #playPause svg,
+#playerScreen .play-main svg {
+  width: 21px !important;
+  height: 21px !important;
 }
 
 /* ============================================================
-   PLAYER ACTIONS
-   Designed to grow with future buttons.
+   ACTION BUTTONS / YOUTUBE
    ============================================================ */
 
 #playerScreen .player-actions {
   display: flex !important;
-
   align-items: center !important;
   justify-content: flex-end !important;
-
   gap: 8px !important;
 
   max-width: 100% !important;
-
   min-width: 0 !important;
 }
 
 #playerScreen .player-action-button {
   width: 38px !important;
   height: 38px !important;
-
   min-width: 38px !important;
-
   flex: 0 0 38px !important;
 
   display: inline-flex !important;
-
   align-items: center !important;
   justify-content: center !important;
 
@@ -682,11 +627,9 @@
   padding: 0 !important;
 
   border: 1px solid rgba(255, 255, 255, 0.1) !important;
-
   border-radius: 10px !important;
 
   background: transparent !important;
-
   color: #999 !important;
 
   cursor: pointer !important;
@@ -700,9 +643,7 @@
 
 #playerScreen .player-action-button:hover {
   color: #fff !important;
-
   background: rgba(255, 255, 255, 0.06) !important;
-
   border-color: rgba(255, 255, 255, 0.18) !important;
 }
 
@@ -713,290 +654,134 @@
 #playerScreen .player-action-button svg {
   width: 18px !important;
   height: 18px !important;
-
-  flex: 0 0 18px !important;
 }
-/* ============================================================
-   ALL CONTROL BUTTONS
-   ============================================================ */
 
-#playerScreen .player-controls button {
-  width: 36px !important;
-  height: 36px !important;
-
-  min-width: 36px !important;
-
-  flex: 0 0 36px !important;
-
+#playerScreen .player-youtube-toggle {
   display: inline-flex !important;
-
   align-items: center !important;
   justify-content: center !important;
-
-  margin: 0 !important;
-  padding: 0 !important;
-
-  border: 0 !important;
-  border-radius: 50% !important;
-
-  background: transparent !important;
-
-  color: #aaa !important;
-
-  cursor: pointer !important;
-
-  box-shadow: none !important;
-
-  transition:
-    background 0.18s ease,
-    color 0.18s ease,
-    transform 0.15s ease !important;
 }
 
-#playerScreen .player-controls button:hover {
-  color: #fff !important;
-
-  background: rgba(255, 255, 255, 0.05) !important;
-}
-
-#playerScreen .player-controls button svg {
+#playerScreen .player-youtube-toggle svg {
   width: 18px !important;
   height: 18px !important;
-
-  flex: 0 0 auto !important;
 }
 
-/* ============================================================
-   SHUFFLE / REPEAT
-   ============================================================ */
-
-#playerScreen .player-text-control {
-  width: auto !important;
-
-  min-width: 58px !important;
-
-  flex: 0 0 auto !important;
-
-  padding: 0 8px !important;
-
-  border-radius: 9px !important;
-
-  color: #999 !important;
-
-  font-size: 11px !important;
-
-  white-space: nowrap !important;
-}
-
-#playerScreen .player-text-control:hover,
-#playerScreen .player-text-control.active {
+#playerScreen.youtube-expanded .player-youtube-toggle {
   color: #fff !important;
-
-  background: rgba(255, 255, 255, 0.05) !important;
+  background: rgba(255, 255, 255, 0.1) !important;
+  border-color: rgba(255, 255, 255, 0.2) !important;
 }
 
 /* ============================================================
-   PLAY BUTTON
-   ============================================================ */
-
-#playerScreen #playPause,
-#playerScreen .play-main {
-  width: 52px !important;
-  height: 52px !important;
-
-  min-width: 52px !important;
-
-  flex: 0 0 52px !important;
-
-  margin: 0 4px !important;
-  padding: 0 !important;
-
-  display: inline-flex !important;
-
-  align-items: center !important;
-  justify-content: center !important;
-
-  border: 0 !important;
-  border-radius: 50% !important;
-
-  background: #f2f0ea !important;
-
-  color: #111 !important;
-
-  box-shadow: 0 7px 24px rgba(255, 255, 255, 0.08) !important;
-}
-
-#playerScreen #playPause:hover,
-#playerScreen .play-main:hover {
-  background: #fff !important;
-  color: #000 !important;
-
-  transform: scale(1.04) !important;
-}
-
-#playerScreen #playPause svg,
-#playerScreen .play-main svg {
-  width: 21px !important;
-  height: 21px !important;
-}
-
-/* ============================================================
-   TAGS PANEL
+   TAG PANEL
    ============================================================ */
 
 #playerScreen .player-panel {
   width: 100% !important;
-
   height: var(--player-tags-height) !important;
   min-height: var(--player-tags-height) !important;
-
   flex: 0 0 var(--player-tags-height) !important;
 
   margin: 0 !important;
   padding: 0 28px !important;
-
   box-sizing: border-box !important;
 
   background: var(--player-panel-bg) !important;
 
   border: 0 !important;
-
   border-top: 1px solid rgba(255, 255, 255, 0.07) !important;
 
   overflow: hidden !important;
 }
 
-/* Expanded panel */
-
 #playerScreen.tags-expanded .player-panel {
   height: var(--player-expanded-tags-height) !important;
   min-height: var(--player-expanded-tags-height) !important;
-
   flex-basis: var(--player-expanded-tags-height) !important;
 }
-
-/* ============================================================
-   TAG PANEL CONTENT
-   ============================================================ */
 
 #playerScreen .player-tab {
   width: 100% !important;
   height: 100% !important;
-
   min-width: 0 !important;
   min-height: 0 !important;
 
   margin: 0 !important;
   padding: 0 !important;
-
   box-sizing: border-box !important;
 }
 
 #playerScreen #tagsPanel {
   display: flex !important;
-
   flex-direction: column !important;
-
   align-items: stretch !important;
   justify-content: flex-start !important;
-
   gap: 0 !important;
 
   background: transparent !important;
 }
 
-/* ============================================================
-   TAG HEADER
-   ============================================================ */
-
 #playerScreen #tagsPanel .panel-header {
   width: 100% !important;
-
   height: 48px !important;
   min-height: 48px !important;
-
   flex: 0 0 48px !important;
 
   display: flex !important;
-
   align-items: center !important;
-
   justify-content: space-between !important;
-
   gap: 12px !important;
 
   margin: 0 !important;
   padding: 0 !important;
-
   box-sizing: border-box !important;
 }
-
-/* Tags heading */
 
 #playerScreen #tagsPanel .panel-header h3 {
   margin: 0 !important;
   padding: 0 !important;
 
   color: #e6e6e6 !important;
-
   font-size: 16px !important;
-
   font-weight: 500 !important;
-
   line-height: 1 !important;
 
   white-space: nowrap !important;
 }
 
-/* ============================================================
-   ADD TAG BUTTON
-   ============================================================ */
-
 #playerScreen #addPlayerTag {
   width: auto !important;
-
   min-width: 82px !important;
-
   height: 32px !important;
-
   flex: 0 0 auto !important;
 
   display: inline-flex !important;
-
   align-items: center !important;
   justify-content: center !important;
-
   gap: 6px !important;
 
   margin: 0 !important;
   padding: 0 11px !important;
 
   border: 1px solid rgba(255, 255, 255, 0.1) !important;
-
   border-radius: 10px !important;
 
   background: transparent !important;
-
   color: #cfcfcf !important;
 
   font-family: inherit !important;
-
   font-size: 11px !important;
-
   font-weight: 500 !important;
 
   white-space: nowrap !important;
-
   cursor: pointer !important;
-
   box-sizing: border-box !important;
 }
 
 #playerScreen #addPlayerTag:hover {
   color: #fff !important;
-
   background: rgba(255, 255, 255, 0.05) !important;
-
   border-color: rgba(255, 255, 255, 0.17) !important;
 }
 
@@ -1005,24 +790,16 @@
   height: 15px !important;
 }
 
-/* ============================================================
-   SELECTED TAGS
-   ============================================================ */
-
 #playerScreen .player-selected-tags {
   width: 100% !important;
-
   height: 78px !important;
   min-height: 78px !important;
-
   flex: 0 0 78px !important;
 
   min-width: 0 !important;
 
   display: none !important;
-
   align-items: center !important;
-
   gap: 8px !important;
 
   margin: 0 !important;
@@ -1030,7 +807,6 @@
 
   overflow-x: auto !important;
   overflow-y: hidden !important;
-
   scrollbar-width: none !important;
 
   box-sizing: border-box !important;
@@ -1040,45 +816,31 @@
   display: none !important;
 }
 
-/* Show tags when expanded */
-
 #playerScreen.tags-expanded .player-selected-tags {
   display: flex !important;
 }
 
-/* ============================================================
-   TAG CHIPS
-   ============================================================ */
-
 #playerScreen .player-selected-tag {
   height: 32px !important;
-
   min-width: max-content !important;
-
   flex: 0 0 auto !important;
 
   display: inline-flex !important;
-
   align-items: center !important;
   justify-content: center !important;
-
   gap: 6px !important;
 
   margin: 0 !important;
   padding: 0 11px !important;
 
   border: 1px solid rgba(255, 255, 255, 0.09) !important;
-
   border-radius: 999px !important;
 
   background: rgba(255, 255, 255, 0.025) !important;
-
   color: #d0d0d0 !important;
 
   font-family: inherit !important;
-
   font-size: 11px !important;
-
   white-space: nowrap !important;
 
   box-sizing: border-box !important;
@@ -1096,9 +858,7 @@
 #playerScreen .remove-player-tag {
   width: 14px !important;
   height: 14px !important;
-
   opacity: 0.45 !important;
-
   cursor: pointer !important;
 }
 
@@ -1106,27 +866,20 @@
   opacity: 1 !important;
 }
 
-/* ============================================================
-   HIDDEN COMPATIBILITY ELEMENTS
-   ============================================================ */
-
 #playerScreen #playerCompatibility {
   display: none !important;
 }
 
 /* ============================================================
-   TAG PICKER OVERLAY
+   TAG PICKER
    ============================================================ */
 
 .player-tag-picker-overlay {
   position: fixed !important;
-
   inset: 0 !important;
-
   z-index: 99999 !important;
 
   display: none !important;
-
   align-items: center !important;
   justify-content: center !important;
 
@@ -1134,7 +887,6 @@
   height: 100vh !important;
 
   padding: 20px !important;
-
   box-sizing: border-box !important;
 
   background: rgba(0, 0, 0, 0.68) !important;
@@ -1147,87 +899,57 @@
   display: flex !important;
 }
 
-/* ============================================================
-   PICKER WINDOW
-   ============================================================ */
-
 .player-tag-picker-window {
   width: min(520px, 100%) !important;
-
   max-width: 100% !important;
-
   max-height: min(650px, 90vh) !important;
-
   min-height: 0 !important;
 
   display: flex !important;
-
   flex-direction: column !important;
 
   overflow: hidden !important;
-
   box-sizing: border-box !important;
 
   background: #151515 !important;
-
   border: 1px solid rgba(255, 255, 255, 0.08) !important;
-
   border-radius: 22px !important;
 
   box-shadow: 0 30px 80px rgba(0, 0, 0, 0.72) !important;
 }
 
-/* ============================================================
-   PICKER HEADER
-   ============================================================ */
-
 .player-tag-picker-header {
   flex: 0 0 auto !important;
 
   display: flex !important;
-
   align-items: center !important;
   justify-content: space-between !important;
-
   gap: 12px !important;
 
   padding: 18px 20px !important;
-
   border-bottom: 1px solid rgba(255, 255, 255, 0.06) !important;
 }
 
 .player-tag-picker-header h3 {
   margin: 0 !important;
-
   color: #fff !important;
-
   font-size: 18px !important;
-
   font-weight: 500 !important;
 }
 
 .player-tag-picker-header span {
   display: block !important;
-
   margin-top: 4px !important;
-
   color: #777 !important;
-
   font-size: 11px !important;
 }
-
-/* ============================================================
-   PICKER CLOSE
-   ============================================================ */
 
 .player-tag-picker-close {
   width: 36px !important;
   height: 36px !important;
-
   min-width: 36px !important;
 
   display: inline-flex !important;
-
   align-items: center !important;
   justify-content: center !important;
 
@@ -1235,11 +957,9 @@
   padding: 0 !important;
 
   border: 1px solid rgba(255, 255, 255, 0.08) !important;
-
   border-radius: 11px !important;
 
   background: rgba(255, 255, 255, 0.04) !important;
-
   color: #999 !important;
 
   cursor: pointer !important;
@@ -1247,7 +967,6 @@
 
 .player-tag-picker-close:hover {
   color: #fff !important;
-
   background: rgba(255, 255, 255, 0.07) !important;
 }
 
@@ -1256,28 +975,20 @@
   height: 17px !important;
 }
 
-/* ============================================================
-   PICKER SEARCH
-   ============================================================ */
-
 .player-tag-search {
   flex: 0 0 auto !important;
 
   height: 44px !important;
 
   display: flex !important;
-
   align-items: center !important;
-
   gap: 8px !important;
 
   margin: 14px 18px !important;
   padding: 0 12px !important;
-
   box-sizing: border-box !important;
 
   border: 1px solid rgba(255, 255, 255, 0.07) !important;
-
   border-radius: 13px !important;
 
   background: #1b1b1b !important;
@@ -1286,17 +997,13 @@
 .player-tag-search svg {
   width: 16px !important;
   height: 16px !important;
-
   flex: 0 0 16px !important;
-
   color: #777 !important;
 }
 
 .player-tag-search input {
   width: 100% !important;
-
   min-width: 0 !important;
-
   flex: 1 1 auto !important;
 
   margin: 0 !important;
@@ -1306,7 +1013,6 @@
   outline: none !important;
 
   background: transparent !important;
-
   color: #fff !important;
 
   font: inherit !important;
@@ -1317,60 +1023,42 @@
   color: #666 !important;
 }
 
-/* ============================================================
-   PICKER LIST
-   ============================================================ */
-
 .player-tag-picker-list {
   flex: 1 1 auto !important;
-
   min-width: 0 !important;
   min-height: 0 !important;
 
   display: grid !important;
-
   grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
-
   gap: 8px !important;
 
   overflow-x: hidden !important;
   overflow-y: auto !important;
 
   margin: 0 !important;
-
   padding: 0 18px 18px !important;
-
   box-sizing: border-box !important;
 }
-
-/* ============================================================
-   PICKER OPTION
-   ============================================================ */
 
 .player-tag-picker-option {
   min-width: 0 !important;
   min-height: 48px !important;
 
   display: flex !important;
-
   align-items: center !important;
-
   gap: 8px !important;
 
   margin: 0 !important;
   padding: 0 12px !important;
 
   border: 1px solid rgba(255, 255, 255, 0.06) !important;
-
   border-radius: 12px !important;
 
   background: #1a1a1a !important;
-
   color: #999 !important;
 
   font: inherit !important;
   font-size: 13px !important;
-
   text-align: left !important;
 
   cursor: pointer !important;
@@ -1378,92 +1066,67 @@
 
 .player-tag-picker-option:hover {
   color: #fff !important;
-
   background: #202020 !important;
-
   border-color: rgba(255, 255, 255, 0.12) !important;
 }
 
 .player-tag-picker-option.selected {
   color: #000 !important;
-
   background: #f1efe9 !important;
-
   border-color: #fff !important;
 }
 
 .player-tag-picker-option svg {
   width: 18px !important;
   height: 18px !important;
-
   flex: 0 0 18px !important;
 }
 
 .player-tag-picker-option span:not(.player-tag-check) {
   min-width: 0 !important;
-
   overflow: hidden !important;
-
   text-overflow: ellipsis !important;
-
   white-space: nowrap !important;
 }
 
 .player-tag-check {
   margin-left: auto !important;
-
   color: inherit !important;
-
   font-weight: 700 !important;
 }
-
-/* ============================================================
-   PICKER FOOTER
-   ============================================================ */
 
 .player-tag-picker-footer {
   flex: 0 0 auto !important;
 
   display: flex !important;
-
   align-items: center !important;
-
   justify-content: space-between !important;
-
   gap: 12px !important;
 
   padding: 13px 18px !important;
-
   border-top: 1px solid rgba(255, 255, 255, 0.06) !important;
 }
 
 .player-tag-picker-footer span {
   min-width: 0 !important;
-
   color: #777 !important;
-
   font-size: 11px !important;
 }
 
 .player-tag-picker-footer button {
   height: 38px !important;
-
   min-width: 70px !important;
 
   padding: 0 17px !important;
 
   border: 1px solid rgba(255, 255, 255, 0.15) !important;
-
   border-radius: 999px !important;
 
   background: #f1efe9 !important;
-
   color: #000 !important;
 
   font: inherit !important;
-
   font-size: 12px !important;
-
   font-weight: 600 !important;
 
   cursor: pointer !important;
@@ -1474,22 +1137,173 @@
 }
 
 /* ============================================================
+   YOUTUBE PANEL
+   ============================================================ */
+
+/* Hidden until JS adds .youtube-expanded. */
+#playerScreen #youtubePanelWrapper {
+  display: none !important;
+}
+
+#playerScreen.youtube-expanded {
+  height: 100vh !important;
+  min-height: 100vh !important;
+  max-height: 100vh !important;
+  overflow: hidden !important;
+}
+
+#playerScreen.youtube-expanded .player-top {
+  flex: 0 0 var(--player-main-height) !important;
+  height: var(--player-main-height) !important;
+  min-height: var(--player-main-height) !important;
+  max-height: var(--player-main-height) !important;
+}
+
+#playerScreen.youtube-expanded
+  > .player-layout
+  > .player-panel:not(.player-youtube-panel) {
+  display: none !important;
+}
+
+#playerScreen.youtube-expanded #youtubePanelWrapper {
+  display: flex !important;
+  position: relative !important;
+
+  width: 100% !important;
+  height: calc(100vh - var(--player-main-height)) !important;
+
+  min-width: 0 !important;
+  min-height: 0 !important;
+
+  flex: 1 1 auto !important;
+
+  margin: 0 !important;
+  padding: 12px 16px 16px !important;
+  box-sizing: border-box !important;
+
+  background: var(--player-panel-bg) !important;
+
+  border: 0 !important;
+  border-top: 1px solid rgba(255, 255, 255, 0.07) !important;
+
+  overflow: hidden !important;
+}
+
+#playerScreen.youtube-expanded #youtubePanel {
+  display: flex !important;
+  flex-direction: column !important;
+
+  width: 100% !important;
+  height: 100% !important;
+
+  min-width: 0 !important;
+  min-height: 0 !important;
+
+  margin: 0 !important;
+  padding: 0 !important;
+
+  background: transparent !important;
+  border: 0 !important;
+}
+
+#playerScreen.youtube-expanded .youtube-panel-header {
+  flex: 0 0 44px !important;
+
+  width: 100% !important;
+  height: 44px !important;
+  min-height: 44px !important;
+
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+
+  margin: 0 !important;
+  padding: 0 4px 10px !important;
+  box-sizing: border-box !important;
+}
+
+#playerScreen.youtube-expanded .youtube-panel-header h3 {
+  margin: 0 !important;
+  color: #e6e6e6 !important;
+  font-size: 16px !important;
+  font-weight: 600 !important;
+}
+
+#playerScreen.youtube-expanded .youtube-content {
+  flex: 1 1 auto !important;
+
+  width: 100% !important;
+  height: auto !important;
+
+  min-width: 0 !important;
+  min-height: 0 !important;
+
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+
+  padding: 0 !important;
+  overflow: hidden !important;
+
+  background: #000 !important;
+  border-radius: 14px !important;
+  box-sizing: border-box !important;
+}
+
+#playerScreen.youtube-expanded .youtube-content iframe {
+  display: block !important;
+
+  width: 100% !important;
+  height: 100% !important;
+
+  min-width: 0 !important;
+  min-height: 0 !important;
+
+  margin: 0 !important;
+  padding: 0 !important;
+
+  border: 0 !important;
+  border-radius: 14px !important;
+
+  background: #000 !important;
+}
+
+#playerScreen.youtube-expanded .youtube-empty {
+  width: 100% !important;
+  height: 100% !important;
+  min-height: 0 !important;
+
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 8px !important;
+
+  margin: 0 !important;
+
+  color: rgba(255, 255, 255, 0.55) !important;
+  background: #000 !important;
+  border-radius: 14px !important;
+
+  text-align: center !important;
+}
+
+/* ============================================================
    TABLET
    ============================================================ */
 
-@media (max-width: 1000px) {
+@media (max-width: 1000px) and (min-width: 769px) {
   #playerScreen .player-top {
     padding-left: 20px !important;
     padding-right: 20px !important;
   }
 
   #playerScreen .player-controls {
-    gap: 6px !important;
+    gap: 5px !important;
   }
 
   #playerScreen .player-text-control {
     min-width: 52px !important;
-
     padding-left: 5px !important;
     padding-right: 5px !important;
   }
@@ -1497,6 +1311,9 @@
 
 /* ============================================================
    MOBILE
+   One clean system:
+   - top row: song left / tag + YouTube right
+   - lower row: progress + controls
    ============================================================ */
 
 @media (max-width: 768px) {
@@ -1506,1286 +1323,12 @@
     --player-expanded-tags-height: 116px;
   }
 
-  /* Main player */
-
   #playerScreen .player-top {
     height: var(--player-main-height) !important;
     min-height: var(--player-main-height) !important;
 
     padding: 8px 12px !important;
   }
-
-  /* Three rows */
-
-  #playerScreen .player-info {
-    grid-template-rows:
-      38px
-      28px
-      48px !important;
-  }
-
-  /* Song row */
-
-  #playerScreen .player-song-row {
-    gap: 10px !important;
-  }
-
-  /* Title */
-
-  #playerScreen #playerTitle {
-    font-size: 14px !important;
-    line-height: 17px !important;
-  }
-
-  /* Folder */
-
-  #playerScreen #playerArtist {
-    font-size: 9px !important;
-    line-height: 11px !important;
-  }
-
-  /* Tags toggle */
-
-  #playerScreen .player-tags-toggle {
-    width: 30px !important;
-    height: 30px !important;
-
-    min-width: 30px !important;
-
-    flex-basis: 30px !important;
-
-    border-radius: 8px !important;
-  }
-
-  #playerScreen .player-tags-toggle svg {
-    width: 14px !important;
-    height: 14px !important;
-  }
-
-  /* Progress */
-
-  #playerScreen .player-progress {
-    grid-template-columns:
-      34px
-      minmax(0, 1fr)
-      34px !important;
-
-    gap: 6px !important;
-  }
-
-  #playerScreen .player-progress span {
-    font-size: 8px !important;
-  }
-
-  /* Controls */
-
-  #playerScreen .player-controls {
-    height: 48px !important;
-
-    gap: 7px !important;
-  }
-
-  #playerScreen .player-controls button {
-    width: 32px !important;
-    height: 32px !important;
-
-    min-width: 32px !important;
-
-    flex-basis: 32px !important;
-  }
-
-  #playerScreen .player-controls button svg {
-    width: 16px !important;
-    height: 16px !important;
-  }
-
-  /* Shuffle / Repeat */
-
-  #playerScreen .player-text-control {
-    min-width: 52px !important;
-
-    height: 32px !important;
-
-    padding: 0 5px !important;
-
-    font-size: 9px !important;
-  }
-
-  /* Play */
-
-  #playerScreen #playPause,
-  #playerScreen .play-main {
-    width: 42px !important;
-    height: 42px !important;
-
-    min-width: 42px !important;
-
-    flex-basis: 42px !important;
-
-    margin: 0 2px !important;
-  }
-
-  #playerScreen #playPause svg,
-  #playerScreen .play-main svg {
-    width: 18px !important;
-    height: 18px !important;
-  }
-
-  /* Tags panel */
-
-  #playerScreen .player-panel {
-    height: var(--player-tags-height) !important;
-    min-height: var(--player-tags-height) !important;
-
-    flex-basis: var(--player-tags-height) !important;
-
-    padding: 0 12px !important;
-  }
-
-  #playerScreen.tags-expanded .player-panel {
-    height: var(--player-expanded-tags-height) !important;
-    min-height: var(--player-expanded-tags-height) !important;
-
-    flex-basis: var(--player-expanded-tags-height) !important;
-  }
-
-  /* Tags header */
-
-  #playerScreen #tagsPanel .panel-header {
-    height: 44px !important;
-    min-height: 44px !important;
-
-    flex-basis: 44px !important;
-  }
-
-  #playerScreen #tagsPanel .panel-header h3 {
-    font-size: 15px !important;
-  }
-
-  /* Add Tag */
-
-  #playerScreen #addPlayerTag {
-    min-width: 76px !important;
-
-    height: 31px !important;
-
-    padding: 0 9px !important;
-
-    font-size: 10px !important;
-  }
-
-  #playerScreen #addPlayerTag svg {
-    width: 14px !important;
-    height: 14px !important;
-  }
-
-  /* Selected tags */
-
-  #playerScreen .player-selected-tags {
-    height: 72px !important;
-    min-height: 72px !important;
-
-    flex-basis: 72px !important;
-
-    gap: 6px !important;
-  }
-
-  #playerScreen .player-selected-tag {
-    height: 30px !important;
-
-    padding: 0 9px !important;
-
-    font-size: 10px !important;
-  }
-
-  #playerScreen .player-selected-tag svg {
-    width: 12px !important;
-    height: 12px !important;
-  }
-
-  /* Picker becomes bottom sheet */
-
-  .player-tag-picker-overlay {
-    align-items: flex-end !important;
-
-    padding: 0 !important;
-  }
-
-  .player-tag-picker-window {
-    width: 100% !important;
-    max-width: 100% !important;
-
-    max-height: 88vh !important;
-
-    border-radius: 20px 20px 0 0 !important;
-  }
-
-  .player-tag-picker-list {
-    grid-template-columns: 1fr !important;
-
-    padding-left: 14px !important;
-    padding-right: 14px !important;
-  }
-
-  .player-tag-picker-header {
-    padding: 15px 16px !important;
-  }
-
-  .player-tag-search {
-    margin: 12px 14px !important;
-  }
-
-  .player-tag-picker-footer {
-    padding: 12px 14px !important;
-  }
-}
-
-/* ============================================================
-   SMALL PHONE
-   ============================================================ */
-
-@media (max-width: 430px) {
-  :root {
-    --player-main-height: 122px;
-    --player-tags-height: 72px;
-    --player-expanded-tags-height: 108px;
-  }
-
-  #playerScreen .player-top {
-    padding-left: 8px !important;
-    padding-right: 8px !important;
-  }
-
-  #playerScreen .player-info {
-    grid-template-rows:
-      36px
-      27px
-      45px !important;
-  }
-
-  #playerScreen .player-song-row {
-    gap: 7px !important;
-  }
-
-  #playerScreen #playerTitle {
-    font-size: 13px !important;
-  }
-
-  #playerScreen #playerArtist {
-    font-size: 8px !important;
-  }
-
-  #playerScreen .player-tags-toggle {
-    width: 28px !important;
-    height: 28px !important;
-
-    min-width: 28px !important;
-
-    flex-basis: 28px !important;
-  }
-
-  #playerScreen .player-tags-toggle svg {
-    width: 13px !important;
-    height: 13px !important;
-  }
-
-  #playerScreen .player-controls {
-    gap: 5px !important;
-  }
-
-  #playerScreen .player-controls button {
-    width: 29px !important;
-    height: 29px !important;
-
-    min-width: 29px !important;
-
-    flex-basis: 29px !important;
-  }
-
-  #playerScreen .player-controls button svg {
-    width: 14px !important;
-    height: 14px !important;
-  }
-
-  #playerScreen .player-text-control {
-    min-width: 46px !important;
-
-    padding: 0 3px !important;
-
-    font-size: 8px !important;
-  }
-
-  #playerScreen #playPause,
-  #playerScreen .play-main {
-    width: 39px !important;
-    height: 39px !important;
-
-    min-width: 39px !important;
-
-    flex-basis: 39px !important;
-  }
-
-  #playerScreen #playPause svg,
-  #playerScreen .play-main svg {
-    width: 17px !important;
-    height: 17px !important;
-  }
-
-  #playerScreen #tagsPanel .panel-header {
-    height: 42px !important;
-    min-height: 42px !important;
-
-    flex-basis: 42px !important;
-  }
-
-  #playerScreen #tagsPanel .panel-header h3 {
-    font-size: 14px !important;
-  }
-
-  #playerScreen #addPlayerTag {
-    min-width: 70px !important;
-
-    height: 29px !important;
-
-    padding: 0 7px !important;
-
-    font-size: 9px !important;
-  }
-
-  #playerScreen .player-selected-tags {
-    height: 66px !important;
-    min-height: 66px !important;
-
-    flex-basis: 66px !important;
-  }
-
-  #playerScreen .player-selected-tag {
-    height: 28px !important;
-
-    padding: 0 8px !important;
-
-    font-size: 9px !important;
-  }
-}
-
-/* ============================================================
-   VERY SMALL PHONE
-   ============================================================ */
-
-@media (max-width: 350px) {
-  :root {
-    --player-main-height: 120px;
-    --player-tags-height: 68px;
-    --player-expanded-tags-height: 102px;
-  }
-
-  #playerScreen .player-top {
-    padding-left: 6px !important;
-    padding-right: 6px !important;
-  }
-
-  #playerScreen .player-info {
-    grid-template-rows:
-      34px
-      26px
-      44px !important;
-  }
-
-  #playerScreen #playerTitle {
-    font-size: 12px !important;
-  }
-
-  #playerScreen #playerArtist {
-    font-size: 8px !important;
-  }
-
-  #playerScreen .player-tags-toggle {
-    width: 26px !important;
-    height: 26px !important;
-
-    min-width: 26px !important;
-
-    flex-basis: 26px !important;
-
-    border-radius: 7px !important;
-  }
-
-  #playerScreen .player-tags-toggle svg {
-    width: 12px !important;
-    height: 12px !important;
-  }
-
-  #playerScreen .player-progress {
-    grid-template-columns:
-      30px
-      minmax(0, 1fr)
-      30px !important;
-
-    gap: 4px !important;
-  }
-
-  #playerScreen .player-controls {
-    gap: 3px !important;
-  }
-
-  #playerScreen .player-controls button {
-    width: 27px !important;
-    height: 27px !important;
-
-    min-width: 27px !important;
-
-    flex-basis: 27px !important;
-  }
-
-  #playerScreen .player-controls button svg {
-    width: 13px !important;
-    height: 13px !important;
-  }
-
-  #playerScreen .player-text-control {
-    min-width: 40px !important;
-
-    padding: 0 2px !important;
-
-    font-size: 7px !important;
-  }
-
-  #playerScreen #playPause,
-  #playerScreen .play-main {
-    width: 36px !important;
-    height: 36px !important;
-
-    min-width: 36px !important;
-
-    flex-basis: 36px !important;
-  }
-
-  #playerScreen #playPause svg,
-  #playerScreen .play-main svg {
-    width: 16px !important;
-    height: 16px !important;
-  }
-
-  #playerScreen #tagsPanel .panel-header {
-    height: 40px !important;
-    min-height: 40px !important;
-
-    flex-basis: 40px !important;
-  }
-
-  #playerScreen #tagsPanel .panel-header h3 {
-    font-size: 13px !important;
-  }
-
-  #playerScreen #addPlayerTag {
-    min-width: 64px !important;
-
-    height: 27px !important;
-
-    padding: 0 6px !important;
-
-    font-size: 8px !important;
-  }
-
-  #playerScreen #addPlayerTag svg {
-    width: 12px !important;
-    height: 12px !important;
-  }
-
-  #playerScreen .player-selected-tags {
-    height: 62px !important;
-    min-height: 62px !important;
-
-    flex-basis: 62px !important;
-  }
-
-  #playerScreen .player-selected-tag {
-    height: 26px !important;
-
-    padding: 0 7px !important;
-
-    font-size: 8px !important;
-  }
-}
-
-/* ============================================================
-   REDUCED MOTION
-   ============================================================ */
-
-@media (prefers-reduced-motion: reduce) {
-  #playerScreen *,
-  .player-tag-picker-overlay * {
-    transition: none !important;
-    animation: none !important;
-  }
-}
-
-/* ============================================================
-   MOBILE PLAYER — FIX VERTICAL LAYOUT
-   ============================================================ */
-
-@media (max-width: 768px) {
-  /* Give the player content a little more usable height */
-  #playerScreen .player-top {
-    padding: 12px 12px 8px !important;
-  }
-
-  /* One full-width column on mobile */
-  #playerScreen .player-info {
-    width: 100% !important;
-    height: 100% !important;
-
-    grid-template-columns: 1fr !important;
-
-    grid-template-rows:
-      32px
-      28px
-      48px !important;
-
-    row-gap: 2px !important;
-
-    align-items: center !important;
-  }
-
-  /* Song */
-  #playerScreen .player-song-row {
-    grid-column: 1 !important;
-    grid-row: 1 !important;
-
-    width: 100% !important;
-  }
-
-  /* Progress — full width */
-  #playerScreen .player-progress {
-    grid-column: 1 !important;
-    grid-row: 2 !important;
-
-    width: 100% !important;
-
-    display: grid !important;
-
-    grid-template-columns:
-      34px
-      minmax(0, 1fr)
-      34px !important;
-
-    gap: 6px !important;
-
-    margin: 0 !important;
-    padding: 0 !important;
-
-    align-self: center !important;
-  }
-
-  /* Controls — below progress */
-  #playerScreen .player-controls {
-    grid-column: 1 !important;
-    grid-row: 3 !important;
-
-    width: 100% !important;
-
-    height: 48px !important;
-
-    margin: 0 !important;
-    padding: 0 !important;
-
-    align-self: center !important;
-
-    justify-content: center !important;
-  }
-}
-
-/* ============================================================
-   MOBILE — COMPACT PROGRESS BAR
-   ============================================================ */
-
-@media (max-width: 768px) {
-  #playerScreen .player-progress {
-    grid-column: 1 !important;
-    grid-row: 2 !important;
-
-    /* Don't stretch across the whole phone */
-    width: min(360px, 82vw) !important;
-    max-width: 360px !important;
-
-    display: grid !important;
-
-    grid-template-columns:
-      32px
-      minmax(70px, 1fr)
-      32px !important;
-
-    gap: 5px !important;
-
-    margin: 0 auto !important;
-    padding: 0 !important;
-
-    align-self: center !important;
-    justify-self: center !important;
-  }
-
-  #playerScreen .player-progress span {
-    font-size: 8px !important;
-  }
-}
-
-/* ================================================================
-   MOONBOX — FINAL PLAYER COLUMN SYSTEM
-   ================================================================
-
-   YOUR COLUMN NUMBERS:
-
-   COLUMN 1 = SONG
-   COLUMN 2 = MAIN PLAYER
-   COLUMN 3 = TAG TOGGLE
-
-   DESKTOP:
-   ┌────────────┬────────────────────┬───────────┐
-   │ COLUMN 1   │ COLUMN 2           │ COLUMN 3  │
-   │ Song       │ Progress           │ Tag       │
-   │            │ Controls           │           │
-   └────────────┴────────────────────┴───────────┘
-
-   MOBILE:
-   ROW 1:
-   ┌────────────────────┬────────────────────┐
-   │ COLUMN 1           │ COLUMN 3           │
-   │ Song               │ Tag                │
-   └────────────────────┴────────────────────┘
-
-   ROW 2:
-   ┌───────────────────────────────────────────┐
-   │ COLUMN 2                                 │
-   │ Progress + Controls                      │
-   └───────────────────────────────────────────┘
-   ================================================================ */
-
-/* ================================================================
-   DESKTOP
-   ================================================================ */
-
-@media (min-width: 769px) {
-  /* --------------------------------------------------------------
-     MAIN 3-COLUMN GRID
-     -------------------------------------------------------------- */
-
-  #playerScreen .player-info {
-    position: relative !important;
-
-    width: 100% !important;
-    height: 100% !important;
-
-    min-width: 0 !important;
-    min-height: 0 !important;
-
-    display: grid !important;
-
-    grid-template-columns:
-      30%
-      50%
-      20% !important;
-
-    grid-template-rows: 1fr !important;
-
-    column-gap: 0 !important;
-    row-gap: 0 !important;
-
-    align-items: center !important;
-
-    margin: 0 !important;
-    padding: 0 !important;
-
-    box-sizing: border-box !important;
-  }
-
-  /* --------------------------------------------------------------
-     SONG ROW BECOMES A TRANSPARENT GRID WRAPPER
-     -------------------------------------------------------------- */
-
-  #playerScreen .player-song-row {
-    display: contents !important;
-  }
-
-  /* --------------------------------------------------------------
-     COLUMN 1 — SONG
-     -------------------------------------------------------------- */
-
-  #playerScreen .song-meta {
-    grid-column: 1 !important;
-    grid-row: 1 !important;
-
-    width: 100% !important;
-    min-width: 0 !important;
-
-    align-self: center !important;
-    justify-self: stretch !important;
-
-    display: flex !important;
-    flex-direction: column !important;
-
-    align-items: flex-start !important;
-    justify-content: center !important;
-
-    gap: 2px !important;
-
-    margin: 0 !important;
-    padding: 0 10px 0 0 !important;
-
-    box-sizing: border-box !important;
-
-    overflow: hidden !important;
-  }
-
-  #playerScreen .player-title-editor {
-    width: 100% !important;
-    min-width: 0 !important;
-
-    overflow: hidden !important;
-  }
-
-  #playerScreen .player-title-row {
-    width: 100% !important;
-    min-width: 0 !important;
-
-    display: flex !important;
-
-    align-items: center !important;
-
-    gap: 7px !important;
-
-    overflow: hidden !important;
-  }
-
-  #playerScreen #playerTitle {
-    max-width: 100% !important;
-    min-width: 0 !important;
-
-    white-space: nowrap !important;
-
-    overflow: hidden !important;
-    text-overflow: ellipsis !important;
-  }
-
-  #playerScreen #playerArtist {
-    width: 100% !important;
-    max-width: 100% !important;
-
-    min-width: 0 !important;
-
-    white-space: nowrap !important;
-
-    overflow: hidden !important;
-    text-overflow: ellipsis !important;
-  }
-
-  /* --------------------------------------------------------------
-     COLUMN 2 — PROGRESS
-     -------------------------------------------------------------- */
-
-  #playerScreen .player-progress {
-    grid-column: 2 !important;
-    grid-row: 1 !important;
-
-    width: 100% !important;
-
-    min-width: 0 !important;
-    max-width: none !important;
-
-    align-self: center !important;
-    justify-self: stretch !important;
-
-    margin: 0 !important;
-    padding: 0 12px !important;
-
-    box-sizing: border-box !important;
-  }
-
-  /* --------------------------------------------------------------
-     COLUMN 2 — CONTROLS
-     -------------------------------------------------------------- */
-
-  #playerScreen .player-controls {
-    grid-column: 2 !important;
-    grid-row: 1 !important;
-
-    width: 100% !important;
-
-    min-width: 0 !important;
-
-    align-self: end !important;
-    justify-self: center !important;
-
-    display: flex !important;
-
-    align-items: center !important;
-    justify-content: center !important;
-
-    gap: 6px !important;
-
-    margin: 0 0 4px 0 !important;
-    padding: 0 !important;
-
-    box-sizing: border-box !important;
-  }
-
-  /* --------------------------------------------------------------
-     COLUMN 3 — TAG TOGGLE
-     -------------------------------------------------------------- */
-
-  #playerScreen .player-tags-toggle {
-    grid-column: 3 !important;
-    grid-row: 1 !important;
-
-    justify-self: end !important;
-    align-self: center !important;
-
-    width: 34px !important;
-    height: 34px !important;
-
-    min-width: 34px !important;
-
-    margin: 0 4px 0 0 !important;
-    padding: 0 !important;
-
-    display: inline-flex !important;
-
-    align-items: center !important;
-    justify-content: center !important;
-
-    box-sizing: border-box !important;
-  }
-}
-
-/* ================================================================
-   MOBILE
-   ================================================================ */
-
-@media (max-width: 768px) {
-  /* --------------------------------------------------------------
-     MOBILE GRID
-
-     Physical grid:
-       left  = COLUMN 1
-       right = COLUMN 3
-
-     Second row spans both:
-       COLUMN 2
-     -------------------------------------------------------------- */
-
-  #playerScreen .player-info {
-    position: relative !important;
-
-    width: 100% !important;
-    height: 100% !important;
-
-    min-width: 0 !important;
-    min-height: 0 !important;
-
-    display: grid !important;
-
-    grid-template-columns:
-      minmax(0, 1fr)
-      minmax(0, 1fr) !important;
-
-    grid-template-rows:
-      50%
-      50% !important;
-
-    column-gap: 0 !important;
-    row-gap: 0 !important;
-
-    align-items: center !important;
-
-    margin: 0 !important;
-    padding: 0 !important;
-
-    box-sizing: border-box !important;
-  }
-
-  /* --------------------------------------------------------------
-     IMPORTANT:
-     Remove player-song-row from the grid itself.
-
-     Its children become grid items:
-       .song-meta
-       .player-tags-toggle
-     -------------------------------------------------------------- */
-
-  #playerScreen .player-song-row {
-    display: contents !important;
-  }
-
-  /* ==============================================================
-     ROW 1 — COLUMN 1 — SONG
-     ============================================================== */
-
-  #playerScreen .song-meta {
-    grid-column: 1 !important;
-    grid-row: 1 !important;
-
-    width: 100% !important;
-    min-width: 0 !important;
-
-    align-self: center !important;
-    justify-self: stretch !important;
-
-    display: flex !important;
-
-    flex-direction: column !important;
-
-    align-items: flex-start !important;
-    justify-content: center !important;
-
-    gap: 1px !important;
-
-    margin: 0 !important;
-    padding: 0 6px 0 0 !important;
-
-    box-sizing: border-box !important;
-
-    overflow: hidden !important;
-  }
-
-  #playerScreen .player-title-editor {
-    width: 100% !important;
-    min-width: 0 !important;
-
-    overflow: hidden !important;
-  }
-
-  #playerScreen .player-title-row {
-    width: 100% !important;
-    min-width: 0 !important;
-
-    display: flex !important;
-
-    align-items: center !important;
-
-    gap: 5px !important;
-
-    overflow: hidden !important;
-  }
-
-  #playerScreen #playerTitle {
-    max-width: 100% !important;
-    min-width: 0 !important;
-
-    font-size: 14px !important;
-    line-height: 17px !important;
-
-    white-space: nowrap !important;
-
-    overflow: hidden !important;
-    text-overflow: ellipsis !important;
-  }
-
-  #playerScreen #playerArtist {
-    width: 100% !important;
-    max-width: 100% !important;
-
-    min-width: 0 !important;
-
-    font-size: 9px !important;
-    line-height: 11px !important;
-
-    white-space: nowrap !important;
-
-    overflow: hidden !important;
-    text-overflow: ellipsis !important;
-  }
-
-  /* ==============================================================
-     ROW 1 — COLUMN 3 — TAG BUTTON
-     ============================================================== */
-
-  #playerScreen .player-tags-toggle {
-    grid-column: 2 !important;
-    grid-row: 1 !important;
-
-    justify-self: end !important;
-    align-self: center !important;
-
-    width: 30px !important;
-    height: 30px !important;
-
-    min-width: 30px !important;
-
-    margin: 0 5px 0 0 !important;
-    padding: 0 !important;
-
-    display: inline-flex !important;
-
-    align-items: center !important;
-    justify-content: center !important;
-
-    border-radius: 8px !important;
-
-    box-sizing: border-box !important;
-  }
-
-  #playerScreen .player-tags-toggle svg {
-    width: 14px !important;
-    height: 14px !important;
-  }
-
-  /* ==============================================================
-     ROW 2 — COLUMN 2 — PROGRESS
-     ============================================================== */
-
-  #playerScreen .player-progress {
-    grid-column: 1 / -1 !important;
-    grid-row: 2 !important;
-
-    width: 100% !important;
-
-    min-width: 0 !important;
-    max-width: none !important;
-
-    align-self: start !important;
-    justify-self: stretch !important;
-
-    display: grid !important;
-
-    grid-template-columns:
-      34px
-      minmax(0, 1fr)
-      34px !important;
-
-    gap: 6px !important;
-
-    margin: 7px 0 0 0 !important;
-    padding: 0 8px !important;
-
-    box-sizing: border-box !important;
-  }
-
-  #playerScreen .player-progress span {
-    font-size: 8px !important;
-
-    line-height: 1 !important;
-  }
-
-  /* ==============================================================
-     ROW 2 — COLUMN 2 — CONTROLS
-     ============================================================== */
-
-  #playerScreen .player-controls {
-    grid-column: 1 / -1 !important;
-    grid-row: 2 !important;
-
-    width: 100% !important;
-    height: auto !important;
-
-    min-width: 0 !important;
-
-    align-self: end !important;
-    justify-self: stretch !important;
-
-    display: flex !important;
-
-    align-items: center !important;
-    justify-content: center !important;
-
-    gap: 4px !important;
-
-    margin: 0 0 3px 0 !important;
-    padding: 0 6px !important;
-
-    flex-wrap: nowrap !important;
-
-    box-sizing: border-box !important;
-  }
-
-  /* --------------------------------------------------------------
-     MOBILE CONTROL BUTTONS
-     -------------------------------------------------------------- */
-
-  #playerScreen .player-controls button {
-    width: 30px !important;
-    height: 30px !important;
-
-    min-width: 30px !important;
-
-    flex: 0 0 30px !important;
-  }
-
-  #playerScreen .player-controls button svg {
-    width: 15px !important;
-    height: 15px !important;
-  }
-
-  #playerScreen .player-text-control {
-    min-width: 42px !important;
-
-    height: 30px !important;
-
-    padding: 0 3px !important;
-
-    font-size: 8px !important;
-  }
-
-  /* --------------------------------------------------------------
-     MOBILE MAIN PLAY BUTTON
-     -------------------------------------------------------------- */
-
-  #playerScreen #playPause,
-  #playerScreen .play-main {
-    width: 40px !important;
-    height: 40px !important;
-
-    min-width: 40px !important;
-
-    flex: 0 0 40px !important;
-
-    margin: 0 1px !important;
-  }
-
-  #playerScreen #playPause svg,
-  #playerScreen .play-main svg {
-    width: 17px !important;
-    height: 17px !important;
-  }
-}
-
-/* ================================================================
-   SMALL PHONES
-   ================================================================ */
-
-@media (max-width: 420px) {
-  #playerScreen #playerTitle {
-    font-size: 13px !important;
-    line-height: 16px !important;
-  }
-
-  #playerScreen #playerArtist {
-    font-size: 8px !important;
-    line-height: 10px !important;
-  }
-
-  #playerScreen .player-tags-toggle {
-    width: 28px !important;
-    height: 28px !important;
-
-    min-width: 28px !important;
-
-    margin-right: 4px !important;
-  }
-
-  #playerScreen .player-controls {
-    gap: 2px !important;
-
-    padding-left: 3px !important;
-    padding-right: 3px !important;
-  }
-
-  #playerScreen .player-controls button {
-    width: 28px !important;
-    height: 28px !important;
-
-    min-width: 28px !important;
-
-    flex-basis: 28px !important;
-  }
-
-  #playerScreen #playPause,
-  #playerScreen .play-main {
-    width: 36px !important;
-    height: 36px !important;
-
-    min-width: 36px !important;
-
-    flex-basis: 36px !important;
-  }
-
-  #playerScreen .player-progress {
-    grid-template-columns:
-      30px
-      minmax(0, 1fr)
-      30px !important;
-
-    gap: 4px !important;
-
-    padding-left: 4px !important;
-    padding-right: 4px !important;
-  }
-}
-
-/* ================================================================
-   VERY SMALL PHONES
-   ================================================================ */
-
-@media (max-width: 300px) {
-  #playerScreen #playerTitle {
-    font-size: 12px !important;
-    line-height: 15px !important;
-  }
-
-  #playerScreen #playerArtist {
-    font-size: 7px !important;
-    line-height: 9px !important;
-  }
-
-  #playerScreen .player-tags-toggle {
-    width: 26px !important;
-    height: 26px !important;
-
-    min-width: 26px !important;
-
-    margin-right: 3px !important;
-  }
-
-  #playerScreen .player-controls {
-    gap: 1px !important;
-
-    padding-left: 2px !important;
-    padding-right: 2px !important;
-  }
-
-  #playerScreen .player-controls button {
-    width: 26px !important;
-    height: 26px !important;
-
-    min-width: 26px !important;
-
-    flex-basis: 26px !important;
-  }
-
-  #playerScreen #playPause,
-  #playerScreen .play-main {
-    width: 32px !important;
-    height: 32px !important;
-
-    min-width: 32px !important;
-
-    flex-basis: 32px !important;
-  }
-
-  #playerScreen .player-progress {
-    grid-template-columns:
-      27px
-      minmax(0, 1fr)
-      27px !important;
-
-    gap: 3px !important;
-  }
-}
-
-/* ================================================================
-   MOONBOX PLAYER — MOBILE FINAL LAYOUT
-   ================================================================
-
-   COLUMN 1 = SONG       → ROW 1 LEFT 50%
-   COLUMN 3 = TAG        → ROW 1 RIGHT 50%
-   COLUMN 2 = PLAYER     → ROW 2 FULL WIDTH
-
-   This version intentionally uses absolute positioning so that
-   previous grid/flex rules cannot interfere.
-   ================================================================ */
-
-@media (max-width: 768px) {
-  /* ==============================================================
-     PLAYER INFO — THE 2 ROW AREA
-     ============================================================== */
 
   #playerScreen .player-info {
     position: relative !important;
@@ -2802,29 +1345,17 @@
     padding: 0 !important;
 
     box-sizing: border-box !important;
-
     overflow: visible !important;
   }
 
-  /* ==============================================================
-     COLUMN 1 — SONG
-     ROW 1 LEFT 50%
-     ============================================================== */
-
+  /* Allow song and controls to be positioned independently. */
   #playerScreen .player-song-row {
-    position: static !important;
-
-    width: 100% !important;
-    height: auto !important;
-
-    min-width: 0 !important;
-    min-height: 0 !important;
-
     display: contents !important;
-
-    margin: 0 !important;
-    padding: 0 !important;
   }
+
+  /* ----------------------------------------------------------
+     TOP LEFT — SONG
+     ---------------------------------------------------------- */
 
   #playerScreen .song-meta {
     position: absolute !important;
@@ -2838,51 +1369,36 @@
     min-width: 0 !important;
 
     display: flex !important;
-
     flex-direction: column !important;
-
     align-items: flex-start !important;
     justify-content: center !important;
-
     gap: 1px !important;
 
     margin: 0 !important;
     padding: 0 8px 0 16px !important;
 
     box-sizing: border-box !important;
-
     overflow: hidden !important;
-
     text-align: left !important;
 
     z-index: 10 !important;
   }
 
-  #playerScreen .player-title-editor {
+  #playerScreen .player-title-editor,
+  #playerScreen .player-title-row {
     width: 100% !important;
-
     min-width: 0 !important;
-
     overflow: hidden !important;
   }
 
   #playerScreen .player-title-row {
-    width: 100% !important;
-
-    min-width: 0 !important;
-
     display: flex !important;
-
     align-items: center !important;
-
     gap: 5px !important;
-
-    overflow: hidden !important;
   }
 
   #playerScreen #playerTitle {
     width: 100% !important;
-
     max-width: 100% !important;
     min-width: 0 !important;
 
@@ -2891,16 +1407,15 @@
 
     font-size: 14px !important;
     line-height: 17px !important;
+    font-weight: 600 !important;
 
     white-space: nowrap !important;
-
     overflow: hidden !important;
     text-overflow: ellipsis !important;
   }
 
   #playerScreen #playerArtist {
     width: 100% !important;
-
     max-width: 100% !important;
     min-width: 0 !important;
 
@@ -2911,113 +1426,148 @@
     line-height: 11px !important;
 
     white-space: nowrap !important;
-
     overflow: hidden !important;
     text-overflow: ellipsis !important;
   }
 
-  /* ==============================================================
-     COLUMN 3 — TAG BUTTON
-     ROW 1 RIGHT 50%
-     ============================================================== */
+  /* ----------------------------------------------------------
+   TOP RIGHT — TAG
+   ---------------------------------------------------------- */
 
   #playerScreen .player-tags-toggle {
     position: absolute !important;
 
-    right: 8px !important;
-    top: 25% !important;
+    top: 1px !important;
+    right: 54px !important;
 
-    transform: translateY(-50%) !important;
+    width: 34px !important;
+    height: 34px !important;
+    min-width: 34px !important;
 
-    width: 36px !important;
-    height: 36px !important;
+    margin: 0 !important;
+    padding: 0 !important;
 
-    min-width: 36px !important;
+    transform: none !important;
+    z-index: 50 !important;
+  }
 
-    display: inline-flex !important;
+  #playerScreen .player-tags-toggle:hover {
+    transform: none !important;
+  }
 
+  #playerScreen .player-tags-toggle:active {
+    transform: scale(0.94) !important;
+  }
+
+  #playerScreen .player-tags-toggle svg {
+    width: 17px !important;
+    height: 17px !important;
+  }
+
+  /* ----------------------------------------------------------
+     TOP RIGHT — YOUTUBE
+     ---------------------------------------------------------- */
+
+  #playerScreen .player-actions {
+    position: absolute !important;
+
+    top: 10px !important;
+    right: 10px !important;
+
+    width: 34px !important;
+    height: 34px !important;
+
+    margin: 0 !important;
+    padding: 0 !important;
+
+    display: flex !important;
     align-items: center !important;
     justify-content: center !important;
+
+    gap: 0 !important;
+
+    z-index: 50 !important;
+  }
+
+  #playerScreen .player-actions .player-action-button,
+  #playerScreen .player-actions .player-youtube-toggle,
+  #playerScreen .player-youtube-toggle {
+    width: 34px !important;
+    height: 34px !important;
+    min-width: 34px !important;
+    max-width: 34px !important;
+
+    flex: 0 0 34px !important;
 
     margin: 0 !important;
     padding: 0 !important;
 
     box-sizing: border-box !important;
-
-    z-index: 20 !important;
+    transform: none !important;
   }
 
-  #playerScreen .player-tags-toggle:hover {
-    transform: translateY(-50%) !important;
+  #playerScreen .player-youtube-toggle:hover {
+    transform: none !important;
   }
 
-  #playerScreen .player-tags-toggle:active {
-    transform: translateY(-50%) scale(0.94) !important;
+  #playerScreen .player-youtube-toggle:active {
+    transform: scale(0.94) !important;
   }
 
-  #playerScreen .player-tags-toggle svg {
-    width: 16px !important;
-    height: 16px !important;
+  #playerScreen .player-youtube-toggle svg {
+    width: 17px !important;
+    height: 17px !important;
+    margin: 0 !important;
   }
 
-  /* ==============================================================
-     COLUMN 2 — PROGRESS
-     ROW 2 — 100%
-     ============================================================== */
+  /* ----------------------------------------------------------
+   LOWER ROW — PROGRESS
+   Dedicated row above playback controls
+   ---------------------------------------------------------- */
 
   #playerScreen .player-progress {
     position: absolute !important;
 
-    left: 0 !important;
-    top: 50% !important;
+    left: 10% !important;
+    top: 54px !important;
 
-    width: 100% !important;
-    height: auto !important;
+    width: 80% !important;
+    height: 18px !important;
 
     min-width: 0 !important;
     max-width: none !important;
 
     display: grid !important;
-
-    grid-template-columns:
-      34px
-      minmax(0, 1fr)
-      34px !important;
-
+    grid-template-columns: 32px minmax(0, 1fr) 32px !important;
     align-items: center !important;
-
     gap: 6px !important;
 
     margin: 0 !important;
-    padding: 0 8px !important;
+    padding: 0 !important;
 
-    transform: translateY(-10px) !important;
-
+    transform: none !important;
     box-sizing: border-box !important;
 
-    z-index: 5 !important;
+    z-index: 20 !important;
   }
 
   #playerScreen .player-progress span {
     font-size: 8px !important;
-
     line-height: 1 !important;
-
-    text-align: center !important;
   }
 
   #playerScreen #progressBar {
     width: 100% !important;
-
-    min-width: 0 !important;
-
     height: 5px !important;
+
+    position: relative !important;
+    z-index: 21 !important;
   }
 
-  /* ==============================================================
-     COLUMN 2 — CONTROLS
-     ROW 2 — 100%
-     ============================================================== */
+  /* ----------------------------------------------------------
+   LOWER ROW — CONTROLS
+   Dedicated bottom row
+   ---------------------------------------------------------- */
 
   #playerScreen .player-controls {
     position: absolute !important;
@@ -3026,39 +1576,30 @@
     bottom: 0 !important;
 
     width: 100% !important;
-    height: 50% !important;
+    height: 52px !important;
 
     min-width: 0 !important;
 
     display: flex !important;
-
-    align-items: flex-end !important;
+    align-items: center !important;
     justify-content: center !important;
 
     gap: 4px !important;
 
     margin: 0 !important;
-    padding: 0 8px 4px !important;
+    padding: 0 8px !important;
 
     box-sizing: border-box !important;
+    flex-wrap: nowrap !important;
 
-    z-index: 5 !important;
+    z-index: 10 !important;
   }
-
-  /* ==============================================================
-     CONTROL BUTTONS
-     ============================================================== */
 
   #playerScreen .player-controls button {
     width: 30px !important;
     height: 30px !important;
-
     min-width: 30px !important;
-
     flex: 0 0 30px !important;
-
-    margin: 0 !important;
-    padding: 0 !important;
   }
 
   #playerScreen .player-controls button svg {
@@ -3066,31 +1607,19 @@
     height: 15px !important;
   }
 
-  /* ==============================================================
-     SHUFFLE / REPEAT
-     ============================================================== */
-
   #playerScreen .player-text-control {
     min-width: 42px !important;
-
     height: 30px !important;
 
     padding: 0 3px !important;
-
     font-size: 8px !important;
   }
-
-  /* ==============================================================
-     MAIN PLAY BUTTON
-     ============================================================== */
 
   #playerScreen #playPause,
   #playerScreen .play-main {
     width: 40px !important;
     height: 40px !important;
-
     min-width: 40px !important;
-
     flex: 0 0 40px !important;
 
     margin: 0 1px !important;
@@ -3101,11 +1630,141 @@
     width: 17px !important;
     height: 17px !important;
   }
+
+  /* ----------------------------------------------------------
+     TAG PANEL
+     ---------------------------------------------------------- */
+
+  #playerScreen .player-panel {
+    height: var(--player-tags-height) !important;
+    min-height: var(--player-tags-height) !important;
+    flex-basis: var(--player-tags-height) !important;
+
+    padding: 0 12px !important;
+  }
+
+  #playerScreen.tags-expanded .player-panel {
+    height: var(--player-expanded-tags-height) !important;
+    min-height: var(--player-expanded-tags-height) !important;
+    flex-basis: var(--player-expanded-tags-height) !important;
+  }
+
+  #playerScreen #tagsPanel .panel-header {
+    height: 44px !important;
+    min-height: 44px !important;
+    flex-basis: 44px !important;
+  }
+
+  #playerScreen #tagsPanel .panel-header h3 {
+    font-size: 15px !important;
+  }
+
+  #playerScreen #addPlayerTag {
+    min-width: 76px !important;
+    height: 31px !important;
+    padding: 0 9px !important;
+    font-size: 10px !important;
+  }
+
+  #playerScreen #addPlayerTag svg {
+    width: 14px !important;
+    height: 14px !important;
+  }
+
+  #playerScreen .player-selected-tags {
+    height: 72px !important;
+    min-height: 72px !important;
+    flex-basis: 72px !important;
+    gap: 6px !important;
+  }
+
+  #playerScreen .player-selected-tag {
+    height: 30px !important;
+    padding: 0 9px !important;
+    font-size: 10px !important;
+  }
+
+  #playerScreen .player-selected-tag svg {
+    width: 12px !important;
+    height: 12px !important;
+  }
+
+  /* ----------------------------------------------------------
+     TAG PICKER — BOTTOM SHEET
+     ---------------------------------------------------------- */
+
+  .player-tag-picker-overlay {
+    align-items: flex-end !important;
+    padding: 0 !important;
+  }
+
+  .player-tag-picker-window {
+    width: 100% !important;
+    max-width: 100% !important;
+    max-height: 88vh !important;
+    border-radius: 20px 20px 0 0 !important;
+  }
+
+  .player-tag-picker-list {
+    grid-template-columns: 1fr !important;
+    padding-left: 14px !important;
+    padding-right: 14px !important;
+  }
+
+  .player-tag-picker-header {
+    padding: 15px 16px !important;
+  }
+
+  .player-tag-search {
+    margin: 12px 14px !important;
+  }
+
+  .player-tag-picker-footer {
+    padding: 12px 14px !important;
+  }
+
+  /* ----------------------------------------------------------
+     YOUTUBE — MOBILE
+     ---------------------------------------------------------- */
+
+  #playerScreen.youtube-expanded {
+    height: 100vh !important;
+    min-height: 100vh !important;
+    max-height: 100vh !important;
+  }
+
+  #playerScreen.youtube-expanded .player-top {
+    flex-basis: var(--player-main-height) !important;
+    height: var(--player-main-height) !important;
+    min-height: var(--player-main-height) !important;
+  }
+
+  #playerScreen.youtube-expanded #youtubePanelWrapper {
+    height: calc(100vh - var(--player-main-height)) !important;
+    min-height: 0 !important;
+    padding: 8px !important;
+  }
+
+  #playerScreen.youtube-expanded .youtube-panel-header {
+    flex-basis: 38px !important;
+    height: 38px !important;
+    min-height: 38px !important;
+    padding: 0 2px 8px !important;
+  }
+
+  #playerScreen.youtube-expanded .youtube-panel-header h3 {
+    font-size: 13px !important;
+  }
+
+  #playerScreen.youtube-expanded .youtube-content,
+  #playerScreen.youtube-expanded .youtube-content iframe {
+    border-radius: 10px !important;
+  }
 }
 
-/* ================================================================
-   SMALL PHONE
-   ================================================================ */
+/* ============================================================
+   SMALL PHONES
+   ============================================================ */
 
 @media (max-width: 420px) {
   #playerScreen .song-meta {
@@ -3123,29 +1782,49 @@
   }
 
   #playerScreen .player-tags-toggle {
+    top: 1px !important;
+    right: 42px !important;
+
+    width: 30px !important;
+    height: 30px !important;
+    min-width: 30px !important;
+  }
+
+  #playerScreen .player-tags-toggle svg {
+    width: 15px !important;
+    height: 15px !important;
+  }
+
+  #playerScreen .player-actions {
+    top: 8px !important;
     right: 6px !important;
 
-    width: 32px !important;
-    height: 32px !important;
+    width: 30px !important;
+    height: 30px !important;
+  }
 
-    min-width: 32px !important;
+  #playerScreen .player-actions .player-action-button,
+  #playerScreen .player-actions .player-youtube-toggle,
+  #playerScreen .player-youtube-toggle {
+    width: 30px !important;
+    height: 30px !important;
+    min-width: 30px !important;
+    max-width: 30px !important;
+    flex-basis: 30px !important;
+  }
+
+  #playerScreen .player-youtube-toggle svg {
+    width: 15px !important;
+    height: 15px !important;
   }
 
   #playerScreen .player-progress {
-    grid-template-columns:
-      30px
-      minmax(0, 1fr)
-      30px !important;
-
+    grid-template-columns: 30px minmax(0, 1fr) 30px !important;
     gap: 4px !important;
-
-    padding-left: 5px !important;
-    padding-right: 5px !important;
   }
 
   #playerScreen .player-controls {
     gap: 2px !important;
-
     padding-left: 4px !important;
     padding-right: 4px !important;
   }
@@ -3153,9 +1832,7 @@
   #playerScreen .player-controls button {
     width: 28px !important;
     height: 28px !important;
-
     min-width: 28px !important;
-
     flex-basis: 28px !important;
   }
 
@@ -3163,16 +1840,43 @@
   #playerScreen .play-main {
     width: 36px !important;
     height: 36px !important;
-
     min-width: 36px !important;
-
     flex-basis: 36px !important;
+  }
+
+  #playerScreen #tagsPanel .panel-header {
+    height: 42px !important;
+    min-height: 42px !important;
+    flex-basis: 42px !important;
+  }
+
+  #playerScreen #tagsPanel .panel-header h3 {
+    font-size: 14px !important;
+  }
+
+  #playerScreen #addPlayerTag {
+    min-width: 70px !important;
+    height: 29px !important;
+    padding: 0 7px !important;
+    font-size: 9px !important;
+  }
+
+  #playerScreen .player-selected-tags {
+    height: 66px !important;
+    min-height: 66px !important;
+    flex-basis: 66px !important;
+  }
+
+  #playerScreen .player-selected-tag {
+    height: 28px !important;
+    padding: 0 8px !important;
+    font-size: 9px !important;
   }
 }
 
-/* ================================================================
-   VERY SMALL PHONE
-   ================================================================ */
+/* ============================================================
+   VERY SMALL PHONES
+   ============================================================ */
 
 @media (max-width: 300px) {
   #playerScreen .song-meta {
@@ -3190,26 +1894,49 @@
   }
 
   #playerScreen .player-tags-toggle {
-    right: 4px !important;
+    top: 1px !important;
+    right: 38px !important;
 
-    width: 28px !important;
-    height: 28px !important;
+    width: 27px !important;
+    height: 27px !important;
+    min-width: 27px !important;
+  }
 
-    min-width: 28px !important;
+  #playerScreen .player-tags-toggle svg {
+    width: 14px !important;
+    height: 14px !important;
+  }
+
+  #playerScreen .player-actions {
+    top: 7px !important;
+    right: 5px !important;
+
+    width: 27px !important;
+    height: 27px !important;
+  }
+
+  #playerScreen .player-actions .player-action-button,
+  #playerScreen .player-actions .player-youtube-toggle,
+  #playerScreen .player-youtube-toggle {
+    width: 27px !important;
+    height: 27px !important;
+    min-width: 27px !important;
+    max-width: 27px !important;
+    flex-basis: 27px !important;
+  }
+
+  #playerScreen .player-youtube-toggle svg {
+    width: 14px !important;
+    height: 14px !important;
   }
 
   #playerScreen .player-progress {
-    grid-template-columns:
-      27px
-      minmax(0, 1fr)
-      27px !important;
-
+    grid-template-columns: 27px minmax(0, 1fr) 27px !important;
     gap: 3px !important;
   }
 
   #playerScreen .player-controls {
     gap: 1px !important;
-
     padding-left: 2px !important;
     padding-right: 2px !important;
   }
@@ -3217,9 +1944,7 @@
   #playerScreen .player-controls button {
     width: 26px !important;
     height: 26px !important;
-
     min-width: 26px !important;
-
     flex-basis: 26px !important;
   }
 
@@ -3227,468 +1952,59 @@
   #playerScreen .play-main {
     width: 32px !important;
     height: 32px !important;
-
     min-width: 32px !important;
-
     flex-basis: 32px !important;
   }
-}
 
-@media (max-width: 768px) {
-  /* Add space between Row 1 and Row 2 */
-  #playerScreen .player-progress {
-    top: calc(50% + 12px) !important;
+  #playerScreen #playPause svg,
+  #playerScreen .play-main svg {
+    width: 16px !important;
+    height: 16px !important;
   }
 
-  #playerScreen .player-controls {
-    bottom: -8px !important;
-  }
-}
-
-@media (max-width: 768px) {
-  #playerScreen .player-progress {
-    width: 75% !important;
-    left: 12.5% !important;
-    padding: 0 !important;
-  }
-}
-
-/* ==========================================================
-   MOONBOX — INDEPENDENT YOUTUBE PANEL
-   ========================================================== */
-
-/* YouTube is hidden normally */
-#playerScreen #youtubePanelWrapper {
-  display: none !important;
-}
-
-/* ==========================================================
-   YOUTUBE OPEN
-   ========================================================== */
-
-#playerScreen.youtube-expanded {
-  /*
-       The player itself becomes the full viewport.
-       The normal player remains at the top.
-       YouTube occupies everything underneath.
-    */
-  height: 100vh !important;
-  min-height: 100vh !important;
-  max-height: 100vh !important;
-
-  overflow: hidden !important;
-}
-
-/* Keep the normal player at the top */
-#playerScreen.youtube-expanded .player-top {
-  flex: 0 0 var(--player-main-height) !important;
-
-  width: 100% !important;
-  height: var(--player-main-height) !important;
-  min-height: var(--player-main-height) !important;
-  max-height: var(--player-main-height) !important;
-}
-
-/* ==========================================================
-   TAGS MUST NOT PARTICIPATE IN YOUTUBE LAYOUT
-   ========================================================== */
-
-#playerScreen.youtube-expanded
-  > .player-layout
-  > .player-panel:not(.player-youtube-panel) {
-  display: none !important;
-}
-
-/* ==========================================================
-   YOUTUBE WRAPPER
-   ========================================================== */
-
-#playerScreen.youtube-expanded #youtubePanelWrapper {
-  display: flex !important;
-
-  position: relative !important;
-
-  width: 100% !important;
-  height: calc(100vh - var(--player-main-height)) !important;
-
-  min-width: 0 !important;
-  min-height: 0 !important;
-
-  max-height: none !important;
-
-  flex: 1 1 auto !important;
-
-  margin: 0 !important;
-  padding: 12px 16px 16px !important;
-
-  box-sizing: border-box !important;
-
-  background: var(--player-panel-bg) !important;
-
-  border: 0 !important;
-  border-top: 1px solid rgba(255, 255, 255, 0.07) !important;
-
-  overflow: hidden !important;
-}
-
-/* ==========================================================
-   YOUTUBE PANEL
-   ========================================================== */
-
-#playerScreen.youtube-expanded #youtubePanel {
-  display: flex !important;
-
-  flex-direction: column !important;
-
-  width: 100% !important;
-  height: 100% !important;
-
-  min-width: 0 !important;
-  min-height: 0 !important;
-
-  margin: 0 !important;
-  padding: 0 !important;
-
-  background: transparent !important;
-
-  border: 0 !important;
-}
-
-/* ==========================================================
-   YOUTUBE HEADER
-   ========================================================== */
-
-#playerScreen.youtube-expanded .youtube-panel-header {
-  flex: 0 0 44px !important;
-
-  width: 100% !important;
-  height: 44px !important;
-  min-height: 44px !important;
-
-  display: flex !important;
-
-  align-items: center !important;
-  justify-content: space-between !important;
-
-  margin: 0 !important;
-  padding: 0 4px 10px !important;
-
-  box-sizing: border-box !important;
-}
-
-#playerScreen.youtube-expanded .youtube-panel-header h3 {
-  margin: 0 !important;
-
-  color: #e6e6e6 !important;
-
-  font-size: 16px !important;
-  font-weight: 600 !important;
-}
-
-/* ==========================================================
-   VIDEO AREA
-   ========================================================== */
-
-#playerScreen.youtube-expanded .youtube-content {
-  flex: 1 1 auto !important;
-
-  width: 100% !important;
-  height: auto !important;
-
-  min-width: 0 !important;
-  min-height: 0 !important;
-
-  display: flex !important;
-
-  align-items: center !important;
-  justify-content: center !important;
-
-  padding: 0 !important;
-
-  overflow: hidden !important;
-
-  background: #000 !important;
-
-  border-radius: 14px !important;
-
-  box-sizing: border-box !important;
-}
-
-/* ==========================================================
-   YOUTUBE IFRAME
-   ========================================================== */
-
-#playerScreen.youtube-expanded .youtube-content iframe {
-  display: block !important;
-
-  width: 100% !important;
-  height: 100% !important;
-
-  min-width: 0 !important;
-  min-height: 0 !important;
-
-  margin: 0 !important;
-  padding: 0 !important;
-
-  border: 0 !important;
-
-  border-radius: 14px !important;
-
-  background: #000 !important;
-}
-
-/* ==========================================================
-   EMPTY STATE
-   ========================================================== */
-
-#playerScreen.youtube-expanded .youtube-empty {
-  width: 100% !important;
-  height: 100% !important;
-
-  min-height: 0 !important;
-
-  display: flex !important;
-
-  flex-direction: column !important;
-
-  align-items: center !important;
-  justify-content: center !important;
-
-  gap: 8px !important;
-
-  margin: 0 !important;
-
-  color: rgba(255, 255, 255, 0.55) !important;
-
-  background: #000 !important;
-
-  border-radius: 14px !important;
-
-  text-align: center !important;
-}
-
-/* ==========================================================
-   YOUTUBE BUTTON
-   ========================================================== */
-
-#playerScreen .player-youtube-toggle {
-  display: inline-flex !important;
-
-  align-items: center !important;
-  justify-content: center !important;
-}
-
-#playerScreen .player-youtube-toggle svg {
-  width: 18px !important;
-  height: 18px !important;
-}
-
-#playerScreen.youtube-expanded .player-youtube-toggle {
-  color: #fff !important;
-  background: rgba(255, 255, 255, 0.1) !important;
-  border-color: rgba(255, 255, 255, 0.2) !important;
-}
-
-/* ==========================================================
-   MOBILE
-   ========================================================== */
-
-@media (max-width: 768px) {
-  #playerScreen.youtube-expanded {
-    height: 100vh !important;
-    min-height: 100vh !important;
-    max-height: 100vh !important;
+  #playerScreen #tagsPanel .panel-header {
+    height: 40px !important;
+    min-height: 40px !important;
+    flex-basis: 40px !important;
   }
 
-  #playerScreen.youtube-expanded .player-top {
-    flex-basis: var(--player-main-height) !important;
-
-    height: var(--player-main-height) !important;
-    min-height: var(--player-main-height) !important;
-  }
-
-  #playerScreen.youtube-expanded #youtubePanelWrapper {
-    height: calc(100vh - var(--player-main-height)) !important;
-
-    min-height: 0 !important;
-
-    padding: 8px !important;
-  }
-
-  #playerScreen.youtube-expanded .youtube-panel-header {
-    flex-basis: 38px !important;
-
-    height: 38px !important;
-    min-height: 38px !important;
-
-    padding: 0 2px 8px !important;
-  }
-
-  #playerScreen.youtube-expanded .youtube-panel-header h3 {
+  #playerScreen #tagsPanel .panel-header h3 {
     font-size: 13px !important;
   }
 
-  #playerScreen.youtube-expanded .youtube-content {
-    border-radius: 10px !important;
+  #playerScreen #addPlayerTag {
+    min-width: 64px !important;
+    height: 27px !important;
+    padding: 0 6px !important;
+    font-size: 8px !important;
   }
 
-  #playerScreen.youtube-expanded .youtube-content iframe {
-    border-radius: 10px !important;
-  }
-}
-/* ================================================================
-   MOONBOX — MOBILE TAG + YOUTUBE BUTTON FIX
-   Keep both buttons visible without overlapping
-   ================================================================ */
-
-@media (max-width: 768px) {
-  /* ------------------------------------------------
-     TAG BUTTON
-     Move it slightly left
-     ------------------------------------------------ */
-
-  #playerScreen .player-tags-toggle {
-    position: absolute !important;
-
-    right: 54px !important;
-    top: 25% !important;
-
-    width: 34px !important;
-    height: 34px !important;
-    min-width: 34px !important;
-
-    margin: 0 !important;
-    padding: 0 !important;
-
-    transform: translateY(-50%) !important;
-
-    z-index: 30 !important;
+  #playerScreen #addPlayerTag svg {
+    width: 12px !important;
+    height: 12px !important;
   }
 
-  /* ------------------------------------------------
-     YOUTUBE / ACTION BUTTON AREA
-     Pin it to the far right
-     ------------------------------------------------ */
-
-  #playerScreen .player-actions {
-    position: absolute !important;
-
-    top: 25% !important;
-    right: 8px !important;
-
-    width: auto !important;
-    height: 34px !important;
-
-    margin: 0 !important;
-    padding: 0 !important;
-
-    display: flex !important;
-    align-items: center !important;
-    justify-content: flex-end !important;
-
-    gap: 6px !important;
-
-    z-index: 30 !important;
+  #playerScreen .player-selected-tags {
+    height: 62px !important;
+    min-height: 62px !important;
+    flex-basis: 62px !important;
   }
 
-  /* ------------------------------------------------
-     YouTube button
-     ------------------------------------------------ */
-
-  #playerScreen .player-youtube-toggle {
-    position: relative !important;
-
-    width: 34px !important;
-    height: 34px !important;
-    min-width: 34px !important;
-
-    flex: 0 0 34px !important;
-
-    margin: 0 !important;
-    padding: 0 !important;
-
-    transform: translateY(-50%) !important;
-  }
-
-  #playerScreen .player-youtube-toggle svg {
-    width: 17px !important;
-    height: 17px !important;
-  }
-
-  /* Don't let hover/active transforms move the buttons */
-  #playerScreen .player-tags-toggle:hover,
-  #playerScreen .player-youtube-toggle:hover {
-    transform: translateY(-50%) !important;
-  }
-
-  #playerScreen .player-tags-toggle:active,
-  #playerScreen .player-youtube-toggle:active {
-    transform: translateY(-50%) scale(0.94) !important;
+  #playerScreen .player-selected-tag {
+    height: 26px !important;
+    padding: 0 7px !important;
+    font-size: 8px !important;
   }
 }
 
-/* ================================================================
-   SMALL PHONE
-   ================================================================ */
+/* ============================================================
+   REDUCED MOTION
+   ============================================================ */
 
-@media (max-width: 420px) {
-  #playerScreen .player-tags-toggle {
-    right: 48px !important;
-
-    width: 30px !important;
-    height: 30px !important;
-    min-width: 30px !important;
-  }
-
-  #playerScreen .player-actions {
-    right: 6px !important;
-    height: 30px !important;
-    gap: 5px !important;
-  }
-
-  #playerScreen .player-youtube-toggle {
-    width: 30px !important;
-    height: 30px !important;
-    min-width: 30px !important;
-
-    flex-basis: 30px !important;
-  }
-
-  #playerScreen .player-youtube-toggle svg {
-    width: 15px !important;
-    height: 15px !important;
-  }
-}
-
-/* ================================================================
-   VERY SMALL PHONE
-   ================================================================ */
-
-@media (max-width: 300px) {
-  #playerScreen .player-tags-toggle {
-    right: 42px !important;
-
-    width: 27px !important;
-    height: 27px !important;
-    min-width: 27px !important;
-  }
-
-  #playerScreen .player-actions {
-    right: 4px !important;
-    height: 27px !important;
-    gap: 4px !important;
-  }
-
-  #playerScreen .player-youtube-toggle {
-    width: 27px !important;
-    height: 27px !important;
-    min-width: 27px !important;
-
-    flex-basis: 27px !important;
-  }
-
-  #playerScreen .player-youtube-toggle svg {
-    width: 14px !important;
-    height: 14px !important;
+@media (prefers-reduced-motion: reduce) {
+  #playerScreen *,
+  .player-tag-picker-overlay * {
+    transition: none !important;
+    animation: none !important;
   }
 }
