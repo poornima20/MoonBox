@@ -947,7 +947,7 @@
   }
 
   .library-header h1 {
-    font-size: 28px;
+    font-size: 18px;
     margin-bottom: 6px;
   }
 
@@ -1099,7 +1099,7 @@
   }
 
   .library-header h1 {
-    font-size: 24px;
+    font-size: 13px;
   }
 
   .library-header p {
@@ -1213,7 +1213,7 @@
   }
 
   .library-header h1 {
-    font-size: 20px;
+    font-size: 11px;
   }
 
   .library-selected-tags {
@@ -1309,7 +1309,7 @@
 
 @container library (max-width: 260px) {
   .library-header h1 {
-    font-size: 18px;
+    font-size: 10px;
   }
 
   .library-filter-button {
@@ -1419,7 +1419,7 @@
   }
 
   .library-header h1 {
-    font-size: 15px;
+    font-size: 8px;
   }
 
   .library-filter-button {
@@ -1521,7 +1521,7 @@
 
 @container library (max-width: 150px) {
   .library-header h1 {
-    font-size: 13px;
+    font-size: 8px;
   }
 
   .library-filter-button {
@@ -1615,7 +1615,7 @@
   }
 
   .library-header h1 {
-    font-size: 20px;
+    font-size: 18px;
     margin-bottom: 0;
   }
 
@@ -1799,7 +1799,7 @@
   }
 
   .library-header h1 {
-    font-size: 17px;
+    font-size: 16px;
   }
 
   .library-filter-button {
@@ -1934,7 +1934,7 @@
 
 @container library (max-width: 260px) {
   .library-header h1 {
-    font-size: 15px;
+    font-size: 14px;
   }
 
   .library-filter-button {
@@ -2014,7 +2014,7 @@
   }
 
   .library-header h1 {
-    font-size: 13px;
+    font-size: 12px;
   }
 
   .library-filter-button {
@@ -2091,7 +2091,7 @@
   }
 
   .library-header h1 {
-    font-size: 20px;
+    font-size: 18px;
     margin-bottom: 0;
   }
 
@@ -2229,7 +2229,7 @@
   }
 
   .library-header h1 {
-    font-size: 20px;
+    font-size: 16px;
   }
 
   .library-header p {
