@@ -66,16 +66,13 @@ body {
 ===================================== */
 
 .main-circle {
-  /*
-       Circle occupies 88% of viewport height.
-       It will shrink when screen width is smaller.
-    */
+  /* Responsive size */
+  width: min(88dvh, 90vw);
+  height: min(88dvh, 90vw);
 
-  width: min(88vh, 100vw);
-  height: min(88vh, 100vw);
-
-  width: min(88dvh, 100vw);
-  height: min(88dvh, 100vw);
+  /* Minimum desktop size */
+  min-width: 390px;
+  min-height: 390px;
 
   aspect-ratio: 1 / 1;
 
@@ -126,8 +123,8 @@ body {
            On shorter screens, prioritize height.
         */
 
-    width: min(100vw, 88dvh);
-    height: min(100vw, 88dvh);
+    width: min(88dvh, 90vw);
+    height: min(88dvh, 90vw);
   }
 }
 
