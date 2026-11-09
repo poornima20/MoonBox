@@ -8,40 +8,43 @@
   box-sizing: border-box;
 }
 
+:root {
+  --background: #000000;
+  --primary: #ffffff;
+  --secondary: #b8b8b8;
+  --muted: #777777;
+
+  --border: rgba(255, 255, 255, 0.25);
+
+  --glow: 0 0 8px rgba(255, 255, 255, 0.65), 0 0 20px rgba(255, 255, 255, 0.3);
+}
+
 /* =====================================
-   2. ROOT SETTINGS
+   2. ROOT
 ===================================== */
 
 html,
 body {
   width: 100%;
   height: 100%;
-
   overflow: hidden;
-
-  background: #000000;
+  background: var(--background);
 }
-
-/* =====================================
-   3. BODY
-===================================== */
 
 body {
   display: flex;
-
   align-items: center;
   justify-content: center;
 
   min-height: 100vh;
   min-height: 100dvh;
 
-  background: #000000;
-
-  overflow: hidden;
+  font-family: Arial, sans-serif;
+  color: var(--primary);
 }
 
 /* =====================================
-   4. MAIN WIDGET CONTAINER
+   3. WIDGET CONTAINER
 ===================================== */
 
 .widget-container {
@@ -50,48 +53,91 @@ body {
   height: 100dvh;
 
   display: flex;
-
   align-items: center;
   justify-content: center;
 
-  background: #000000;
-
   overflow: hidden;
-
-  padding: 0;
+  background: #000000;
 }
 
 /* =====================================
-   5. MAIN CIRCLE
+   4. MAIN CIRCLE
 ===================================== */
 
 .main-circle {
-  /* Responsive size */
-  width: min(88dvh, 90vw);
-  height: min(88dvh, 90vw);
-
-  /* Minimum desktop size */
-  min-width: 390px;
-  min-height: 390px;
-
+  width: min(88dvh, 90vw, 900px);
   aspect-ratio: 1 / 1;
+
+  position: relative;
 
   border-radius: 50%;
 
   background: #000000;
 
-  border: 1px solid rgba(255, 255, 255, 0.35);
-
-  position: relative;
-
-  display: flex;
-
-  align-items: center;
-  justify-content: center;
+  overflow: hidden;
 
   flex-shrink: 0;
 
-  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* =====================================
+   5. OUTER PROGRESS SVG
+===================================== */
+
+.outer-progress {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+  transform: rotate(-90deg);
+  z-index: 1;
+  pointer-events: none;
+}
+
+/* Background circular track */
+
+.progress-track {
+  fill: none;
+
+  stroke: rgba(255, 255, 255, 0.22);
+
+  stroke-width: 1.5;
+}
+
+/* Active circular progress */
+
+.progress-fill {
+  fill: none;
+
+  stroke: #ffffff;
+
+  stroke-width: 3;
+
+  stroke-linecap: round;
+
+  filter: drop-shadow(0 0 6px rgba(255, 255, 255, 0.8));
+
+  transition: none;
+}
+
+/* Draggable progress indicator */
+
+.progress-thumb {
+  fill: #ffffff;
+
+  stroke: #ffffff;
+
+  stroke-width: 2;
+
+  filter: drop-shadow(0 0 7px white);
+
+  pointer-events: auto;
+
+  cursor: grab;
 }
 
 /* =====================================
@@ -99,55 +145,848 @@ body {
 ===================================== */
 
 .circle-content {
+  position: relative;
+
+  z-index: 2;
+
   width: 100%;
   height: 100%;
+
+  padding: 9% 8%;
+
+  display: flex;
+
+  flex-direction: column;
+
+  align-items: center;
+
+  justify-content: space-between;
+
+  text-align: center;
+
+  pointer-events: none;
+}
+
+/* Allow buttons and links to work */
+
+.circle-content button,
+.circle-content a {
+  pointer-events: auto;
+}
+
+/* =====================================
+   7. LOGO HEADER
+===================================== */
+
+.top-section {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px; /* Space between logo and NOW PLAYING */
+  flex-shrink: 0;
+}
+
+.widget-header {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.logo-link {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: transform 0.2s ease;
+}
+
+.logo-link:hover {
+  transform: scale(1.08);
+}
+
+.moonbox-logo {
+  width: clamp(26px, 4vw, 40px);
+  height: clamp(26px, 4vw, 40px);
+  object-fit: contain;
+}
+
+/* =====================================
+   3D MOONBOX PILL BUTTON
+===================================== */
+
+.tag-button {
+  appearance: none;
+
+  border: 0;
+
+  display: inline-flex;
+
+  align-items: center;
+
+  justify-content: center;
+
+  gap: 12px;
+
+  min-width: 180px;
+
+  padding: 14px 30px;
+
+  border-radius: 999px;
+
+  background: linear-gradient(180deg, #ffffff 0%, #e8e8e8 100%);
+
+  color: #080808;
+
+  font:
+    650 14px/1 Arial,
+    sans-serif;
+
+  letter-spacing: 0.04em;
+
+  cursor: pointer;
+
+  box-shadow:
+    0 1px 0 rgba(255, 255, 255, 0.95) inset,
+    0 -2px 4px rgba(0, 0, 0, 0.12) inset,
+    0 5px 0 #8d8d8d,
+    0 9px 22px rgba(255, 255, 255, 0.1);
+
+  transform: translateY(0);
+
+  transition:
+    transform 140ms ease,
+    background 180ms ease,
+    color 180ms ease,
+    box-shadow 140ms ease;
+
+  -webkit-tap-highlight-color: transparent;
+
+  flex-shrink: 0;
+}
+
+/* HOVER */
+
+.tag-button:hover {
+  transform: translateY(-2px);
+
+  box-shadow:
+    0 1px 0 rgba(255, 255, 255, 0.95) inset,
+    0 -2px 4px rgba(0, 0, 0, 0.12) inset,
+    0 7px 0 #8d8d8d,
+    0 13px 26px rgba(255, 255, 255, 0.14);
+}
+
+/* CLICK / PRESS */
+
+.tag-button:active {
+  transform: translateY(4px);
+
+  box-shadow:
+    0 2px 5px rgba(0, 0, 0, 0.28) inset,
+    0 0 12px rgba(255, 255, 255, 0.08);
+}
+
+/* KEYBOARD ACCESSIBILITY */
+
+.tag-button:focus-visible {
+  outline: 2px solid #ffffff;
+
+  outline-offset: 6px;
+}
+
+/* TAG ICON */
+
+.tag-button svg {
+  width: 19px;
+
+  height: 19px;
+
+  flex: none;
+}
+
+/* MOBILE */
+
+@media (max-width: 600px) {
+  .tag-button {
+    min-width: 145px;
+
+    padding: 11px 22px;
+
+    font-size: 11px;
+
+    gap: 9px;
+  }
+}
+
+/* REDUCED MOTION */
+
+@media (prefers-reduced-motion: reduce) {
+  .tag-button {
+    transition: none;
+  }
+}
+
+/* =====================================
+   9. SONG INFORMATION
+===================================== */
+
+.song-information {
+  width: 100%;
+
+  display: flex;
+
+  flex-direction: column;
+
+  align-items: center;
+
+  gap: 10px;
+
+  flex-shrink: 0;
+}
+
+.song-information h1 {
+  color: #ffffff;
+
+  font-size: clamp(22px, 3.2vw, 38px);
+
+  font-weight: 500;
+
+  letter-spacing: -0.04em;
+}
+
+.song-information p {
+  color: var(--secondary);
+
+  font-size: clamp(12px, 1.3vw, 15px);
+
+  letter-spacing: 0.08em;
+}
+
+/* =====================================
+   MUSIC SECTION SPACING
+===================================== */
+
+.music-section {
+  width: 100%;
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+
+  gap: clamp(18px, 2.5vh, 28px);
+
+  flex-shrink: 0;
+}
+
+/* =====================================
+   10. PLAYBACK TIME
+===================================== */
+
+.playback-time {
+  display: flex;
+
+  align-items: center;
+
+  gap: 8px;
+
+  color: #ffffff;
+
+  font-size: clamp(11px, 1.2vw, 14px);
+
+  font-variant-numeric: tabular-nums;
+}
+
+.time-separator {
+  color: var(--muted);
+}
+
+/* =====================================
+   11. PLAYBACK CONTROLS
+===================================== */
+
+.playback-controls {
+  width: 100%;
 
   display: flex;
 
   align-items: center;
+
   justify-content: center;
 
+  gap: clamp(12px, 2.5vw, 28px);
+
+  flex-shrink: 0;
+}
+
+.control-button {
+  width: clamp(28px, 3.5vw, 42px);
+
+  height: clamp(28px, 3.5vw, 42px);
+
+  display: flex;
+
+  align-items: center;
+
+  justify-content: center;
+
+  border: none;
+
+  background: transparent;
+
+  color: var(--secondary);
+
+  cursor: pointer;
+
+  transition: all 0.2s ease;
+}
+
+.control-icon {
+  font-size: clamp(17px, 2vw, 22px);
+}
+
+.control-button:hover,
+.control-button.selected {
   color: #ffffff;
 
-  font-family: Arial, sans-serif;
+  filter: drop-shadow(0 0 6px white);
+}
+
+.play-button {
+  width: clamp(43px, 5vw, 58px);
+
+  height: clamp(43px, 5vw, 58px);
+
+  border-radius: 50%;
+
+  border: 1px solid #ffffff;
+
+  background: #ffffff;
+
+  color: #000000;
+
+  font-size: 20px;
+
+  cursor: pointer;
+
+  box-shadow: var(--glow);
+
+  transition: transform 0.2s ease;
+}
+
+.play-button:hover {
+  transform: scale(1.08);
 }
 
 /* =====================================
-   7. MOBILE RESPONSIVENESS
+   12. MOBILE RESPONSIVENESS
 ===================================== */
 
 @media (max-width: 600px) {
   .main-circle {
-    /*
-           On mobile, prioritize screen width.
-           On shorter screens, prioritize height.
-        */
-
     width: min(88dvh, 90vw);
-    height: min(88dvh, 90vw);
+  }
+
+  .circle-content {
+    padding: 10% 7%;
+  }
+
+  .playback-controls {
+    gap: clamp(8px, 3vw, 15px);
+  }
+
+  .mode-button {
+    padding: 8px 18px;
+
+    font-size: 9px;
+  }
+
+  .song-information h1 {
+    font-size: clamp(19px, 5vw, 27px);
   }
 }
 
 /* =====================================
-   8. LANDSCAPE RESPONSIVENESS
+   13. SHORT SCREEN RESPONSIVENESS
 ===================================== */
 
-@media (orientation: landscape) {
+@media (max-height: 650px) {
   .main-circle {
-    width: min(88dvh, 100vw);
-    height: min(88dvh, 100vw);
+    width: min(94dvh, 90vw);
+  }
+
+  .circle-content {
+    padding: 7% 8%;
   }
 }
 
 /* =====================================
-   9. REDUCED MOTION
+   14. REDUCED MOTION
 ===================================== */
 
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,
   *::after {
-    animation-duration: 0.01ms !important;
     transition-duration: 0.01ms !important;
+
+    animation-duration: 0.01ms !important;
   }
+}
+
+/* =====================================
+   15. TAG NAVIGATOR MODE
+===================================== */
+
+/* Make hidden sections stay hidden */
+
+[hidden] {
+  display: none !important;
+}
+
+/* Hide player progress when Tags is active */
+
+.main-circle.tags-mode #progressLayer {
+  display: none;
+}
+
+/* Tag segments */
+
+.tag-segments-layer {
+  display: none;
+}
+
+.main-circle.tags-mode .tag-segments-layer {
+  display: block;
+}
+
+.tag-segment {
+  fill: rgba(255, 255, 255, 0.035);
+
+  stroke: rgba(255, 255, 255, 0.16);
+
+  stroke-width: 0.8;
+
+  cursor: pointer;
+
+  pointer-events: all;
+
+  transition:
+    fill 180ms ease,
+    filter 180ms ease;
+}
+
+.tag-segment:hover {
+  fill: rgba(255, 255, 255, 0.35);
+}
+
+.tag-segment.selected {
+  fill: #ffffff;
+
+  stroke: #ffffff;
+
+  filter: drop-shadow(0 0 5px white)
+    drop-shadow(0 0 12px rgba(255, 255, 255, 0.7));
+}
+
+/* =====================================
+   TAGS MIDDLE SECTION
+===================================== */
+
+.tags-section {
+  width: 100%;
+
+  flex: 1;
+
+  min-height: 0;
+
+  display: flex;
+
+  align-items: center;
+
+  justify-content: center;
+
+  pointer-events: none;
+}
+
+.selected-tag-card {
+  width: clamp(170px, 34%, 260px);
+
+  aspect-ratio: 1 / 1;
+
+  border: 1px solid rgba(255, 255, 255, 0.3);
+
+  border-radius: 50%;
+
+  display: flex;
+  flex-direction: column;
+
+  align-items: center;
+  justify-content: center;
+
+  gap: 12px;
+
+  cursor: pointer;
+  pointer-events: auto;
+
+  background: rgba(255, 255, 255, 0.025);
+
+  transition:
+    background 180ms ease,
+    border 180ms ease,
+    box-shadow 180ms ease,
+    transform 180ms ease;
+
+  -webkit-tap-highlight-color: transparent;
+}
+
+.selected-tag-card:hover {
+  border-color: rgba(255, 255, 255, 0.75);
+
+  box-shadow: 0 0 20px rgba(255, 255, 255, 0.12);
+}
+
+.selected-tag-card.is-selected {
+  background: #ffffff;
+
+  border-color: #ffffff;
+
+  color: #000000;
+
+  box-shadow: 0 0 25px rgba(255, 255, 255, 0.25);
+}
+
+.selected-tag-icon {
+  width: 28px;
+
+  height: 28px;
+}
+
+.selected-tag-icon svg {
+  width: 100%;
+
+  height: 100%;
+}
+
+.selected-tag-card h1 {
+  font-size: clamp(15px, 2vw, 23px);
+
+  font-weight: 600;
+}
+
+.selected-tag-card p {
+  font-size: clamp(11px, 1.2vw, 14px);
+
+  color: var(--secondary);
+}
+
+.selected-tag-card.is-selected p {
+  color: #555555;
+}
+
+.tag-selection-status {
+  font-size: 8px;
+
+  letter-spacing: 0.12em;
+
+  opacity: 0.65;
+}
+
+/* Change icon color when selected */
+
+.selected-tag-card.is-selected .selected-tag-icon {
+  color: #000000;
+}
+
+.selected-tag-card:not(.is-selected) .selected-tag-icon {
+  color: #ffffff;
+}
+
+/* =====================================
+   TAG MODE BOTTOM NAVIGATION
+===================================== */
+
+.tag-mode-navigation {
+  display: flex;
+
+  align-items: center;
+
+  justify-content: center;
+
+  gap: 22px;
+
+  color: #ffffff;
+
+  font-size: 13px;
+
+  font-weight: 600;
+
+  letter-spacing: 0.15em;
+
+  pointer-events: auto;
+}
+
+.navigation-arrow {
+  appearance: none;
+
+  border: none;
+
+  background: transparent;
+
+  color: #ffffff;
+
+  font-size: 30px;
+
+  line-height: 1;
+
+  cursor: pointer;
+
+  padding: 5px 10px;
+
+  transition:
+    transform 0.2s ease,
+    opacity 0.2s ease;
+}
+
+.navigation-arrow:hover {
+  transform: scale(1.25);
+
+  opacity: 0.7;
+}
+
+.navigation-arrow:focus-visible,
+.selected-tag-card:focus-visible {
+  outline: 2px solid #ffffff;
+
+  outline-offset: 5px;
+}
+
+/* =====================================
+   MOBILE TAG NAVIGATOR
+===================================== */
+
+@media (max-width: 600px) {
+  .selected-tag-card {
+    width: clamp(105px, 30%, 155px);
+  }
+
+  .selected-tag-icon {
+    width: 23px;
+
+    height: 23px;
+  }
+
+  .tag-mode-navigation {
+    gap: 14px;
+
+    font-size: 11px;
+  }
+}
+
+/* =====================================
+   MODE-SPECIFIC BUTTON APPEARANCE
+===================================== */
+
+/* NOW PLAYING MODE */
+
+.main-circle:not(.tags-mode) #nowPlayingButton {
+  background: transparent;
+  color: #ffffff;
+  box-shadow: none;
+  transform: none;
+  border: none;
+  pointer-events: none;
+}
+
+/* TAGS MODE */
+
+.main-circle.tags-mode #nowPlayingButton {
+  background: linear-gradient(180deg, #ffffff 0%, #e8e8e8 100%);
+  color: #080808;
+
+  box-shadow:
+    0 1px 0 rgba(255, 255, 255, 0.95) inset,
+    0 -2px 4px rgba(0, 0, 0, 0.12) inset,
+    0 5px 0 #8d8d8d,
+    0 9px 22px rgba(255, 255, 255, 0.1);
+
+  pointer-events: auto;
+}
+
+/* =====================================
+   TAG MODE: CIRCULAR SEGMENTS
+===================================== */
+
+/* Hide music progress in Tags mode */
+
+.main-circle.tags-mode #progressLayer {
+  display: none;
+}
+
+/* Hide tag segments in Player mode */
+
+.tag-segments-layer {
+  display: none;
+  pointer-events: none;
+}
+
+/* Show segments in Tags mode */
+
+.main-circle.tags-mode .tag-segments-layer {
+  display: block;
+  pointer-events: auto;
+}
+
+/* Individual tag sections */
+
+.tag-segment {
+  fill: rgba(255, 255, 255, 0.035);
+
+  stroke: rgba(255, 255, 255, 0.22);
+
+  stroke-width: 1.2;
+
+  cursor: pointer;
+
+  pointer-events: all;
+
+  transition:
+    fill 180ms ease,
+    stroke 180ms ease,
+    filter 180ms ease;
+}
+
+/* Hover effect */
+
+.tag-segment:hover {
+  fill: rgba(255, 255, 255, 0.25);
+
+  stroke: #ffffff;
+}
+
+/* Currently focused segment */
+
+.tag-segment.focused {
+  stroke: #ffffff;
+
+  stroke-width: 2;
+
+  filter: drop-shadow(0 0 5px white);
+}
+
+/* Selected segments */
+
+.tag-segment.selected {
+  fill: #ffffff;
+
+  stroke: #ffffff;
+
+  stroke-width: 1.5;
+
+  filter: drop-shadow(0 0 6px white)
+    drop-shadow(0 0 12px rgba(255, 255, 255, 0.7));
+}
+
+/* Remove rectangular browser focus outline from SVG segments */
+
+.tag-segment,
+.tag-segment:focus,
+.tag-segment:focus-visible,
+.tag-segment:active {
+  outline: none !important;
+  box-shadow: none !important;
+}
+
+/* ==========================================
+   MOONBOX — LUCIDE ICON SYSTEM
+========================================== */
+
+/* Common icon behaviour */
+
+.circle-content svg.lucide {
+  display: block;
+  flex-shrink: 0;
+  fill: none;
+  stroke: currentColor;
+}
+
+/* NOW PLAYING AND TAGS PILL ICONS */
+
+.button-icon {
+  width: clamp(13px, 1.9cqw, 19px);
+  height: clamp(13px, 1.9cqw, 19px);
+
+  stroke-width: 2;
+  flex-shrink: 0;
+}
+
+/* MUSIC CONTROL ICONS */
+
+.control-icon {
+  width: clamp(16px, 2.5cqw, 23px);
+  height: clamp(16px, 2.5cqw, 23px);
+
+  stroke-width: 1.8;
+}
+
+/* PLAY / PAUSE ICON */
+
+.play-icon {
+  width: clamp(17px, 2.6cqw, 24px);
+  height: clamp(17px, 2.6cqw, 24px);
+
+  stroke-width: 2.2;
+}
+
+/* INNER TAG CIRCLE ICON */
+
+.center-tag-icon {
+  width: clamp(23px, 4.5cqw, 36px);
+  height: clamp(23px, 4.5cqw, 36px);
+
+  stroke-width: 1.8;
+}
+
+/* TAG NAVIGATION ARROWS */
+
+.navigation-icon {
+  width: clamp(18px, 2.7cqw, 25px);
+  height: clamp(18px, 2.7cqw, 25px);
+
+  stroke-width: 2.2;
+}
+
+/* BUTTON ALIGNMENT */
+
+.tag-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.control-button,
+.play-button,
+.navigation-arrow {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* PREVENT ICON DISTORTION */
+
+.tag-button svg,
+.control-button svg,
+.play-button svg,
+.navigation-arrow svg,
+.selected-tag-icon svg {
+  max-width: 100%;
+  max-height: 100%;
+}
+
+/* SELECTED SHUFFLE / REPEAT */
+
+.control-button.selected {
+  color: #ffffff;
+  filter: drop-shadow(0 0 6px white);
 }

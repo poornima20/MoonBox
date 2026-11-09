@@ -8,19 +8,231 @@
     <title>MoonBox Widget</title>
 
     <link rel="stylesheet" href="widget.css" />
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@1.70.0/dist/umd/lucide.min.js"></script>
   </head>
 
   <body>
     <main class="widget-container">
       <!-- Main Circular Structure -->
-      <div class="main-circle">
-        <!-- All future widget elements will be placed inside this circle -->
+
+      <div class="main-circle" id="mainCircle">
+        <!-- OUTER CIRCULAR PROGRESS -->
+
+        <svg
+          class="outer-progress"
+          id="outerProgress"
+          viewBox="0 0 600 600"
+          aria-label="Circular player and tag navigation"
+        >
+          <!-- OUTER CIRCULAR PROGRESS: NOW PLAYING MODE -->
+          <g id="progressLayer">
+            <circle class="progress-track" cx="300" cy="300" r="296" />
+            <circle
+              class="progress-fill"
+              id="progressFill"
+              cx="300"
+              cy="300"
+              r="296"
+            />
+            <circle
+              class="progress-thumb"
+              id="progressThumb"
+              cx="594"
+              cy="300"
+              r="5"
+            />
+          </g>
+
+          <!-- OUTER CIRCULAR PROGRESS: TAGS MODE -->
+          <g id="tagSegmentsLayer" class="tag-segments-layer"></g>
+        </svg>
+
+        <!-- ALL CONTENT INSIDE THE CIRCLE -->
 
         <div class="circle-content">
-          <h1>MOONBOX</h1>
+          <!-- =================================
+            SECTION 1: BRAND + NOW PLAYING
+          ================================== -->
+
+          <section class="top-section">
+            <header class="widget-header">
+              <a
+                href="../index.html"
+                target="_blank"
+                rel="noopener"
+                class="logo-link"
+                aria-label="Open MoonBox"
+              >
+                <img
+                  src="../assets/MoonBox_32.png"
+                  alt="MoonBox Logo"
+                  class="moonbox-logo"
+                />
+              </a>
+            </header>
+
+            <button
+              class="tag-button is-selected"
+              id="nowPlayingButton"
+              type="button"
+              aria-pressed="true"
+            >
+              <i data-lucide="audio-waveform" class="button-icon"></i>
+              NOW PLAYING
+            </button>
+          </section>
+
+          <!-- =================================
+            SECTION 2: MUSIC INFORMATION MIDDLE SECTION
+          ================================== -->
+
+          <section class="music-section">
+            <!-- Song information -->
+
+            <div class="song-information">
+              <h1 id="songTitle">Yosemite</h1>
+
+              <p id="folderName">English Songs</p>
+            </div>
+
+            <!-- Duration -->
+
+            <div class="playback-time">
+              <span id="currentTime">0:22</span>
+
+              <span class="time-separator">/</span>
+
+              <span id="duration">3:14</span>
+            </div>
+
+            <!-- Music controls -->
+
+            <section class="playback-controls">
+              <button
+                class="control-button"
+                id="shuffleButton"
+                type="button"
+                aria-label="Shuffle"
+              >
+                <i data-lucide="shuffle" class="control-icon"></i>
+              </button>
+
+              <button
+                class="control-button"
+                id="previousButton"
+                type="button"
+                aria-label="Previous song"
+              >
+                <i data-lucide="skip-back" class="control-icon"></i>
+              </button>
+
+              <button
+                class="play-button"
+                id="playPauseButton"
+                type="button"
+                aria-label="Pause"
+              >
+                <span id="playPauseIcon"
+                  ><i data-lucide="pause" class="play-icon"></i
+                ></span>
+              </button>
+
+              <button
+                class="control-button"
+                id="nextButton"
+                type="button"
+                aria-label="Next song"
+              >
+                <i data-lucide="skip-forward" class="control-icon"></i>
+              </button>
+
+              <button
+                class="control-button"
+                id="repeatButton"
+                type="button"
+                aria-label="Repeat"
+              >
+                <span id="repeatIcon">
+                  <i data-lucide="repeat" class="control-icon"></i>
+                </span>
+              </button>
+            </section>
+          </section>
+
+          <!-- =================================
+            SECTION 2: TAG NAVIGATION MIDDLE SECTION
+          ================================== -->
+
+          <section class="tags-section" id="tagsSection" hidden>
+            <div
+              class="selected-tag-card"
+              id="selectedTagCard"
+              role="button"
+              tabindex="0"
+              aria-label="Toggle selected tag"
+            >
+              <div class="selected-tag-icon" id="selectedTagIcon">
+                <i data-lucide="tag" class="center-tag-icon"></i>
+              </div>
+
+              <h1 id="selectedTagName">Chill</h1>
+
+              <p id="selectedTagCount">42 songs</p>
+
+              <span class="tag-selection-status" id="tagSelectionStatus">
+                TAP TO SELECT
+              </span>
+            </div>
+          </section>
+
+          <!-- =================================
+          SECTION 3: MODE NAVIGATION
+          ================================== -->
+
+          <section class="bottom-section">
+            <!-- NOW PLAYING MODE: TAGS PILL -->
+
+            <button
+              class="tag-button"
+              id="tagsButton"
+              type="button"
+              aria-pressed="false"
+            >
+              <i data-lucide="tag" class="button-icon"></i>
+
+              <span>Tags</span>
+            </button>
+
+            <!-- TAGS MODE: NOW PLAYING NAVIGATION -->
+
+            <div class="tag-mode-navigation" id="tagModeNavigation" hidden>
+              <button
+                class="navigation-arrow"
+                id="previousTagButton"
+                type="button"
+                aria-label="Previous tag"
+              >
+                <i data-lucide="chevron-left" class="navigation-icon"></i>
+              </button>
+
+              <span>TAGS</span>
+
+              <button
+                class="navigation-arrow"
+                id="nextTagButton"
+                type="button"
+                aria-label="Next tag"
+              >
+                <i data-lucide="chevron-right" class="navigation-icon"></i>
+              </button>
+            </div>
+          </section>
         </div>
       </div>
     </main>
+
+    <script src="https://unpkg.com/lucide@1.70.0/dist/umd/lucide.min.js"></script>
 
     <script src="widget.js"></script>
   </body>
