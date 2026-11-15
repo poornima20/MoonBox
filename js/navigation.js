@@ -23,6 +23,52 @@ document.addEventListener("DOMContentLoaded", () => {
   const libraryPanel = document.querySelector(".library-screen");
 
   /* ======================================================
+      WIDGET / VISUALIZER
+====================================================== */
+
+  /* ======================================================
+    WIDGET / VISUALIZER
+====================================================== */
+
+  const openWidgetButton = document.getElementById("openWidget");
+  const widgetOverlay = document.getElementById("widgetOverlay");
+  const closeWidgetButton = document.getElementById("closeWidget");
+
+  function openWidget() {
+    if (!widgetOverlay) {
+      console.error("MoonBox widget overlay not found.");
+      return;
+    }
+
+    widgetOverlay.classList.add("active");
+    widgetOverlay.setAttribute("aria-hidden", "false");
+
+    document.body.classList.add("widget-open");
+  }
+
+  function closeWidget() {
+    if (!widgetOverlay) return;
+
+    widgetOverlay.classList.remove("active");
+    widgetOverlay.setAttribute("aria-hidden", "true");
+
+    document.body.classList.remove("widget-open");
+
+    openWidgetButton?.focus();
+  }
+
+  openWidgetButton?.addEventListener("click", openWidget);
+
+  closeWidgetButton?.addEventListener("click", closeWidget);
+
+  /* Close widget with Escape */
+  document.addEventListener("keydown", (event) => {
+    if (event.key === "Escape" && widgetOverlay?.classList.contains("active")) {
+      closeWidget();
+    }
+  });
+
+  /* ======================================================
         RESIZE STATE
   ====================================================== */
 

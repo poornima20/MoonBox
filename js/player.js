@@ -928,6 +928,7 @@ document.addEventListener("DOMContentLoaded", () => {
     updatePlayerTop(song);
 
     lucide.createIcons();
+    publishWidgetState();
   }
 
   /* ==========================================================
@@ -970,6 +971,8 @@ document.addEventListener("DOMContentLoaded", () => {
           },
         }),
       );
+
+      publishWidgetState();
     } catch (error) {
       console.error("MoonBox Player: Could not play audio.", error);
 
@@ -1006,6 +1009,8 @@ document.addEventListener("DOMContentLoaded", () => {
         },
       }),
     );
+
+    publishWidgetState();
   }
 
   /* ==========================================================
@@ -1026,6 +1031,7 @@ document.addEventListener("DOMContentLoaded", () => {
     progress.style.setProperty("--progress", `${percent}%`);
 
     currentTime.textContent = format(audio.currentTime);
+    publishWidgetState();
   });
 
   /* ==========================================================
@@ -1048,6 +1054,7 @@ document.addEventListener("DOMContentLoaded", () => {
     progress.max = duration;
 
     totalTime.textContent = format(duration);
+    publishWidgetState();
   });
 
   /* ==========================================================
@@ -2031,4 +2038,123 @@ document.addEventListener("DOMContentLoaded", () => {
 
   /* Do NOT call loadSong() here */
   lucide.createIcons();
+
+  /* ==========================================
+   MOONBOX WIDGET STATE BRIDGE
+========================================== */
+
+  function publishWidgetState() {
+    const song = songs[currentSong];
+
+    const state = {
+      hasActiveSong,
+
+      song: song
+        ? {
+            id: song.id || null,
+            title: song.title || song.name || "Unknown Song",
+            originalTitle: song.originalTitle || song.name || "",
+            artist: song.artist || "Unknown Artist",
+            album: song.album || "",
+            cover: getSongCover(song),
+            duration: Number.isFinite(audio.duration)
+              ? audio.duration
+              : Number(song.duration) || 0,
+            format: song.format || "",
+            genre: song.genre || "",
+            year: song.year || "",
+            folder: song.folderName || "",
+            folderTagId: song.folderTagId || null,
+            tags: Array.isArray(song.tags) ? [...song.tags] : [],
+          }
+        : null,
+
+      playback: {
+        currentTime: audio.currentTime || 0,
+        duration: Number.isFinite(audio.duration) ? audio.duration : 0,
+        playing: !audio.paused && !audio.ended,
+        shuffle,
+        repeatMode,
+      },
+
+      queue: songs.map((song) => ({
+        id: song.id || null,
+        title: song.title || song.name || "Unknown Song",
+        artist: song.artist || "Unknown Artist",
+        cover: getSongCover(song),
+      })),
+
+      currentIndex: currentSong,
+    };
+
+    document.dispatchEvent(
+      new CustomEvent("moonbox:widgetStateChanged", {
+        detail: state,
+      }),
+    );
+  }
+
+  /* ==========================================
+   RECEIVE COMMANDS FROM WIDGET
+========================================== */
+
+  document.addEventListener("moonbox:widgetCommand", (event) => {
+    const { command, value } = event.detail || {};
+
+    switch (command) {
+      case "togglePlayback":
+        if (playing) {
+          pauseSong();
+        } else {
+          playSong();
+        }
+        break;
+
+      case "previous":
+        previous();
+        break;
+
+      case "next":
+        next();
+        break;
+
+      case "seek": {
+        const seekTime = Number(value);
+
+        if (
+          Number.isFinite(seekTime) &&
+          Number.isFinite(audio.duration) &&
+          audio.duration > 0
+        ) {
+          audio.currentTime = Math.max(0, Math.min(seekTime, audio.duration));
+
+          elapsed = audio.currentTime;
+          updateProgress();
+          publishWidgetState();
+        }
+        break;
+      }
+
+      case "toggleShuffle":
+        shuffle = !shuffle;
+
+        shuffleButton.classList.toggle("active", shuffle);
+
+        shuffleButton.querySelector("span").textContent = shuffle
+          ? "Shuffle On"
+          : "Shuffle";
+
+        publishWidgetState();
+        break;
+
+      case "cycleRepeat":
+        repeatMode = (repeatMode + 1) % 3;
+        updateRepeatButton();
+        publishWidgetState();
+        break;
+    }
+  });
+
+  /* Initial widget state */
+  publishWidgetState();
 });

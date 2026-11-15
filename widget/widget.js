@@ -1,740 +1,709 @@
-/* =====================================
-   1. DEMO SONG DATA
+(() => {
+  /* =====================================
+   2. WIDGET STATE
 ===================================== */
 
-const demoSongs = [
-  {
-    title: "Yosemite",
-    folder: "English Songs",
-    duration: 194,
-  },
-  {
-    title: "Starboy",
-    folder: "English Songs",
-    duration: 230,
-  },
-  {
-    title: "Love Scenario",
-    folder: "Korean Songs",
-    duration: 207,
-  },
-];
+  // Playback information received from the main MoonBox player.
+  let isPlaying = false;
+  let isShuffle = false;
+  let repeatMode = 0;
 
-/* =====================================
-   2. PLAYER STATE
+  let moonboxState = {
+    hasActiveSong: false,
+    song: null,
+
+    playback: {
+      currentTime: 0,
+      duration: 0,
+      playing: false,
+      shuffle: false,
+      repeatMode: 0,
+    },
+
+    queue: [],
+    currentIndex: -1,
+  };
+
+  // Tag information received from tag.js.
+
+  let moonboxTags = [];
+  let selectedTagIds = new Set();
+
+  /* =====================================
+   REQUEST REAL TAG DATA FROM TAG.JS
 ===================================== */
 
-let currentSongIndex = 0;
+  function requestWidgetTagState() {
+    document.dispatchEvent(
+      new CustomEvent("moonbox:requestWidgetTagState", {
+        detail: {
+          setState(state) {
+            moonboxTags = Array.isArray(state.tags) ? state.tags : [];
 
-let currentTime = 22;
+            selectedTagIds = new Set(
+              Array.isArray(state.selectedTagIds)
+                ? state.selectedTagIds.map(String)
+                : [],
+            );
 
-let isPlaying = true;
+            if (moonboxTags.length === 0) {
+              focusedTagIndex = 0;
+              tagSegmentsLayer.innerHTML = "";
+              return;
+            }
 
-let isShuffle = false;
+            focusedTagIndex = Math.min(focusedTagIndex, moonboxTags.length - 1);
 
-let repeatMode = 0;
+            createTagSegments();
+            updateFocusedTag();
+          },
+        },
+      }),
+    );
+  }
 
-// 0 = Repeat off
-// 1 = Repeat queue
-// 2 = Repeat one
+  // Widget-only UI state.
 
-let playbackInterval = null;
+  let tagsMode = false;
+  let focusedTagIndex = 0;
+  let isDragging = false;
 
-let isDragging = false;
-
-/* =====================================
+  /* =====================================
    3. GET HTML ELEMENTS
 ===================================== */
 
-const songTitle = document.getElementById("songTitle");
+  const songTitle = document.getElementById("songTitle");
 
-const folderName = document.getElementById("folderName");
+  const folderName = document.getElementById("folderName");
 
-const currentTimeDisplay = document.getElementById("currentTime");
+  const currentTimeDisplay = document.getElementById("wcurrentTime");
 
-const durationDisplay = document.getElementById("duration");
+  const durationDisplay = document.getElementById("duration");
 
-const progressFill = document.getElementById("progressFill");
+  const progressFill = document.getElementById("progressFill");
 
-const progressThumb = document.getElementById("progressThumb");
+  const progressThumb = document.getElementById("progressThumb");
 
-const outerProgress = document.getElementById("outerProgress");
+  const outerProgress = document.getElementById("outerProgress");
 
-const playPauseButton = document.getElementById("playPauseButton");
+  const playPauseButton = document.getElementById("playPauseButton");
 
-const playPauseIcon = document.getElementById("playPauseIcon");
+  const playPauseIcon = document.getElementById("playPauseIcon");
 
-const shuffleButton = document.getElementById("shuffleButton");
+  const shuffleButton = document.getElementById("shuffleButton");
 
-const repeatButton = document.getElementById("repeatButton");
+  const repeatButton = document.getElementById("repeatButton");
 
-const repeatIcon = document.getElementById("repeatIcon");
+  const repeatIcon = document.getElementById("repeatIcon");
 
-/* =====================================
+  /* =====================================
    4. CIRCULAR PROGRESS SETTINGS
 ===================================== */
 
-const RADIUS = 296;
+  const RADIUS = 296;
 
-const CENTER = 300;
+  const CENTER = 300;
 
-const CIRCUMFERENCE = 2 * Math.PI * RADIUS;
+  const CIRCUMFERENCE = 2 * Math.PI * RADIUS;
 
-// Configure circular stroke.
+  // Configure circular stroke.
 
-progressFill.style.strokeDasharray = CIRCUMFERENCE;
+  // Configure circular stroke.
 
-progressFill.style.strokeDashoffset = CIRCUMFERENCE;
+  if (!progressFill) {
+    console.error("MoonBox Widget: #progressFill was not found.");
+  } else {
+    progressFill.style.strokeDasharray = CIRCUMFERENCE;
+    progressFill.style.strokeDashoffset = CIRCUMFERENCE;
+  }
 
-/* =====================================
+  /* =====================================
    5. FORMAT TIME
 ===================================== */
 
-function formatTime(seconds) {
-  const minutes = Math.floor(seconds / 60);
+  function formatTime(seconds) {
+    const minutes = Math.floor(seconds / 60);
 
-  const remainingSeconds = Math.floor(seconds % 60);
+    const remainingSeconds = Math.floor(seconds % 60);
 
-  return `${minutes}:${String(remainingSeconds).padStart(2, "0")}`;
-}
+    return `${minutes}:${String(remainingSeconds).padStart(2, "0")}`;
+  }
 
-/* =====================================
+  /* =====================================
    6. UPDATE SONG INFORMATION
 ===================================== */
 
-function updateSongInformation() {
-  const song = demoSongs[currentSongIndex];
+  function updateSongInformation() {
+    const song = moonboxState.song;
 
-  songTitle.textContent = song.title;
+    if (!moonboxState.hasActiveSong || !song) {
+      songTitle.textContent = "Your Music";
+      folderName.textContent = "Nothing playing";
+      durationDisplay.textContent = "0:00";
+      currentTimeDisplay.textContent = "0:00";
+      return;
+    }
 
-  folderName.textContent = song.folder;
+    songTitle.textContent = song.title || "Unknown title";
 
-  durationDisplay.textContent = formatTime(song.duration);
+    folderName.textContent = song.folder || "";
 
-  currentTimeDisplay.textContent = formatTime(currentTime);
-}
+    durationDisplay.textContent = formatTime(moonboxState.playback.duration);
 
-/* =====================================
-   UPDATE CIRCULAR PROGRESS
+    currentTimeDisplay.textContent = formatTime(
+      moonboxState.playback.currentTime,
+    );
+  }
+
+  /* =====================================
+   7. UPDATE CIRCULAR PROGRESS
 ===================================== */
 
-function updateProgress() {
-  const song = demoSongs[currentSongIndex];
+  function updateProgress() {
+    const duration = Number(moonboxState.playback.duration) || 0;
 
-  const progress = Math.min(currentTime / song.duration, 1);
+    const currentTime = Number(moonboxState.playback.currentTime) || 0;
 
-  // Update progress line
+    const progress =
+      duration > 0 ? Math.min(Math.max(currentTime / duration, 0), 1) : 0;
 
-  const offset = CIRCUMFERENCE * (1 - progress);
+    const offset = CIRCUMFERENCE * (1 - progress);
 
-  progressFill.style.strokeDashoffset = offset;
+    progressFill.style.strokeDashoffset = offset;
 
-  // Calculate progress ball position
+    const angle = progress * Math.PI * 2;
 
-  // IMPORTANT:
-  // The SVG itself is rotated -90 degrees.
-  // Therefore, calculate the ball position
-  // in the SVG's original coordinate system.
+    const x = CENTER + RADIUS * Math.cos(angle);
 
-  const angle = progress * Math.PI * 2;
+    const y = CENTER + RADIUS * Math.sin(angle);
 
-  const x = CENTER + RADIUS * Math.cos(angle);
+    progressThumb.setAttribute("cx", x);
 
-  const y = CENTER + RADIUS * Math.sin(angle);
+    progressThumb.setAttribute("cy", y);
 
-  // Apply ball position
+    currentTimeDisplay.textContent = formatTime(currentTime);
+  }
 
-  progressThumb.setAttribute("cx", x);
-
-  progressThumb.setAttribute("cy", y);
-
-  // Update current playback time
-
-  currentTimeDisplay.textContent = formatTime(currentTime);
-}
-
-/* =====================================
+  /* =====================================
    8. UPDATE PLAY / PAUSE BUTTON
 ===================================== */
 
-function updatePlayButton() {
-  playPauseIcon.innerHTML = `
+  function updatePlayButton() {
+    playPauseIcon.innerHTML = `
     <i
       data-lucide="${isPlaying ? "pause" : "play"}"
       class="play-icon"
     ></i>
   `;
 
-  playPauseButton.setAttribute("aria-label", isPlaying ? "Pause" : "Play");
+    playPauseButton.setAttribute("aria-label", isPlaying ? "Pause" : "Play");
 
-  lucide.createIcons({
-    root: playPauseIcon,
-  });
-}
+    lucide.createIcons({
+      root: playPauseIcon,
+    });
+  }
 
-/* =====================================
+  /* =====================================
    9. PLAY / PAUSE
 ===================================== */
 
-function togglePlayback() {
-  isPlaying = !isPlaying;
+  function sendPlayerCommand(command, value = null) {
+    document.dispatchEvent(
+      new CustomEvent("moonbox:widgetCommand", {
+        detail: {
+          command,
+          value,
+        },
+      }),
+    );
+  }
 
-  updatePlayButton();
-}
+  function togglePlayback() {
+    sendPlayerCommand("togglePlayback");
+  }
 
-playPauseButton.addEventListener("click", togglePlayback);
+  playPauseButton.addEventListener("click", togglePlayback);
 
-/* =====================================
-   10. PLAYBACK SIMULATION
-===================================== */
-
-function startPlaybackSimulation() {
-  clearInterval(playbackInterval);
-
-  playbackInterval = setInterval(() => {
-    if (!isPlaying || isDragging) return;
-
-    const song = demoSongs[currentSongIndex];
-
-    currentTime++;
-
-    if (currentTime >= song.duration) {
-      if (repeatMode === 2) {
-        currentTime = 0;
-      } else if (currentSongIndex < demoSongs.length - 1) {
-        nextSong();
-      } else if (repeatMode === 1) {
-        currentSongIndex = 0;
-
-        currentTime = 0;
-
-        updateSongInformation();
-      } else {
-        currentTime = song.duration;
-
-        isPlaying = false;
-
-        updatePlayButton();
-      }
-    }
-
-    updateProgress();
-  }, 1000);
-}
-
-/* =====================================
+  /* =====================================
    11. SEEK USING OUTER CIRCLE
 ===================================== */
 
-function seekFromPointer(event) {
-  const rect = outerProgress.getBoundingClientRect();
+  function seekFromPointer(event) {
+    const rect = outerProgress.getBoundingClientRect();
 
-  const centerX = rect.left + rect.width / 2;
+    const centerX = rect.left + rect.width / 2;
+    const centerY = rect.top + rect.height / 2;
 
-  const centerY = rect.top + rect.height / 2;
+    const x = event.clientX - centerX;
+    const y = event.clientY - centerY;
 
-  const x = event.clientX - centerX;
+    let angle = Math.atan2(y, x);
 
-  const y = event.clientY - centerY;
+    let progress = (angle + Math.PI / 2) / (Math.PI * 2);
 
-  // Find angle from the centre.
+    progress = (progress + 1) % 1;
 
-  let angle = Math.atan2(y, x);
+    const duration = Number(moonboxState.playback.duration) || 0;
 
-  // Adjust so 0 starts at the top.
+    if (duration <= 0) return;
 
-  let progress = (angle + Math.PI / 2) / (Math.PI * 2);
+    const seekTime = progress * duration;
 
-  progress = (progress + 1) % 1;
+    sendPlayerCommand("seek", seekTime);
+  }
 
-  const song = demoSongs[currentSongIndex];
-
-  currentTime = progress * song.duration;
-
-  updateProgress();
-}
-
-/* =====================================
+  /* =====================================
    BUTTON SELECTED STATE
 ===================================== */
 
-const nowPlayingButton = document.getElementById("nowPlayingButton");
+  const nowPlayingButton = document.getElementById("nowPlayingButton");
 
-const tagsButton = document.getElementById("tagsButton");
+  const tagsButton = document.getElementById("tagsButton");
 
-function setActiveMode(activeButton) {
-  [nowPlayingButton, tagsButton].forEach((button) => {
-    const selected = button === activeButton;
+  function setActiveMode(activeButton) {
+    [nowPlayingButton, tagsButton].forEach((button) => {
+      const selected = button === activeButton;
 
-    button.classList.toggle("is-selected", selected);
+      button.classList.toggle("is-selected", selected);
 
-    button.setAttribute("aria-pressed", String(selected));
-  });
-}
+      button.setAttribute("aria-pressed", String(selected));
+    });
+  }
 
-/* =====================================
+  /* =====================================
    12. DRAG AND CLICK EVENTS
 ===================================== */
 
-outerProgress.addEventListener("pointerdown", (event) => {
-  if (tagsMode) return;
-  isDragging = true;
+  outerProgress.addEventListener("pointerdown", (event) => {
+    if (tagsMode) return;
+    isDragging = true;
 
-  outerProgress.setPointerCapture(event.pointerId);
+    outerProgress.setPointerCapture(event.pointerId);
 
-  seekFromPointer(event);
-});
+    seekFromPointer(event);
+  });
 
-outerProgress.addEventListener("pointermove", (event) => {
-  if (tagsMode || !isDragging) return;
-  if (!isDragging) return;
+  outerProgress.addEventListener("pointermove", (event) => {
+    if (tagsMode || !isDragging) return;
+    if (!isDragging) return;
 
-  seekFromPointer(event);
-});
+    seekFromPointer(event);
+  });
 
-outerProgress.addEventListener("pointerup", () => {
-  isDragging = false;
-});
+  outerProgress.addEventListener("pointerup", () => {
+    isDragging = false;
+  });
 
-outerProgress.addEventListener("pointercancel", () => {
-  isDragging = false;
-});
+  outerProgress.addEventListener("pointercancel", () => {
+    isDragging = false;
+  });
 
-/* =====================================
+  /* =====================================
    13. PREVIOUS SONG
 ===================================== */
 
-function previousSong() {
-  currentSongIndex--;
-
-  if (currentSongIndex < 0) {
-    currentSongIndex = demoSongs.length - 1;
+  function previousSong() {
+    sendPlayerCommand("previous");
   }
 
-  currentTime = 0;
+  document
+    .getElementById("previousButton")
+    .addEventListener("click", previousSong);
 
-  isPlaying = true;
-
-  updateSongInformation();
-
-  updateProgress();
-
-  updatePlayButton();
-}
-
-document
-  .getElementById("previousButton")
-  .addEventListener("click", previousSong);
-
-/* =====================================
+  /* =====================================
    14. NEXT SONG
 ===================================== */
 
-function nextSong() {
-  if (isShuffle) {
-    let nextIndex;
-
-    do {
-      nextIndex = Math.floor(Math.random() * demoSongs.length);
-    } while (demoSongs.length > 1 && nextIndex === currentSongIndex);
-
-    currentSongIndex = nextIndex;
-  } else {
-    currentSongIndex++;
-
-    if (currentSongIndex >= demoSongs.length) {
-      currentSongIndex = repeatMode === 1 ? 0 : demoSongs.length - 1;
-    }
+  function nextSong() {
+    sendPlayerCommand("next");
   }
 
-  currentTime = 0;
-
-  isPlaying = true;
-
-  updateSongInformation();
-
-  updateProgress();
-
-  updatePlayButton();
-}
-
-document.getElementById("nextButton").addEventListener("click", nextSong);
-
-/* =====================================
+  document.getElementById("nextButton").addEventListener("click", nextSong);
+  /* =====================================
    15. SHUFFLE
 ===================================== */
+  shuffleButton.addEventListener("click", () => {
+    sendPlayerCommand("toggleShuffle");
+  });
 
-shuffleButton.addEventListener("click", () => {
-  isShuffle = !isShuffle;
-
-  shuffleButton.classList.toggle("selected", isShuffle);
-});
-
-/* =====================================
+  /* =====================================
    16. REPEAT
 ===================================== */
 
-function updateRepeat() {
-  const iconName = repeatMode === 2 ? "repeat-1" : "repeat";
+  function updateRepeat() {
+    const iconName = repeatMode === 2 ? "repeat-1" : "repeat";
 
-  repeatIcon.innerHTML = `
+    repeatIcon.innerHTML = `
     <i data-lucide="${iconName}" class="control-icon"></i>
   `;
 
-  repeatButton.classList.toggle("selected", repeatMode !== 0);
+    repeatButton.classList.toggle("selected", repeatMode !== 0);
 
-  repeatButton.setAttribute(
-    "aria-label",
-    ["Repeat off", "Repeat queue", "Repeat one"][repeatMode],
-  );
+    repeatButton.setAttribute(
+      "aria-label",
+      ["Repeat off", "Repeat queue", "Repeat one"][repeatMode],
+    );
 
-  lucide.createIcons({
-    root: repeatIcon,
+    lucide.createIcons({
+      root: repeatIcon,
+    });
+  }
+
+  repeatButton.addEventListener("click", () => {
+    sendPlayerCommand("cycleRepeat");
   });
-}
 
-repeatButton.addEventListener("click", () => {
-  repeatMode = (repeatMode + 1) % 3;
-
-  updateRepeat();
-});
-
-/* =====================================
-   18. MOONBOX TAG DATA
-===================================== */
-
-// Frontend demo data.
-// Later we will replace this with MoonBox data.
-
-const demoTags = [
-  { name: "Chill", count: 42, icon: "moon" },
-  { name: "Workout", count: 28, icon: "zap" },
-  { name: "Romantic", count: 35, icon: "heart" },
-  { name: "Focus", count: 19, icon: "brain" },
-  { name: "Party", count: 56, icon: "party-popper" },
-  { name: "Sad", count: 23, icon: "cloud-rain" },
-  { name: "Favorites", count: 64, icon: "star" },
-];
-
-let tagsMode = false;
-
-let focusedTagIndex = 0;
-
-// Multiple tags can be selected simultaneously.
-
-const selectedTags = new Set();
-
-/* =====================================
+  /* =====================================
    19. TAG ELEMENTS
 ===================================== */
 
-const mainCircle = document.getElementById("mainCircle");
+  const mainCircle = document.getElementById("mainCircle");
 
-const progressLayer = document.getElementById("progressLayer");
+  const progressLayer = document.getElementById("progressLayer");
 
-const tagSegmentsLayer = document.getElementById("tagSegmentsLayer");
+  const tagSegmentsLayer = document.getElementById("tagSegmentsLayer");
 
-const musicSection = document.querySelector(".music-section");
+  const musicSection = document.querySelector(".music-section");
 
-const tagsSection = document.getElementById("tagsSection");
+  const tagsSection = document.getElementById("tagsSection");
 
-const tagCard = document.getElementById("selectedTagCard");
+  const tagCard = document.getElementById("selectedTagCard");
 
-const selectedTagIcon = document.getElementById("selectedTagIcon");
+  const selectedTagIcon = document.getElementById("selectedTagIcon");
 
-const selectedTagName = document.getElementById("selectedTagName");
+  const selectedTagName = document.getElementById("selectedTagName");
 
-const selectedTagCount = document.getElementById("selectedTagCount");
+  const selectedTagCount = document.getElementById("selectedTagCount");
 
-const tagSelectionStatus = document.getElementById("tagSelectionStatus");
+  const tagSelectionStatus = document.getElementById("tagSelectionStatus");
 
-const tagModeNavigation = document.getElementById("tagModeNavigation");
+  const tagModeNavigation = document.getElementById("tagModeNavigation");
 
-const previousTagButton = document.getElementById("previousTagButton");
+  const previousTagButton = document.getElementById("previousTagButton");
 
-const nextTagButton = document.getElementById("nextTagButton");
+  const nextTagButton = document.getElementById("nextTagButton");
 
-if (!tagSegmentsLayer) {
-  throw new Error("MoonBox: tagSegmentsLayer is missing from widget.html");
-}
+  /* Receive selection and tag changes */
 
-function createTagSegments() {
-  tagSegmentsLayer.innerHTML = "";
+  document.addEventListener("moonbox:tagsChanged", () => {
+    requestWidgetTagState();
+  });
 
-  const totalTags = demoTags.length;
+  /* Receive tag creation, editing and deletion */
 
-  const segmentAngle = (Math.PI * 2) / totalTags;
+  [
+    "moonbox:tagCreated",
+    "moonbox:tagUpdated",
+    "moonbox:tagDeleted",
+    "moonbox:foldersReady",
+    "moonbox:cloudTagsReady",
+  ].forEach((eventName) => {
+    document.addEventListener(eventName, requestWidgetTagState);
+  });
 
-  // Space between segments
-  const gap = 0.035;
+  if (!tagSegmentsLayer) {
+    throw new Error("MoonBox: tagSegmentsLayer is missing from widget.html");
+  }
 
-  // Outer and inner radius
-  const outerRadius = 296;
+  function createTagSegments() {
+    tagSegmentsLayer.innerHTML = "";
 
-  const innerRadius = 260;
+    const totalTags = moonboxTags.length;
 
-  demoTags.forEach((tag, index) => {
-    const startAngle = index * segmentAngle + gap / 2;
+    if (totalTags === 0) return;
 
-    const endAngle = (index + 1) * segmentAngle - gap / 2;
+    const segmentAngle = (Math.PI * 2) / totalTags;
 
-    // Outer starting point
+    const gap = 0.035;
 
-    const x1 = CENTER + outerRadius * Math.cos(startAngle);
+    const outerRadius = 296;
+    const innerRadius = 260;
 
-    const y1 = CENTER + outerRadius * Math.sin(startAngle);
+    moonboxTags.forEach((tag, index) => {
+      const startAngle = index * segmentAngle + gap / 2;
 
-    // Outer ending point
+      const endAngle = (index + 1) * segmentAngle - gap / 2;
 
-    const x2 = CENTER + outerRadius * Math.cos(endAngle);
+      const x1 = CENTER + outerRadius * Math.cos(startAngle);
+      const y1 = CENTER + outerRadius * Math.sin(startAngle);
 
-    const y2 = CENTER + outerRadius * Math.sin(endAngle);
+      const x2 = CENTER + outerRadius * Math.cos(endAngle);
+      const y2 = CENTER + outerRadius * Math.sin(endAngle);
 
-    // Inner ending point
+      const x3 = CENTER + innerRadius * Math.cos(endAngle);
+      const y3 = CENTER + innerRadius * Math.sin(endAngle);
 
-    const x3 = CENTER + innerRadius * Math.cos(endAngle);
+      const x4 = CENTER + innerRadius * Math.cos(startAngle);
+      const y4 = CENTER + innerRadius * Math.sin(startAngle);
 
-    const y3 = CENTER + innerRadius * Math.sin(endAngle);
+      const pathData = `
+      M ${x1} ${y1}
+      A ${outerRadius} ${outerRadius} 0 0 1 ${x2} ${y2}
+      L ${x3} ${y3}
+      A ${innerRadius} ${innerRadius} 0 0 0 ${x4} ${y4}
+      Z
+    `;
 
-    // Inner starting point
+      const segment = document.createElementNS(
+        "http://www.w3.org/2000/svg",
+        "path",
+      );
 
-    const x4 = CENTER + innerRadius * Math.cos(startAngle);
+      segment.setAttribute("d", pathData);
+      segment.classList.add("tag-segment");
 
-    const y4 = CENTER + innerRadius * Math.sin(startAngle);
+      segment.dataset.index = index;
+      segment.dataset.tagId = String(tag.id);
 
-    // Create circular segment
+      segment.setAttribute("role", "button");
+      segment.setAttribute("tabindex", "0");
 
-    const pathData = `
-            M ${x1} ${y1}
+      segment.setAttribute("aria-label", `${tag.name}, ${tag.count} songs`);
 
-            A ${outerRadius} ${outerRadius}
-            0 0 1 ${x2} ${y2}
-
-            L ${x3} ${y3}
-
-            A ${innerRadius} ${innerRadius}
-            0 0 0 ${x4} ${y4}
-
-            Z
-        `;
-
-    const segment = document.createElementNS(
-      "http://www.w3.org/2000/svg",
-      "path",
-    );
-
-    segment.setAttribute("d", pathData);
-
-    segment.classList.add("tag-segment");
-
-    segment.dataset.index = index;
-
-    segment.setAttribute("role", "button");
-
-    segment.setAttribute("tabindex", "0");
-
-    segment.setAttribute("aria-label", `${tag.name}, ${tag.count} songs`);
-
-    // Click to display tag in centre
-
-    segment.addEventListener("click", () => {
-      focusTag(index);
-    });
-
-    // Keyboard support
-
-    segment.addEventListener("keydown", (event) => {
-      if (event.key === "Enter" || event.key === " ") {
-        event.preventDefault();
-
+      segment.addEventListener("click", () => {
         focusTag(index);
-      }
+      });
+
+      segment.addEventListener("keydown", (event) => {
+        if (event.key === "Enter" || event.key === " ") {
+          event.preventDefault();
+          focusTag(index);
+        }
+      });
+
+      tagSegmentsLayer.appendChild(segment);
+    });
+  }
+
+  function updateFocusedTag() {
+    const tag = moonboxTags[focusedTagIndex];
+
+    if (!tag) return;
+
+    selectedTagIcon.innerHTML = `
+    <i data-lucide="${tag.icon}" class="center-tag-icon"></i>
+  `;
+
+    lucide.createIcons({
+      root: selectedTagIcon,
     });
 
-    tagSegmentsLayer.appendChild(segment);
-  });
-}
+    selectedTagName.textContent = tag.name;
 
-function updateFocusedTag() {
-  const tag = demoTags[focusedTagIndex];
+    selectedTagCount.textContent = `${tag.count} ${tag.count === 1 ? "song" : "songs"}`;
 
-  // Update central tag information
+    const isSelected = selectedTagIds.has(String(tag.id));
 
-  selectedTagIcon.innerHTML = `
-  <i data-lucide="${tag.icon}" class="center-tag-icon"></i>
-`;
+    tagCard.classList.toggle("is-selected", isSelected);
 
-  lucide.createIcons({
-    root: selectedTagIcon,
-  });
+    tagSelectionStatus.textContent = isSelected ? "SELECTED" : "TAP TO SELECT";
 
-  selectedTagName.textContent = tag.name;
+    document.querySelectorAll(".tag-segment").forEach((segment) => {
+      const tagId = segment.dataset.tagId;
 
-  selectedTagCount.textContent = `${tag.count} songs`;
+      const selected = selectedTagIds.has(tagId);
 
-  // Check whether current tag is selected
+      const focused = tagId === String(tag.id);
 
-  const isSelected = selectedTags.has(focusedTagIndex);
+      segment.classList.toggle("selected", selected);
 
-  tagCard.classList.toggle("is-selected", isSelected);
+      segment.classList.toggle("focused", focused);
 
-  tagSelectionStatus.textContent = isSelected ? "SELECTED" : "TAP TO SELECT";
+      segment.setAttribute("aria-pressed", String(selected));
+    });
+  }
 
-  // Update all circumference segments
-
-  document.querySelectorAll(".tag-segment").forEach((segment) => {
-    const index = Number(segment.dataset.index);
-
-    const selected = selectedTags.has(index);
-
-    const focused = index === focusedTagIndex;
-
-    segment.classList.toggle("selected", selected);
-
-    segment.classList.toggle("focused", focused);
-
-    segment.setAttribute("aria-pressed", String(selected));
-  });
-}
-/* =====================================
+  /* =====================================
    22. FOCUS A TAG
 ===================================== */
 
-function focusTag(index) {
-  focusedTagIndex = (index + demoTags.length) % demoTags.length;
+  function focusTag(index) {
+    if (moonboxTags.length === 0) return;
 
-  updateFocusedTag();
-}
+    focusedTagIndex = (index + moonboxTags.length) % moonboxTags.length;
 
-/* =====================================
+    updateFocusedTag();
+  }
+
+  /* =====================================
    23. SELECT / DESELECT TAG
 ===================================== */
 
-function toggleFocusedTag() {
-  if (selectedTags.has(focusedTagIndex)) {
-    selectedTags.delete(focusedTagIndex);
-  } else {
-    selectedTags.add(focusedTagIndex);
+  function toggleFocusedTag() {
+    const tag = moonboxTags[focusedTagIndex];
+
+    if (!tag) return;
+
+    document.dispatchEvent(
+      new CustomEvent("moonbox:toggleTagSelection", {
+        detail: {
+          tagId: String(tag.id),
+        },
+      }),
+    );
   }
 
-  updateFocusedTag();
-}
+  // Click central tag.
 
-// Click central tag.
+  tagCard.addEventListener("click", toggleFocusedTag);
 
-tagCard.addEventListener("click", toggleFocusedTag);
+  // Keyboard selection.
 
-// Keyboard selection.
+  tagCard.addEventListener("keydown", (event) => {
+    if (event.key === "Enter" || event.key === " ") {
+      event.preventDefault();
 
-tagCard.addEventListener("keydown", (event) => {
-  if (event.key === "Enter" || event.key === " ") {
-    event.preventDefault();
+      toggleFocusedTag();
+    }
+  });
 
-    toggleFocusedTag();
-  }
-});
-
-/* =====================================
+  /* =====================================
    24. PREVIOUS / NEXT TAG
 ===================================== */
 
-previousTagButton.addEventListener("click", () => {
-  focusTag(focusedTagIndex - 1);
-});
+  previousTagButton.addEventListener("click", () => {
+    focusTag(focusedTagIndex - 1);
+  });
 
-nextTagButton.addEventListener("click", () => {
-  focusTag(focusedTagIndex + 1);
-});
+  nextTagButton.addEventListener("click", () => {
+    focusTag(focusedTagIndex + 1);
+  });
 
-/* =====================================
+  /* =====================================
    25. SWITCH BETWEEN MODES
 ===================================== */
 
-function showTagsMode() {
-  tagsMode = true;
+  function showTagsMode() {
+    tagsMode = true;
 
-  mainCircle.classList.add("tags-mode");
+    mainCircle.classList.add("tags-mode");
 
-  // Hide music player.
+    // Hide music player.
 
-  musicSection.hidden = true;
+    musicSection.hidden = true;
 
-  // Show tag navigator.
+    // Show tag navigator.
 
-  tagsSection.hidden = false;
+    tagsSection.hidden = false;
 
-  // Change bottom navigation.
+    // Change bottom navigation.
 
-  tagsButton.hidden = true;
+    tagsButton.hidden = true;
 
-  tagModeNavigation.hidden = false;
+    tagModeNavigation.hidden = false;
 
-  // Keep Now Playing as the return button.
+    // Keep Now Playing as the return button.
 
-  nowPlayingButton.classList.add("is-selected");
+    nowPlayingButton.classList.add("is-selected");
 
-  nowPlayingButton.setAttribute("aria-pressed", "true");
+    nowPlayingButton.setAttribute("aria-pressed", "true");
 
-  updateFocusedTag();
-}
+    updateFocusedTag();
+  }
 
-function showNowPlayingMode() {
-  tagsMode = false;
+  function showNowPlayingMode() {
+    tagsMode = false;
 
-  mainCircle.classList.remove("tags-mode");
+    mainCircle.classList.remove("tags-mode");
 
-  // Restore music player.
+    // Restore music player.
 
-  musicSection.hidden = false;
+    musicSection.hidden = false;
 
-  // Hide tag navigator.
+    // Hide tag navigator.
 
-  tagsSection.hidden = true;
+    tagsSection.hidden = true;
 
-  // Restore bottom Tags pill.
+    // Restore bottom Tags pill.
 
-  tagsButton.hidden = false;
+    tagsButton.hidden = false;
 
-  tagModeNavigation.hidden = true;
+    tagModeNavigation.hidden = true;
 
-  nowPlayingButton.classList.remove("is-selected");
+    nowPlayingButton.classList.remove("is-selected");
 
-  nowPlayingButton.setAttribute("aria-pressed", "false");
-}
+    nowPlayingButton.setAttribute("aria-pressed", "false");
+  }
 
-/* =====================================
+  /* ==========================================
+   RECEIVE MAIN PLAYER STATE
+========================================== */
+
+  document.addEventListener("moonbox:widgetStateChanged", (event) => {
+    if (!event.detail) return;
+
+    moonboxState = event.detail;
+
+    renderWidget();
+  });
+
+  function renderWidget() {
+    const song = moonboxState.song;
+
+    updateSongInformation();
+
+    if (!moonboxState.hasActiveSong || !song) {
+      isPlaying = false;
+      updatePlayButton();
+
+      progressFill.style.strokeDashoffset = CIRCUMFERENCE;
+
+      progressThumb.setAttribute("cx", CENTER);
+      progressThumb.setAttribute("cy", CENTER);
+
+      return;
+    }
+
+    isPlaying = moonboxState.playback.playing;
+
+    isShuffle = moonboxState.playback.shuffle;
+
+    repeatMode = moonboxState.playback.repeatMode;
+
+    updatePlayButton();
+
+    updateProgress();
+
+    updateRepeat();
+
+    // Artwork and current-song tags will be connected
+    // once we confirm your actual song metadata structure.
+  }
+
+  function renderEmptyWidget() {
+    songTitle.textContent = "Your Music";
+
+    folderName.textContent = "Nothing playing";
+
+    currentTimeDisplay.textContent = "0:00";
+
+    durationDisplay.textContent = "0:00";
+  }
+
+  /* =====================================
    26. MODE BUTTON EVENTS
 ===================================== */
 
-tagsButton.addEventListener("click", showTagsMode);
+  tagsButton.addEventListener("click", showTagsMode);
 
-nowPlayingButton.addEventListener("click", showNowPlayingMode);
+  nowPlayingButton.addEventListener("click", showNowPlayingMode);
 
-/* =====================================
-   27. INITIALIZE TAG NAVIGATOR
-===================================== */
-
-createTagSegments();
-
-updateFocusedTag();
-
-/* =====================================
+  /* =====================================
    17. INITIALIZE WIDGET
 ===================================== */
 
-function initializeWidget() {
-  lucide.createIcons();
-  updateSongInformation();
+  function initializeWidget() {
+    lucide.createIcons();
 
-  updateProgress();
+    updateSongInformation();
+    updateProgress();
+    updatePlayButton();
+    updateRepeat();
 
-  updatePlayButton();
+    requestWidgetTagState();
 
-  updateRepeat();
+    console.log("MoonBox Widget Ready");
+  }
 
-  startPlaybackSimulation();
-
-  console.log("MoonBox Now Playing Widget Ready");
-}
-
-initializeWidget();
+  initializeWidget();
+})(); //error handling for the whole widget code block, so that if any error occurs, it doesn't break the rest of the application.

@@ -3015,6 +3015,42 @@ document.addEventListener("moonbox:requestTags", (event) => {
   }
 });
 
+/* ==========================================================
+   WIDGET → REQUEST REAL TAG STATE
+========================================================== */
+
+document.addEventListener("moonbox:requestWidgetTagState", (event) => {
+  const setState = event.detail?.setState;
+
+  if (typeof setState !== "function") return;
+
+  setState({
+    tags: tags.map((tag) => ({
+      id: String(tag.id),
+      name: tag.name,
+      icon: tag.icon || "music",
+      folderTag: !!tag.folderTag,
+      count: getTagSongCount(String(tag.id)),
+    })),
+
+    selectedTagIds: [...selectedTagIds].map(String),
+  });
+});
+
+/* ==========================================================
+   WIDGET → TOGGLE REAL TAG SELECTION
+========================================================== */
+
+document.addEventListener("moonbox:toggleTagSelection", (event) => {
+  const tagId = String(event.detail?.tagId || "");
+
+  if (!tagId || !tags.some((tag) => String(tag.id) === tagId)) {
+    return;
+  }
+
+  toggleTagSelection(tagId);
+});
+
 document.addEventListener("moonbox:removeTag", (event) => {
   const tagId = event.detail?.tagId;
 

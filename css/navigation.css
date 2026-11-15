@@ -253,6 +253,26 @@ button:focus-visible {
 }
 
 /* ==========================================================
+   TOP NAVIGATION ACTIONS
+========================================================== */
+
+.top-nav-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-shrink: 0;
+}
+
+/* ==========================================================
+   VISUALIZER BUTTON
+   Shares the Import Songs button styling.
+========================================================== */
+
+#openWidget {
+  flex-shrink: 0;
+}
+
+/* ==========================================================
    MAIN WORKSPACE
    ========================================================== */
 
@@ -567,4 +587,62 @@ body.workspace-resizing * {
   }
 }
 
+/* =====================================================
+   MOONBOX WIDGET OVERLAY
+===================================================== */
 
+.widget-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 99999;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  background: rgba(0, 0, 0, 0.96);
+
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+
+  transition:
+    opacity 0.3s ease,
+    visibility 0.3s ease;
+}
+
+.widget-overlay.active {
+  opacity: 1;
+  visibility: visible;
+  pointer-events: auto;
+}
+
+.widget-close-button {
+  position: absolute;
+  top: 24px;
+  right: 24px;
+  z-index: 100000;
+
+  width: 42px;
+  height: 42px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 50%;
+
+  background: rgba(255, 255, 255, 0.08);
+  color: white;
+
+  cursor: pointer;
+}
+
+.widget-close-button:hover {
+  background: rgba(255, 255, 255, 0.18);
+}
+
+body.widget-open {
+  overflow: hidden;
+}
